@@ -15,7 +15,15 @@ const platforms: Platform[] = [
   '레뷰',
 ]
 
-type SortKey = 'visitDate' | 'platform' | 'storeName' | 'category' | 'retailValue' | 'extraPayment' | 'netSaved'
+type SortKey =
+  | 'visitDate'
+  | 'reviewDeadline'
+  | 'platform'
+  | 'storeName'
+  | 'category'
+  | 'retailValue'
+  | 'extraPayment'
+  | 'netSaved'
 
 type Column = {
   key: SortKey
@@ -24,6 +32,7 @@ type Column = {
 
 const columns: Column[] = [
   { key: 'visitDate', label: '날짜' },
+  { key: 'reviewDeadline', label: '마감일' },
   { key: 'platform', label: '플랫폼' },
   { key: 'storeName', label: '업체명' },
   { key: 'category', label: '카테고리' },
@@ -38,6 +47,7 @@ function netSaved(v: Visit): number {
 
 function sortValue(v: Visit, key: SortKey): string | number {
   if (key === 'netSaved') return netSaved(v)
+  if (key === 'reviewDeadline') return v.reviewDeadline ?? ''
   return v[key]
 }
 
@@ -159,6 +169,7 @@ export default function TablePage() {
                   className="cursor-pointer border-b border-line last:border-b-0 hover:bg-surface"
                 >
                   <td className="px-4 py-3 font-mono text-ink">{v.visitDate}</td>
+                  <td className="px-4 py-3 font-mono text-red-400">{v.reviewDeadline ?? '-'}</td>
                   <td className="px-4 py-3">{v.platform}</td>
                   <td className="px-4 py-3">{v.storeName}</td>
                   <td className="px-4 py-3">{v.category}</td>

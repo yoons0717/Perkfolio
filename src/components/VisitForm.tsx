@@ -57,6 +57,9 @@ export default function VisitForm({
   const [retailValue, setRetailValue] = useState(String(initialValues?.retailValue ?? ''))
   const [extraPayment, setExtraPayment] = useState(String(initialValues?.extraPayment ?? 0))
   const [postUrl, setPostUrl] = useState(initialValues?.postUrl ?? '')
+  const [reviewDeadline, setReviewDeadline] = useState<Date | null>(
+    initialValues?.reviewDeadline ? parseDateString(initialValues.reviewDeadline) : null,
+  )
   const [status, setStatus] = useState<VisitStatus>(initialValues?.status ?? '예정')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -80,6 +83,7 @@ export default function VisitForm({
         extraPayment: Number(extraPayment),
         status,
         postUrl: postUrl.trim() === '' ? null : postUrl.trim(),
+        reviewDeadline: reviewDeadline ? toDateString(reviewDeadline) : null,
       })
     } catch {
       setError('저장에 실패했습니다. 잠시 후 다시 시도해주세요.')
@@ -118,6 +122,18 @@ export default function VisitForm({
             </Select>
           </label>
         </div>
+
+        <label className="flex flex-col gap-1 text-sm">
+          리뷰 마감일 (선택)
+          <DatePicker
+            selected={reviewDeadline}
+            onChange={(date: Date | null) => setReviewDeadline(date)}
+            dateFormat="yyyy-MM-dd"
+            isClearable
+            placeholderText="마감일 없음"
+            className={`w-full ${inputClass}`}
+          />
+        </label>
 
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-sm">

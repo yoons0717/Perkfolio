@@ -48,6 +48,17 @@ export default function CalendarPage() {
     return map
   }, [visits])
 
+  const deadlinesByDate = useMemo(() => {
+    const map = new Map<string, Visit[]>()
+    for (const v of visits) {
+      if (!v.reviewDeadline) continue
+      const list = map.get(v.reviewDeadline) ?? []
+      list.push(v)
+      map.set(v.reviewDeadline, list)
+    }
+    return map
+  }, [visits])
+
   const grid = useMemo(() => getMonthGrid(cursor.getFullYear(), cursor.getMonth()), [cursor])
 
   async function handleToggle(e: React.MouseEvent, v: Visit) {
@@ -61,6 +72,7 @@ export default function CalendarPage() {
 
   const todayStr = toDateString(today)
   const selectedVisits = selectedDate ? (visitsByDate.get(selectedDate) ?? []) : []
+  const selectedDeadlines = selectedDate ? (deadlinesByDate.get(selectedDate) ?? []) : []
 
   return (
     <div>
@@ -99,16 +111,23 @@ export default function CalendarPage() {
           const isToday = dateStr === todayStr
           const isSelected = dateStr === selectedDate
           const dayVisits = visitsByDate.get(dateStr) ?? []
+          const dayDeadlines = deadlinesByDate.get(dateStr) ?? []
           const shown = dayVisits.slice(0, 2)
           const extra = dayVisits.length - shown.length
-          const dots = dayVisits.slice(0, 4)
+          const shownDeadlines = dayDeadlines.slice(0, 2)
+          const extraDeadlines = dayDeadlines.length - shownDeadlines.length
+          const dots = [
+            ...dayVisits.map((v) => ({ key: v.id, color: v.status === '완료' ? 'bg-green' : 'bg-blue' })),
+            ...dayDeadlines.map((v) => ({ key: `dl-${v.id}`, color: 'bg-red-500' })),
+          ].slice(0, 4)
+          const dotsExtra = dayVisits.length + dayDeadlines.length - dots.length
 
           return (
             <button
               key={dateStr}
               type="button"
               onClick={() => setSelectedDate(dateStr)}
-              className={`flex min-h-[3.25rem] flex-col items-stretch rounded-lg border bg-surface p-1 text-left text-xs sm:min-h-[6.5rem] sm:p-1.5 ${
+              className={`flex min-h-[3.25rem] flex-col items-stretch rounded-lg border bg-surface p-1 text-left text-xs transition-colors hover:border-blue/60 hover:bg-white/5 sm:min-h-[6.5rem] sm:p-1.5 ${
                 isToday ? 'border-blue' : 'border-line'
               } ${isSelected ? 'bg-blue-bg' : ''} ${inMonth ? '' : 'opacity-30'}`}
             >
@@ -116,15 +135,10 @@ export default function CalendarPage() {
 
               {/* mobile: dot summary only, avoids cramped text at narrow widths */}
               <div className="mt-1 flex flex-wrap gap-1 sm:hidden">
-                {dots.map((v) => (
-                  <span
-                    key={v.id}
-                    className={`h-1.5 w-1.5 rounded-full ${v.status === '완료' ? 'bg-green' : 'bg-blue'}`}
-                  />
+                {dots.map((d) => (
+                  <span key={d.key} className={`h-1.5 w-1.5 rounded-full ${d.color}`} />
                 ))}
-                {dayVisits.length > dots.length && (
-                  <span className="text-[9px] text-muted">+{dayVisits.length - dots.length}</span>
-                )}
+                {dotsExtra > 0 && <span className="text-[9px] text-muted">+{dotsExtra}</span>}
               </div>
 
               {/* sm+: full store-name cards */}
@@ -136,6 +150,16 @@ export default function CalendarPage() {
                   </div>
                 ))}
                 {extra > 0 && <span className="text-[10px] text-muted">+{extra}개</span>}
+
+                {shownDeadlines.map((v) => (
+                  <div key={`dl-${v.id}`} className="flex h-5 items-stretch gap-1 rounded bg-white/5 px-1 py-0.5">
+                    <span className="w-[3px] rounded-sm bg-red-500" />
+                    <span className="truncate self-center text-[10px]">
+                      <span className="text-ink">{v.storeName}</span> <span className="text-red-400">마감</span>
+                    </span>
+                  </div>
+                ))}
+                {extraDeadlines > 0 && <span className="text-[10px] text-red-400">+{extraDeadlines}개 마감</span>}
               </div>
             </button>
           )
@@ -145,31 +169,46 @@ export default function CalendarPage() {
       {selectedDate && (
         <div className="mt-6 rounded-xl border border-line bg-surface">
           <div className="border-b border-line px-4 py-3 font-display font-bold text-ink">
-            {selectedDate} 방문
+            {selectedDate}
           </div>
-          {selectedVisits.length === 0 ? (
+          {selectedVisits.length === 0 && selectedDeadlines.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-muted">이 날짜에 등록된 방문이 없습니다.</p>
           ) : (
-            selectedVisits.map((v) => (
-              <div
-                key={v.id}
-                onClick={() => navigate(`/edit/${v.id}`)}
-                className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
-              >
-                <span>
-                  {v.platform} · {v.storeName}
-                </span>
-                <button
-                  type="button"
-                  onClick={(e) => handleToggle(e, v)}
-                  className={`rounded-full px-3 py-1 font-mono text-xs ${
-                    v.status === '완료' ? 'bg-green-bg text-green' : 'bg-blue-bg text-blue'
-                  }`}
+            <>
+              {selectedVisits.map((v) => (
+                <div
+                  key={v.id}
+                  onClick={() => navigate(`/edit/${v.id}`)}
+                  className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
                 >
-                  {v.status}
-                </button>
-              </div>
-            ))
+                  <span>
+                    {v.platform} · {v.storeName}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggle(e, v)}
+                    className={`rounded-full px-3 py-1 font-mono text-xs ${
+                      v.status === '완료' ? 'bg-green-bg text-green' : 'bg-blue-bg text-blue'
+                    }`}
+                  >
+                    {v.status}
+                  </button>
+                </div>
+              ))}
+              {selectedDeadlines.map((v) => (
+                <div
+                  key={`dl-${v.id}`}
+                  onClick={() => navigate(`/edit/${v.id}`)}
+                  className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
+                >
+                  <span>
+                    <span className="font-medium text-ink">{v.storeName}</span>
+                    <span className="ml-2 text-xs text-red-400">리뷰 마감</span>
+                  </span>
+                  <span className="rounded-full bg-red-500/10 px-3 py-1 font-mono text-xs text-red-400">마감일</span>
+                </div>
+              ))}
+            </>
           )}
         </div>
       )}

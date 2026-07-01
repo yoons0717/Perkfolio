@@ -106,6 +106,7 @@ export default function EditPage() {
       extraPayment: visit.extraPayment,
       status: visit.status,
       postUrl: visit.postUrl,
+      reviewDeadline: visit.reviewDeadline,
     }
 
     return (
@@ -140,6 +141,8 @@ export default function EditPage() {
             <ViewField label="방문일" value={visit.visitDate} />
             <ViewField label="플랫폼" value={visit.platform} />
           </div>
+
+          <ViewField label="리뷰 마감일" value={visit.reviewDeadline ?? '없음'} />
 
           <div className="grid grid-cols-2 gap-3">
             <ViewField label="업체명" value={visit.storeName} />

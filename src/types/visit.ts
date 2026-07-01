@@ -24,6 +24,7 @@ export type Visit = {
   extraPayment: number
   status: VisitStatus
   postUrl: string | null
+  reviewDeadline: string | null
   createdAt: string
 }
 

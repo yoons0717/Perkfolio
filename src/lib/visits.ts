@@ -14,6 +14,7 @@ type VisitRow = {
   extra_payment: number
   status: Visit['status']
   post_url: string | null
+  review_deadline: string | null
   created_at: string
 }
 
@@ -31,6 +32,7 @@ function toVisit(row: VisitRow): Visit {
     extraPayment: row.extra_payment,
     status: row.status,
     postUrl: row.post_url,
+    reviewDeadline: row.review_deadline,
     createdAt: row.created_at,
   }
 }
@@ -66,6 +68,7 @@ export async function addVisit(visit: NewVisit): Promise<Visit> {
       extra_payment: visit.extraPayment,
       status: visit.status,
       post_url: visit.postUrl,
+      review_deadline: visit.reviewDeadline,
     })
     .select()
     .single()
@@ -89,6 +92,7 @@ export async function updateVisit(id: string, visit: NewVisit): Promise<Visit> {
       extra_payment: visit.extraPayment,
       status: visit.status,
       post_url: visit.postUrl,
+      review_deadline: visit.reviewDeadline,
     })
     .eq('id', id)
     .select()
