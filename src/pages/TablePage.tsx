@@ -26,7 +26,7 @@ const columns: Column[] = [
   { key: 'platform', label: '플랫폼' },
   { key: 'storeName', label: '업체명' },
   { key: 'category', label: '카테고리' },
-  { key: 'retailValue', label: '협찬가' },
+  { key: 'retailValue', label: '체험가' },
   { key: 'extraPayment', label: '추가결제' },
   { key: 'netSaved', label: '순절감액' },
 ]

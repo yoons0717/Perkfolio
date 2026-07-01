@@ -7,7 +7,7 @@ export type Platform =
   | '리뷰노트'
   | '레뷰'
 
-export type Category = '카페' | '음식점' | '기타'
+export type Category = '카페' | '음식점' | '술집' | '기타'
 
 export type VisitStatus = '예정' | '완료'
 
@@ -18,6 +18,8 @@ export type Visit = {
   storeName: string
   category: Category
   sponsoredItems: string
+  campaignUrl: string
+  storeInfoUrl: string
   retailValue: number
   extraPayment: number
   status: VisitStatus

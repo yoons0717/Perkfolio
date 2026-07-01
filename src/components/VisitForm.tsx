@@ -15,12 +15,13 @@ const platforms: Platform[] = [
   '레뷰',
 ]
 
-const categories: Category[] = ['카페', '음식점', '기타']
+const categories: Category[] = ['카페', '음식점', '술집', '기타']
 
 const inputClass =
-  'rounded-lg border border-line bg-surface px-3 py-2 text-ink focus:border-blue focus:outline-none'
+  'rounded-lg border border-line bg-surface px-3 py-3 text-ink focus:border-blue focus:outline-none'
 const selectClass =
   'rounded-lg border border-line bg-surface px-3 py-3 text-ink focus:border-blue focus:outline-none'
+const sectionLabelClass = 'font-mono text-xs uppercase tracking-wider text-muted'
 
 function toDateString(date: Date): string {
   const year = date.getFullYear()
@@ -56,6 +57,8 @@ export default function VisitForm({
   const [storeName, setStoreName] = useState(initialValues?.storeName ?? '')
   const [category, setCategory] = useState<Category>(initialValues?.category ?? categories[0])
   const [sponsoredItems, setSponsoredItems] = useState(initialValues?.sponsoredItems ?? '')
+  const [campaignUrl, setCampaignUrl] = useState(initialValues?.campaignUrl ?? '')
+  const [storeInfoUrl, setStoreInfoUrl] = useState(initialValues?.storeInfoUrl ?? '')
   const [retailValue, setRetailValue] = useState(String(initialValues?.retailValue ?? ''))
   const [extraPayment, setExtraPayment] = useState(String(initialValues?.extraPayment ?? 0))
   const [postUrl, setPostUrl] = useState(initialValues?.postUrl ?? '')
@@ -76,6 +79,8 @@ export default function VisitForm({
         storeName,
         category,
         sponsoredItems,
+        campaignUrl,
+        storeInfoUrl,
         retailValue: Number(retailValue),
         extraPayment: Number(extraPayment),
         status,
@@ -89,119 +94,153 @@ export default function VisitForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <label className="flex flex-col gap-1 text-sm">
-        방문일
-        <DatePicker
-          selected={visitDate}
-          onChange={(date: Date | null) => setVisitDate(date)}
-          dateFormat="yyyy-MM-dd"
-          className={`w-full ${inputClass}`}
-          required
-        />
-      </label>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            방문일
+            <DatePicker
+              selected={visitDate}
+              onChange={(date: Date | null) => setVisitDate(date)}
+              dateFormat="yyyy-MM-dd"
+              className={`w-full ${inputClass}`}
+              required
+            />
+          </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        플랫폼
-        <Select
-          value={platform}
-          onChange={(e) => setPlatform(e.target.value as Platform)}
-          className={selectClass}
-        >
-          {platforms.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </Select>
-      </label>
+          <label className="flex flex-col gap-1 text-sm">
+            플랫폼
+            <Select
+              value={platform}
+              onChange={(e) => setPlatform(e.target.value as Platform)}
+              className={selectClass}
+            >
+              {platforms.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </Select>
+          </label>
+        </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        업체명
-        <input
-          type="text"
-          value={storeName}
-          onChange={(e) => setStoreName(e.target.value)}
-          required
-          className={inputClass}
-        />
-      </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            업체명
+            <input
+              type="text"
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              required
+              className={inputClass}
+            />
+          </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        카테고리
-        <Select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as Category)}
-          className={selectClass}
-        >
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </Select>
-      </label>
+          <label className="flex flex-col gap-1 text-sm">
+            카테고리
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as Category)}
+              className={selectClass}
+            >
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </Select>
+          </label>
+        </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        협찬 내역
-        <input
-          type="text"
-          placeholder="예: 파스타 2, 음료 2"
-          value={sponsoredItems}
-          onChange={(e) => setSponsoredItems(e.target.value)}
-          required
-          className={inputClass}
-        />
-      </label>
+        <label className="flex flex-col gap-1 text-sm">
+          가게 정보 URL
+          <input
+            type="url"
+            value={storeInfoUrl}
+            onChange={(e) => setStoreInfoUrl(e.target.value)}
+            required
+            className={inputClass}
+          />
+        </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        정가
-        <input
-          type="number"
-          min="0"
-          value={retailValue}
-          onChange={(e) => setRetailValue(e.target.value)}
-          required
-          className={inputClass}
-        />
-      </label>
+        <label className="flex flex-col gap-1 text-sm">
+          체험 내역
+          <input
+            type="text"
+            placeholder="예: 파스타 2, 음료 2"
+            value={sponsoredItems}
+            onChange={(e) => setSponsoredItems(e.target.value)}
+            required
+            className={inputClass}
+          />
+        </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        추가 결제액
-        <input
-          type="number"
-          min="0"
-          value={extraPayment}
-          onChange={(e) => setExtraPayment(e.target.value)}
-          className={inputClass}
-        />
-      </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            정가
+            <input
+              type="number"
+              min="0"
+              value={retailValue}
+              onChange={(e) => setRetailValue(e.target.value)}
+              required
+              className={inputClass}
+            />
+          </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        포스팅 링크 (선택)
-        <input
-          type="url"
-          value={postUrl}
-          onChange={(e) => setPostUrl(e.target.value)}
-          className={inputClass}
-        />
-      </label>
+          <label className="flex flex-col gap-1 text-sm">
+            추가 결제액
+            <input
+              type="number"
+              min="0"
+              value={extraPayment}
+              onChange={(e) => setExtraPayment(e.target.value)}
+              className={inputClass}
+            />
+          </label>
+        </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        상태
-        <Select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as VisitStatus)}
-          className={selectClass}
-        >
-          <option value="예정">예정</option>
-          <option value="완료">완료</option>
-        </Select>
-      </label>
+        <label className="flex flex-col gap-1 text-sm">
+          상태
+          <Select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as VisitStatus)}
+            className={selectClass}
+          >
+            <option value="예정">예정</option>
+            <option value="완료">완료</option>
+          </Select>
+        </label>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-line pt-6">
+        <p className={sectionLabelClass}>링크</p>
+
+        <label className="flex flex-col gap-1 text-sm">
+          체험단 URL
+          <input
+            type="url"
+            value={campaignUrl}
+            onChange={(e) => setCampaignUrl(e.target.value)}
+            required
+            className={inputClass}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm">
+          포스팅 링크 (선택)
+          <input
+            type="url"
+            value={postUrl}
+            onChange={(e) => setPostUrl(e.target.value)}
+            className={inputClass}
+          />
+        </label>
+      </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
-      <div className="mt-2 flex items-center gap-3">
+      <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={submitting}

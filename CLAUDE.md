@@ -1,6 +1,6 @@
 # CLAUDE.md — Perkfolio
 
-개인 블로거용 협찬 방문 관리 웹앱. 전체 계획은 `PLAN.md` 참고.
+개인 블로거용 체험단 방문 관리 웹앱. 전체 계획은 `PLAN.md` 참고.
 
 ## 기술 스택
 - React + TypeScript + Vite

@@ -31,7 +31,7 @@ export default function EditPage() {
   }
 
   if (loadError) {
-    return <p className="mx-auto mt-10 max-w-md px-4 text-sm text-red-400">기록을 불러오지 못했습니다.</p>
+    return <p className="mx-auto mt-10 max-w-lg px-4 text-sm text-red-400">기록을 불러오지 못했습니다.</p>
   }
 
   if (!visit) {
@@ -44,6 +44,8 @@ export default function EditPage() {
     storeName: visit.storeName,
     category: visit.category,
     sponsoredItems: visit.sponsoredItems,
+    campaignUrl: visit.campaignUrl,
+    storeInfoUrl: visit.storeInfoUrl,
     retailValue: visit.retailValue,
     extraPayment: visit.extraPayment,
     status: visit.status,
@@ -51,7 +53,7 @@ export default function EditPage() {
   }
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-md px-4">
+    <div className="mx-auto mt-10 w-full max-w-lg px-4">
       <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">방문 기록 수정</h1>
       <VisitForm
         initialValues={initialValues}
