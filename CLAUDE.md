@@ -1,0 +1,40 @@
+# CLAUDE.md — Perkfolio
+
+개인 블로거용 협찬 방문 관리 웹앱. 전체 계획은 `PLAN.md` 참고.
+
+## 기술 스택
+- React + TypeScript + Vite
+- Tailwind CSS
+- React Router
+- Supabase (Postgres + Auth) — 데이터/인증 모두 Supabase 사용, localStorage 미사용
+- 상태 관리: React state/Context만 사용. Redux, Zustand 등 전역상태 라이브러리 도입 금지
+
+## 폴더 구조
+- `src/lib/` — 데이터 접근 및 외부 연동 로직만 (`supabaseClient.ts`, `visits.ts`)
+- `src/pages/` — 라우트 단위 화면 컴포넌트 (Login, Add, Table, Calendar, Dashboard)
+- `src/components/` — 재사용 UI 컴포넌트
+- `src/context/` — AuthContext 등 전역 컨텍스트
+- `src/types/` — 공용 타입 정의 (Visit 등)
+
+## 코드 컨벤션
+- 컴포넌트는 함수형 컴포넌트만 사용 (class component 금지)
+- 컴포넌트 파일/함수명: PascalCase (예: `VisitForm.tsx`)
+- 일반 함수/변수명: camelCase
+- Supabase 테이블/컬럼명은 snake_case(Postgres 관례), TS 타입에서는 camelCase로 매핑해서 사용
+- import는 상대 경로 사용 (alias 설정 안 함)
+- 데이터 접근(Supabase 호출)은 반드시 `src/lib` 모듈을 통해서만 수행 — 컴포넌트에서 Supabase client 직접 호출 금지
+
+## 환경 변수
+- `.env.local`에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 저장
+- `.env.local`은 git에 커밋하지 않음 (`.gitignore` 처리)
+
+## 명령어
+- `npm install` — 의존성 설치
+- `npm run dev` — 개발 서버 실행
+- `npm run build` — 프로덕션 빌드
+- `npm run lint` — ESLint 검사
+
+## 규칙
+- 요청받지 않은 기능/화면 추가 금지
+- 기존 코드 스타일 유지, 관련 없는 리팩토링 금지
+- 커밋은 사용자가 명시적으로 요청할 때만 수행
