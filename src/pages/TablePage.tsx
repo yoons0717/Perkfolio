@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
+import StatusBadgeButton from '../components/StatusBadgeButton'
 import { useVisitActions } from '../hooks/useVisitActions'
 import { formatDDay, formatWon } from '../lib/format'
-import { statusBadgeClass, statusOrder } from '../lib/statusStyle'
+import { statusOrder } from '../lib/statusStyle'
 import { getVisits } from '../lib/visits'
 import { platforms } from '../types/visit'
 import type { Platform, Visit, VisitStatus } from '../types/visit'
@@ -176,13 +177,7 @@ export default function TablePage() {
                   <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
                   <td className="px-4 py-3 font-mono font-semibold text-green">{formatWon(netSaved(v))}</td>
                   <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={(e) => handleToggleStatus(e, v)}
-                      className={`rounded-full px-3 py-1 font-mono text-xs ${statusBadgeClass(v.status)}`}
-                    >
-                      {v.status}
-                    </button>
+                    <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
                   </td>
                   <td className="px-4 py-3">
                     <button

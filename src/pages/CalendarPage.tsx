@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import StatusBadgeButton from '../components/StatusBadgeButton'
 import { useVisitActions } from '../hooks/useVisitActions'
 import { formatDDay, toDateString } from '../lib/format'
-import { statusBadgeClass, statusDotClass } from '../lib/statusStyle'
+import { statusDotClass } from '../lib/statusStyle'
 import { getVisits } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
@@ -187,13 +188,7 @@ export default function CalendarPage() {
                   <span>
                     {v.platform} · {v.storeName}
                   </span>
-                  <button
-                    type="button"
-                    onClick={(e) => handleToggleStatus(e, v)}
-                    className={`rounded-full px-3 py-1 font-mono text-xs ${statusBadgeClass(v.status)}`}
-                  >
-                    {v.status}
-                  </button>
+                  <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
                 </div>
               ))}
               {selectedDeadlines.map((v) => (
