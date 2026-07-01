@@ -33,7 +33,12 @@
 - `npm install` — 의존성 설치
 - `npm run dev` — 개발 서버 실행
 - `npm run build` — 프로덕션 빌드
-- `npm run lint` — ESLint 검사
+- `npm run lint` — oxlint 검사
+- `npm test` — Vitest 테스트 실행
+
+## 테스트
+- 도구: Vitest + React Testing Library
+- 테스트 파일은 대상 파일과 같은 위치에 `*.test.tsx`(또는 `.test.ts`)로 둠
 
 ## 규칙
 - 요청받지 않은 기능/화면 추가 금지
