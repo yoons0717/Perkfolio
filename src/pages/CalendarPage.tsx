@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StatusBadgeButton from '../components/StatusBadgeButton'
 import { useVisitActions } from '../hooks/useVisitActions'
-import { formatDDay, toDateString } from '../lib/format'
-import { statusDotClass } from '../lib/statusStyle'
+import { toDateString } from '../lib/format'
+import { deadlineDisplay, statusDotClass } from '../lib/statusStyle'
 import { getVisits } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
@@ -114,7 +114,7 @@ export default function CalendarPage() {
             ...dayVisits.map((v) => ({ key: v.id, color: statusDotClass(v.status) })),
             ...dayDeadlines.map((v) => ({
               key: `dl-${v.id}`,
-              color: v.status === '리뷰완료' ? 'bg-green' : 'bg-red-500',
+              color: deadlineDisplay(v.status, v.reviewDeadline)?.reviewed ? 'bg-green' : 'bg-red-500',
             })),
           ].slice(0, 4)
           const dotsExtra = dayVisits.length + dayDeadlines.length - dots.length
@@ -148,21 +148,20 @@ export default function CalendarPage() {
                 ))}
                 {extra > 0 && <span className="text-[10px] text-muted">+{extra}개</span>}
 
-                {shownDeadlines.map((v) => (
-                  <div key={`dl-${v.id}`} className="flex h-5 items-stretch gap-1 rounded bg-white/5 px-1 py-0.5">
-                    <span className={`w-[3px] rounded-sm ${v.status === '리뷰완료' ? 'bg-green' : 'bg-red-500'}`} />
-                    <span className="truncate self-center text-[10px]">
-                      <span className="text-ink">{v.storeName}</span>{' '}
-                      {v.status === '리뷰완료' ? (
-                        <span className="text-green">리뷰완료</span>
-                      ) : (
-                        <span className="text-red-400">
-                          마감 {v.reviewDeadline && formatDDay(v.reviewDeadline)}
+                {shownDeadlines.map((v) => {
+                  const deadline = deadlineDisplay(v.status, v.reviewDeadline)!
+                  return (
+                    <div key={`dl-${v.id}`} className="flex h-5 items-stretch gap-1 rounded bg-white/5 px-1 py-0.5">
+                      <span className={`w-[3px] rounded-sm ${deadline.reviewed ? 'bg-green' : 'bg-red-500'}`} />
+                      <span className="truncate self-center text-[10px]">
+                        <span className="text-ink">{v.storeName}</span>{' '}
+                        <span className={deadline.reviewed ? 'text-green' : 'text-red-400'}>
+                          {deadline.reviewed ? deadline.text : `마감 ${deadline.text}`}
                         </span>
-                      )}
-                    </span>
-                  </div>
-                ))}
+                      </span>
+                    </div>
+                  )
+                })}
                 {extraDeadlines > 0 && <span className="text-[10px] text-red-400">+{extraDeadlines}개 마감</span>}
               </div>
             </button>
@@ -191,29 +190,30 @@ export default function CalendarPage() {
                   <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
                 </div>
               ))}
-              {selectedDeadlines.map((v) => (
-                <div
-                  key={`dl-${v.id}`}
-                  onClick={() => navigate(`/edit/${v.id}`)}
-                  className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
-                >
-                  <span>
-                    <span className="font-medium text-ink">{v.storeName}</span>
-                    <span className={`ml-2 text-xs ${v.status === '리뷰완료' ? 'text-green' : 'text-red-400'}`}>
-                      {v.status === '리뷰완료' ? '리뷰완료' : '리뷰 마감'}
+              {selectedDeadlines.map((v) => {
+                const deadline = deadlineDisplay(v.status, v.reviewDeadline)!
+                return (
+                  <div
+                    key={`dl-${v.id}`}
+                    onClick={() => navigate(`/edit/${v.id}`)}
+                    className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
+                  >
+                    <span>
+                      <span className="font-medium text-ink">{v.storeName}</span>
+                      <span className={`ml-2 text-xs ${deadline.reviewed ? 'text-green' : 'text-red-400'}`}>
+                        {deadline.reviewed ? '리뷰완료' : '리뷰 마감'}
+                      </span>
                     </span>
-                  </span>
-                  {v.status === '리뷰완료' ? (
-                    <span className="rounded-full bg-green-bg px-3 py-1 font-mono text-xs text-green">
-                      리뷰완료
+                    <span
+                      className={`rounded-full px-3 py-1 font-mono text-xs ${
+                        deadline.reviewed ? 'bg-green-bg text-green' : 'bg-red-500/10 text-red-400'
+                      }`}
+                    >
+                      {deadline.text}
                     </span>
-                  ) : (
-                    <span className="rounded-full bg-red-500/10 px-3 py-1 font-mono text-xs text-red-400">
-                      {v.reviewDeadline && formatDDay(v.reviewDeadline)}
-                    </span>
-                  )}
-                </div>
-              ))}
+                  </div>
+                )
+              })}
             </>
           )}
         </div>

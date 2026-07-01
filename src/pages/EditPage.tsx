@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
-import { formatDDay, formatWon } from '../lib/format'
+import { formatWon } from '../lib/format'
+import { deadlineDisplay } from '../lib/statusStyle'
 import { deleteVisit, getVisit, updateVisit } from '../lib/visits'
 import type { NewVisit, Visit } from '../types/visit'
 
@@ -153,9 +154,7 @@ export default function EditPage() {
             value={
               !visit.reviewDeadline
                 ? '없음'
-                : visit.status === '리뷰완료'
-                  ? `${visit.reviewDeadline} (리뷰완료)`
-                  : `${visit.reviewDeadline} (${formatDDay(visit.reviewDeadline)})`
+                : `${visit.reviewDeadline} (${deadlineDisplay(visit.status, visit.reviewDeadline)?.text})`
             }
           />
 

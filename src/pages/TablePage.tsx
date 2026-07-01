@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
 import StatusBadgeButton from '../components/StatusBadgeButton'
 import { useVisitActions } from '../hooks/useVisitActions'
-import { formatDDay, formatWon } from '../lib/format'
-import { statusOrder } from '../lib/statusStyle'
+import { formatWon } from '../lib/format'
+import { deadlineDisplay, statusOrder } from '../lib/statusStyle'
 import { getVisits } from '../lib/visits'
 import { platforms } from '../types/visit'
 import type { Platform, Visit, VisitStatus } from '../types/visit'
@@ -157,18 +157,16 @@ export default function TablePage() {
                 >
                   <td className="px-4 py-3 font-mono text-ink">{v.visitDate}</td>
                   <td className="px-4 py-3 font-mono">
-                    {v.reviewDeadline ? (
-                      v.status === '리뷰완료' ? (
-                        <span className="text-green">리뷰완료</span>
-                      ) : (
+                    {(() => {
+                      const deadline = deadlineDisplay(v.status, v.reviewDeadline)
+                      if (!deadline) return <span className="text-muted">-</span>
+                      if (deadline.reviewed) return <span className="text-green">{deadline.text}</span>
+                      return (
                         <span className="text-red-400">
-                          {v.reviewDeadline}{' '}
-                          <span className="text-[10px] text-muted">({formatDDay(v.reviewDeadline)})</span>
+                          {v.reviewDeadline} <span className="text-[10px] text-muted">({deadline.text})</span>
                         </span>
                       )
-                    ) : (
-                      <span className="text-muted">-</span>
-                    )}
+                    })()}
                   </td>
                   <td className="px-4 py-3">{v.platform}</td>
                   <td className="px-4 py-3">{v.storeName}</td>
