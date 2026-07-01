@@ -32,6 +32,7 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   useEffect(() => {
     getVisits()
@@ -65,8 +66,14 @@ export default function CalendarPage() {
 
   async function handleToggle(e: React.MouseEvent, v: Visit) {
     e.stopPropagation()
-    const updated = await toggleStatus(v.id, v.status)
-    setVisits((prev) => prev.map((item) => (item.id === v.id ? updated : item)))
+    try {
+      const updated = await toggleStatus(v.id, v.status)
+      setVisits((prev) => prev.map((item) => (item.id === v.id ? updated : item)))
+      setActionError(null)
+    } catch (err) {
+      console.error(err)
+      setActionError('상태 변경에 실패했습니다.')
+    }
   }
 
   if (loading) return null
@@ -78,6 +85,8 @@ export default function CalendarPage() {
 
   return (
     <div>
+      {actionError && <p className="mb-3 text-sm text-red-400">{actionError}</p>}
+
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"

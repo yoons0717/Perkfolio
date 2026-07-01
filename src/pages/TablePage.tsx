@@ -57,6 +57,7 @@ export default function TablePage() {
   const [visits, setVisits] = useState<Visit[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<'전체' | VisitStatus>('전체')
   const [platformFilter, setPlatformFilter] = useState<'전체' | Platform>('전체')
   const [sortKey, setSortKey] = useState<SortKey>('visitDate')
@@ -95,15 +96,27 @@ export default function TablePage() {
 
   async function handleToggleStatus(e: React.MouseEvent, v: Visit) {
     e.stopPropagation()
-    const updated = await toggleStatus(v.id, v.status)
-    setVisits((prev) => prev.map((item) => (item.id === v.id ? updated : item)))
+    try {
+      const updated = await toggleStatus(v.id, v.status)
+      setVisits((prev) => prev.map((item) => (item.id === v.id ? updated : item)))
+      setActionError(null)
+    } catch (err) {
+      console.error(err)
+      setActionError('상태 변경에 실패했습니다.')
+    }
   }
 
   async function handleDelete(e: React.MouseEvent, v: Visit) {
     e.stopPropagation()
     if (!window.confirm(`"${v.storeName}" 기록을 삭제할까요?`)) return
-    await deleteVisit(v.id)
-    setVisits((prev) => prev.filter((item) => item.id !== v.id))
+    try {
+      await deleteVisit(v.id)
+      setVisits((prev) => prev.filter((item) => item.id !== v.id))
+      setActionError(null)
+    } catch (err) {
+      console.error(err)
+      setActionError('삭제에 실패했습니다.')
+    }
   }
 
   if (loading) return null
@@ -111,6 +124,8 @@ export default function TablePage() {
 
   return (
     <div>
+      {actionError && <p className="mb-3 text-sm text-red-400">{actionError}</p>}
+
       <div className="mb-4 flex gap-3">
         <div className="w-36">
           <Select

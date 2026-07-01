@@ -63,6 +63,7 @@ export default function EditPage() {
   const [visit, setVisit] = useState<Visit | null>(null)
   const [loadError, setLoadError] = useState(false)
   const [mode, setMode] = useState<'view' | 'edit'>('view')
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -81,8 +82,13 @@ export default function EditPage() {
   async function handleDelete() {
     if (!id) return
     if (!window.confirm('이 방문 기록을 삭제할까요?')) return
-    await deleteVisit(id)
-    navigate('/table')
+    try {
+      await deleteVisit(id)
+      navigate('/table')
+    } catch (err) {
+      console.error(err)
+      setDeleteError('삭제에 실패했습니다.')
+    }
   }
 
   if (loadError) {
@@ -175,6 +181,8 @@ export default function EditPage() {
           <ViewLinkField label="포스팅 링크" href={visit.postUrl} />
         </div>
       </div>
+
+      {deleteError && <p className="mt-3 text-sm text-red-400">{deleteError}</p>}
 
       <div className="mt-6 flex items-center gap-3">
         <button
