@@ -16,6 +16,9 @@
 
   --color-green: #34d399;
   --color-green-bg: rgba(52, 211, 153, 0.14);
+
+  --color-amber: #f0b429;
+  --color-amber-bg: rgba(240, 180, 41, 0.14);
 }
 
 body {

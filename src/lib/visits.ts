@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { nextStatus } from './statusStyle'
 import type { NewVisit, Visit } from '../types/visit'
 
 type VisitRow = {
@@ -108,10 +109,9 @@ export async function deleteVisit(id: string): Promise<void> {
 }
 
 export async function toggleStatus(id: string, currentStatus: Visit['status']): Promise<Visit> {
-  const nextStatus = currentStatus === '예정' ? '완료' : '예정'
   const { data, error } = await supabase
     .from('visits')
-    .update({ status: nextStatus })
+    .update({ status: nextStatus(currentStatus) })
     .eq('id', id)
     .select()
     .single()

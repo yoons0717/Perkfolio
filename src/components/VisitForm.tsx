@@ -219,7 +219,8 @@ export default function VisitForm({
             className={selectClass}
           >
             <option value="예정">예정</option>
-            <option value="완료">완료</option>
+            <option value="방문완료">방문완료</option>
+            <option value="리뷰완료">리뷰완료</option>
           </Select>
         </label>
       </div>

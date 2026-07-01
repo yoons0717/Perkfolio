@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
-import { formatWon } from '../lib/format'
+import { formatDDay, formatWon } from '../lib/format'
 import { deleteVisit, getVisit, updateVisit } from '../lib/visits'
 import type { NewVisit, Visit } from '../types/visit'
 
@@ -142,7 +142,16 @@ export default function EditPage() {
             <ViewField label="플랫폼" value={visit.platform} />
           </div>
 
-          <ViewField label="리뷰 마감일" value={visit.reviewDeadline ?? '없음'} />
+          <ViewField
+            label="리뷰 마감일"
+            value={
+              !visit.reviewDeadline
+                ? '없음'
+                : visit.status === '리뷰완료'
+                  ? `${visit.reviewDeadline} (리뷰완료)`
+                  : `${visit.reviewDeadline} (${formatDDay(visit.reviewDeadline)})`
+            }
+          />
 
           <div className="grid grid-cols-2 gap-3">
             <ViewField label="업체명" value={visit.storeName} />

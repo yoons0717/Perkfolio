@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
-import { formatWon } from '../lib/format'
+import { formatDDay, formatWon } from '../lib/format'
+import { statusBadgeClass } from '../lib/statusStyle'
 import { deleteVisit, getVisits, toggleStatus } from '../lib/visits'
 import type { Platform, Visit, VisitStatus } from '../types/visit'
 
@@ -119,7 +120,8 @@ export default function TablePage() {
           >
             <option value="전체">상태 전체</option>
             <option value="예정">예정</option>
-            <option value="완료">완료</option>
+            <option value="방문완료">방문완료</option>
+            <option value="리뷰완료">리뷰완료</option>
           </Select>
         </div>
         <div className="w-36">
@@ -169,7 +171,20 @@ export default function TablePage() {
                   className="cursor-pointer border-b border-line last:border-b-0 hover:bg-surface"
                 >
                   <td className="px-4 py-3 font-mono text-ink">{v.visitDate}</td>
-                  <td className="px-4 py-3 font-mono text-red-400">{v.reviewDeadline ?? '-'}</td>
+                  <td className="px-4 py-3 font-mono">
+                    {v.reviewDeadline ? (
+                      v.status === '리뷰완료' ? (
+                        <span className="text-green">리뷰완료</span>
+                      ) : (
+                        <span className="text-red-400">
+                          {v.reviewDeadline}{' '}
+                          <span className="text-[10px] text-muted">({formatDDay(v.reviewDeadline)})</span>
+                        </span>
+                      )
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">{v.platform}</td>
                   <td className="px-4 py-3">{v.storeName}</td>
                   <td className="px-4 py-3">{v.category}</td>
@@ -180,9 +195,7 @@ export default function TablePage() {
                     <button
                       type="button"
                       onClick={(e) => handleToggleStatus(e, v)}
-                      className={`rounded-full px-3 py-1 font-mono text-xs ${
-                        v.status === '완료' ? 'bg-green-bg text-green' : 'bg-blue-bg text-blue'
-                      }`}
+                      className={`rounded-full px-3 py-1 font-mono text-xs ${statusBadgeClass(v.status)}`}
                     >
                       {v.status}
                     </button>
