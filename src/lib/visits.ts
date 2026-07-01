@@ -1,0 +1,103 @@
+import { supabase } from './supabaseClient'
+import type { NewVisit, Visit } from '../types/visit'
+
+type VisitRow = {
+  id: string
+  visit_date: string
+  platform: Visit['platform']
+  store_name: string
+  category: Visit['category']
+  sponsored_items: string
+  retail_value: number
+  extra_payment: number
+  status: Visit['status']
+  post_url: string | null
+  created_at: string
+}
+
+function toVisit(row: VisitRow): Visit {
+  return {
+    id: row.id,
+    visitDate: row.visit_date,
+    platform: row.platform,
+    storeName: row.store_name,
+    category: row.category,
+    sponsoredItems: row.sponsored_items,
+    retailValue: row.retail_value,
+    extraPayment: row.extra_payment,
+    status: row.status,
+    postUrl: row.post_url,
+    createdAt: row.created_at,
+  }
+}
+
+export async function getVisits(): Promise<Visit[]> {
+  const { data, error } = await supabase
+    .from('visits')
+    .select('*')
+    .order('visit_date', { ascending: false })
+
+  if (error) throw error
+  return (data as VisitRow[]).map(toVisit)
+}
+
+export async function addVisit(visit: NewVisit): Promise<Visit> {
+  const { data, error } = await supabase
+    .from('visits')
+    .insert({
+      visit_date: visit.visitDate,
+      platform: visit.platform,
+      store_name: visit.storeName,
+      category: visit.category,
+      sponsored_items: visit.sponsoredItems,
+      retail_value: visit.retailValue,
+      extra_payment: visit.extraPayment,
+      status: visit.status,
+      post_url: visit.postUrl,
+    })
+    .select()
+    .single()
+
+  if (error) throw error
+  return toVisit(data as VisitRow)
+}
+
+export async function updateVisit(id: string, visit: NewVisit): Promise<Visit> {
+  const { data, error } = await supabase
+    .from('visits')
+    .update({
+      visit_date: visit.visitDate,
+      platform: visit.platform,
+      store_name: visit.storeName,
+      category: visit.category,
+      sponsored_items: visit.sponsoredItems,
+      retail_value: visit.retailValue,
+      extra_payment: visit.extraPayment,
+      status: visit.status,
+      post_url: visit.postUrl,
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return toVisit(data as VisitRow)
+}
+
+export async function deleteVisit(id: string): Promise<void> {
+  const { error } = await supabase.from('visits').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function toggleStatus(id: string, currentStatus: Visit['status']): Promise<Visit> {
+  const nextStatus = currentStatus === '예정' ? '완료' : '예정'
+  const { data, error } = await supabase
+    .from('visits')
+    .update({ status: nextStatus })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return toVisit(data as VisitRow)
+}
