@@ -3,6 +3,7 @@ import type { FormEvent, ReactNode } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import Select from './Select'
+import { inputClass, selectClass, sectionLabelClass } from './formStyles'
 import type { Category, NewVisit, Platform, VisitStatus } from '../types/visit'
 
 const platforms: Platform[] = [
@@ -16,12 +17,6 @@ const platforms: Platform[] = [
 ]
 
 const categories: Category[] = ['카페', '음식점', '술집', '기타']
-
-const inputClass =
-  'rounded-lg border border-line bg-surface px-3 py-3 text-ink focus:border-blue focus:outline-none'
-const selectClass =
-  'rounded-lg border border-line bg-surface px-3 py-3 text-ink focus:border-blue focus:outline-none'
-const sectionLabelClass = 'font-mono text-xs uppercase tracking-wider text-muted'
 
 function toDateString(date: Date): string {
   const year = date.getFullYear()

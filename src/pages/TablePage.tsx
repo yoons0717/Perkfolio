@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
+import { formatWon } from '../lib/format'
 import { deleteVisit, getVisits, toggleStatus } from '../lib/visits'
 import type { Platform, Visit, VisitStatus } from '../types/visit'
 
@@ -38,10 +39,6 @@ function netSaved(v: Visit): number {
 function sortValue(v: Visit, key: SortKey): string | number {
   if (key === 'netSaved') return netSaved(v)
   return v[key]
-}
-
-function formatWon(n: number): string {
-  return `₩${n.toLocaleString('ko-KR')}`
 }
 
 export default function TablePage() {

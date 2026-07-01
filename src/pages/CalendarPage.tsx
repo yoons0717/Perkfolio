@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getVisits, toggleStatus } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
@@ -22,6 +23,7 @@ function getMonthGrid(year: number, month: number): Date[] {
 }
 
 export default function CalendarPage() {
+  const navigate = useNavigate()
   const today = new Date()
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
   const [visits, setVisits] = useState<Visit[]>([])
@@ -151,7 +153,8 @@ export default function CalendarPage() {
             selectedVisits.map((v) => (
               <div
                 key={v.id}
-                className="flex items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0"
+                onClick={() => navigate(`/edit/${v.id}`)}
+                className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
               >
                 <span>
                   {v.platform} · {v.storeName}
