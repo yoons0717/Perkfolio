@@ -10,9 +10,10 @@
 - 상태 관리: React state/Context만 사용. Redux, Zustand 등 전역상태 라이브러리 도입 금지
 
 ## 폴더 구조
-- `src/lib/` — 데이터 접근 및 외부 연동 로직만 (`supabaseClient.ts`, `visits.ts`)
-- `src/pages/` — 라우트 단위 화면 컴포넌트 (Login, Add, Table, Calendar, Dashboard)
+- `src/lib/` — 데이터 접근 및 외부 연동 로직만 (`supabaseClient.ts`, `visits.ts`, `format.ts`, `statusStyle.ts`)
+- `src/pages/` — 라우트 단위 화면 컴포넌트 (Login, Add, Edit, Table, Calendar, Dashboard)
 - `src/components/` — 재사용 UI 컴포넌트
+- `src/hooks/` — 여러 화면에서 공유하는 React 커스텀 훅 (예: `useVisitActions`)
 - `src/context/` — AuthContext 등 전역 컨텍스트
 - `src/types/` — 공용 타입 정의 (Visit 등)
 

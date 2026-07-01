@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useVisitActions } from '../hooks/useVisitActions'
 import { formatDDay, toDateString } from '../lib/format'
 import { statusBadgeClass, statusDotClass } from '../lib/statusStyle'
-import { getVisits, toggleStatus } from '../lib/visits'
+import { getVisits } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
 const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
@@ -25,7 +26,7 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [actionError, setActionError] = useState<string | null>(null)
+  const { actionError, handleToggleStatus } = useVisitActions(setVisits)
 
   useEffect(() => {
     getVisits()
@@ -56,18 +57,6 @@ export default function CalendarPage() {
   }, [visits])
 
   const grid = useMemo(() => getMonthGrid(cursor.getFullYear(), cursor.getMonth()), [cursor])
-
-  async function handleToggle(e: React.MouseEvent, v: Visit) {
-    e.stopPropagation()
-    try {
-      const updated = await toggleStatus(v.id, v.status)
-      setVisits((prev) => prev.map((item) => (item.id === v.id ? updated : item)))
-      setActionError(null)
-    } catch (err) {
-      console.error(err)
-      setActionError('상태 변경에 실패했습니다.')
-    }
-  }
 
   if (loading) return null
   if (error) return <p className="text-sm text-red-400">{error}</p>
@@ -200,7 +189,7 @@ export default function CalendarPage() {
                   </span>
                   <button
                     type="button"
-                    onClick={(e) => handleToggle(e, v)}
+                    onClick={(e) => handleToggleStatus(e, v)}
                     className={`rounded-full px-3 py-1 font-mono text-xs ${statusBadgeClass(v.status)}`}
                   >
                     {v.status}
