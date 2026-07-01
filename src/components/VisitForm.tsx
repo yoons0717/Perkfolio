@@ -52,7 +52,10 @@ export default function VisitForm({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!visitDate) return
+    if (!visitDate) {
+      setError('방문일을 입력해주세요.')
+      return
+    }
     setError(null)
     setSubmitting(true)
 
