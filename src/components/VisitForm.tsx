@@ -4,26 +4,12 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import Select from './Select'
 import { inputClass, selectClass, sectionLabelClass } from './formStyles'
+import { toDateString } from '../lib/format'
+import { statusOrder } from '../lib/statusStyle'
+import { platforms } from '../types/visit'
 import type { Category, NewVisit, Platform, VisitStatus } from '../types/visit'
 
-const platforms: Platform[] = [
-  '포포몬',
-  '강남맛집',
-  '캐시노트',
-  '서울오빠',
-  '디너의여왕',
-  '리뷰노트',
-  '레뷰',
-]
-
 const categories: Category[] = ['카페', '음식점', '술집', '기타']
-
-function toDateString(date: Date): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 
 function parseDateString(value: string): Date {
   const [year, month, day] = value.split('-').map(Number)
@@ -218,9 +204,11 @@ export default function VisitForm({
             onChange={(e) => setStatus(e.target.value as VisitStatus)}
             className={selectClass}
           >
-            <option value="예정">예정</option>
-            <option value="방문완료">방문완료</option>
-            <option value="리뷰완료">리뷰완료</option>
+            {statusOrder.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </Select>
         </label>
       </div>

@@ -7,6 +7,16 @@ export type Platform =
   | '리뷰노트'
   | '레뷰'
 
+export const platforms: Platform[] = [
+  '포포몬',
+  '강남맛집',
+  '캐시노트',
+  '서울오빠',
+  '디너의여왕',
+  '리뷰노트',
+  '레뷰',
+]
+
 export type Category = '카페' | '음식점' | '술집' | '기타'
 
 export type VisitStatus = '예정' | '방문완료' | '리뷰완료'

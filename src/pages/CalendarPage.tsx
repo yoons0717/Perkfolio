@@ -1,18 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { formatDDay } from '../lib/format'
+import { formatDDay, toDateString } from '../lib/format'
 import { statusBadgeClass, statusDotClass } from '../lib/statusStyle'
 import { getVisits, toggleStatus } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
 const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
-
-function toDateString(date: Date): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 
 function getMonthGrid(year: number, month: number): Date[] {
   const firstOfMonth = new Date(year, month, 1)

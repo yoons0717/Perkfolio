@@ -2,19 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
 import { formatDDay, formatWon } from '../lib/format'
-import { statusBadgeClass } from '../lib/statusStyle'
+import { statusBadgeClass, statusOrder } from '../lib/statusStyle'
 import { deleteVisit, getVisits, toggleStatus } from '../lib/visits'
+import { platforms } from '../types/visit'
 import type { Platform, Visit, VisitStatus } from '../types/visit'
-
-const platforms: Platform[] = [
-  '포포몬',
-  '강남맛집',
-  '캐시노트',
-  '서울오빠',
-  '디너의여왕',
-  '리뷰노트',
-  '레뷰',
-]
 
 type SortKey =
   | 'visitDate'
@@ -134,9 +125,11 @@ export default function TablePage() {
             className="rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink"
           >
             <option value="전체">상태 전체</option>
-            <option value="예정">예정</option>
-            <option value="방문완료">방문완료</option>
-            <option value="리뷰완료">리뷰완료</option>
+            {statusOrder.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </Select>
         </div>
         <div className="w-36">
