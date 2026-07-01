@@ -90,7 +90,7 @@ export default function CalendarPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
         {grid.map((date) => {
           const dateStr = toDateString(date)
           const inMonth = date.getMonth() === cursor.getMonth()
@@ -99,18 +99,34 @@ export default function CalendarPage() {
           const dayVisits = visitsByDate.get(dateStr) ?? []
           const shown = dayVisits.slice(0, 2)
           const extra = dayVisits.length - shown.length
+          const dots = dayVisits.slice(0, 4)
 
           return (
             <button
               key={dateStr}
               type="button"
               onClick={() => setSelectedDate(dateStr)}
-              className={`flex min-h-[6.5rem] flex-col items-stretch rounded-lg border bg-surface p-1.5 text-left text-xs ${
+              className={`flex min-h-[3.25rem] flex-col items-stretch rounded-lg border bg-surface p-1 text-left text-xs sm:min-h-[6.5rem] sm:p-1.5 ${
                 isToday ? 'border-blue' : 'border-line'
               } ${isSelected ? 'bg-blue-bg' : ''} ${inMonth ? '' : 'opacity-30'}`}
             >
               <span className={isToday ? 'font-bold text-blue' : 'text-muted'}>{date.getDate()}</span>
-              <div className="mt-1.5 flex flex-col gap-1">
+
+              {/* mobile: dot summary only, avoids cramped text at narrow widths */}
+              <div className="mt-1 flex flex-wrap gap-1 sm:hidden">
+                {dots.map((v) => (
+                  <span
+                    key={v.id}
+                    className={`h-1.5 w-1.5 rounded-full ${v.status === '완료' ? 'bg-green' : 'bg-blue'}`}
+                  />
+                ))}
+                {dayVisits.length > dots.length && (
+                  <span className="text-[9px] text-muted">+{dayVisits.length - dots.length}</span>
+                )}
+              </div>
+
+              {/* sm+: full store-name cards */}
+              <div className="mt-1.5 hidden flex-col gap-1 sm:flex">
                 {shown.map((v) => (
                   <div key={v.id} className="flex h-5 items-stretch gap-1 rounded bg-white/5 px-1 py-0.5">
                     <span className={`w-[3px] rounded-sm ${v.status === '완료' ? 'bg-green' : 'bg-blue'}`} />

@@ -136,8 +136,8 @@ export default function TablePage() {
           아직 등록된 방문 기록이 없습니다.
         </p>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-line">
-          <table className="w-full border-collapse text-sm">
+        <div className="overflow-x-auto rounded-xl border border-line">
+          <table className="w-full min-w-[860px] border-collapse whitespace-nowrap text-sm">
             <thead>
               <tr className="border-b border-line bg-surface text-left text-muted">
                 {columns.map((col) => (
