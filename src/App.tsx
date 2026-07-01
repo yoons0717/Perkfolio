@@ -1,8 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import NavBar from './components/NavBar'
 import ProtectedRoute from './components/ProtectedRoute'
+import RecordsLayout from './components/RecordsLayout'
 import LoginPage from './pages/LoginPage'
 import AddPage from './pages/AddPage'
+import EditPage from './pages/EditPage'
 import TablePage from './pages/TablePage'
 import CalendarPage from './pages/CalendarPage'
 import DashboardPage from './pages/DashboardPage'
@@ -23,21 +25,23 @@ function App() {
           }
         />
         <Route
-          path="/table"
+          path="/edit/:id"
           element={
             <ProtectedRoute>
-              <TablePage />
+              <EditPage />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/calendar"
           element={
             <ProtectedRoute>
-              <CalendarPage />
+              <RecordsLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="/table" element={<TablePage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+        </Route>
         <Route
           path="/dashboard"
           element={

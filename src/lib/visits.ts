@@ -41,6 +41,12 @@ export async function getVisits(): Promise<Visit[]> {
   return (data as VisitRow[]).map(toVisit)
 }
 
+export async function getVisit(id: string): Promise<Visit> {
+  const { data, error } = await supabase.from('visits').select('*').eq('id', id).single()
+  if (error) throw error
+  return toVisit(data as VisitRow)
+}
+
 export async function addVisit(visit: NewVisit): Promise<Visit> {
   const { data, error } = await supabase
     .from('visits')
