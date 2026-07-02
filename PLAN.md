@@ -13,9 +13,6 @@
 ## 디자인 톤
 다크 대시보드 컨셉으로 고정 (`src/index.css`의 `@theme` 토큰 참고). 배경 `#14161A`, 카드 `#1D2027`, 텍스트 `#E7E9EC`. 상태 색상: 예정=blue(`#5B8DEF`) / 방문완료=amber(`#F0B429`) / 리뷰완료=green(`#34D399`), 마감일 임박은 red-400. 폰트: 헤딩 Inter, 본문 Pretendard, 숫자 JetBrains Mono. 새 화면 작업 시 이 토큰을 그대로 재사용.
 
-## 진행 상황
-Phase 0~4 + 상세 페이지(조회/수정)까지 완료. 지금은 Phase 5(테스트 코드 작성) 진행 중이고, Phase 6(대시보드)는 그 다음.
-
 ---
 
 ## Phase 0: 프로젝트 셋업 ✅
@@ -69,12 +66,13 @@ Phase 0~4 + 상세 페이지(조회/수정)까지 완료. 지금은 Phase 5(테�
 
 ---
 
-## Phase 5: 테스트 코드 작성 (진행 중)
-도구: Vitest + React Testing Library
+## Phase 5: 테스트 코드 작성 ✅
+도구: Vitest + React Testing Library. 커밋 전 `npm run test:run`을 Husky pre-commit 훅으로 자동 실행 — 테스트 실패 시 커밋 불가.
 
-- [x] 테스트 환경 셋업
-- [x] 입력 폼 테스트
-- [ ] 표 / 캘린더 / 상세 화면 테스트
+- [x] 테스트 환경 셋업 (+ pre-commit 훅)
+- [x] 입력 폼 테스트 (`VisitForm`, `AddPage`)
+- [x] 표 / 캘린더 테스트 (`TablePage`, `CalendarPage`) + 공용 로직 단위 테스트 (`statusStyle`, `useVisitActions`)
+- [x] 상세 화면 테스트 (`EditPage`) — 조회/수정 모드 전환, 저장, 삭제
 
 ## 이후 단계 (미착수)
 
