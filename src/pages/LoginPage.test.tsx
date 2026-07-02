@@ -37,6 +37,17 @@ describe('LoginPage', () => {
     expect(await screen.findByText('표 화면')).toBeInTheDocument()
   })
 
+  it('re-enables the submit button after a rejected signIn call (e.g. network error)', async () => {
+    vi.mocked(signInWithPassword).mockRejectedValue(new Error('network error'))
+    renderLoginPage()
+
+    await userEvent.type(screen.getByPlaceholderText('이메일'), 'user@example.com')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호'), 'password123')
+    await userEvent.click(screen.getByRole('button', { name: '로그인' }))
+
+    expect(await screen.findByRole('button', { name: '로그인' })).not.toBeDisabled()
+  })
+
   it('shows an error message and stays on the page on failure', async () => {
     vi.mocked(signInWithPassword).mockResolvedValue({
       data: {},

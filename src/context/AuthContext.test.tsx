@@ -39,6 +39,26 @@ describe('AuthProvider', () => {
     expect(await screen.findByText('로그인: 1')).toBeInTheDocument()
   })
 
+  it('stops loading once onAuthStateChange delivers a session, even if getSession never resolves', async () => {
+    vi.mocked(getSession).mockReturnValue(new Promise(() => {}) as never)
+    let handler!: (session: unknown) => void
+    vi.mocked(onAuthStateChange).mockImplementation((cb) => {
+      handler = cb
+      return vi.fn()
+    })
+
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    )
+    expect(screen.getByText('로딩 중')).toBeInTheDocument()
+
+    handler({ user: { id: '1' } })
+
+    expect(await screen.findByText('로그인: 1')).toBeInTheDocument()
+  })
+
   it('updates the session when onAuthStateChange fires', async () => {
     vi.mocked(getSession).mockResolvedValue(null)
     let handler!: (session: unknown) => void

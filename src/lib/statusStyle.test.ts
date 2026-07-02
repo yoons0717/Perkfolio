@@ -7,6 +7,11 @@ describe('nextStatus', () => {
     expect(nextStatus('방문완료')).toBe('리뷰완료')
     expect(nextStatus('리뷰완료')).toBe('예정')
   })
+
+  it('throws for a status not in statusOrder instead of silently resetting to 예정', () => {
+    // simulates a stale DB value from a pre-migration status string (e.g. '완료')
+    expect(() => nextStatus('완료' as unknown as (typeof statusOrder)[number])).toThrow()
+  })
 })
 
 describe('statusBadgeClass / statusDotClass', () => {

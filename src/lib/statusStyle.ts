@@ -5,6 +5,7 @@ export const statusOrder: VisitStatus[] = ['예정', '방문완료', '리뷰완�
 
 export function nextStatus(current: VisitStatus): VisitStatus {
   const idx = statusOrder.indexOf(current)
+  if (idx === -1) throw new Error(`Unknown visit status: ${current}`)
   return statusOrder[(idx + 1) % statusOrder.length]
 }
 

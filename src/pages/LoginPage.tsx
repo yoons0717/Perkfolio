@@ -15,16 +15,21 @@ export default function LoginPage() {
     setError(null)
     setSubmitting(true)
 
-    const { error } = await signInWithPassword(email, password)
+    try {
+      const { error } = await signInWithPassword(email, password)
 
-    setSubmitting(false)
+      if (error) {
+        setError('이메일 또는 비밀번호가 올바르지 않습니다.')
+        return
+      }
 
-    if (error) {
-      setError('이메일 또는 비밀번호가 올바르지 않습니다.')
-      return
+      navigate('/table')
+    } catch (err) {
+      console.error(err)
+      setError('로그인에 실패했습니다.')
+    } finally {
+      setSubmitting(false)
     }
-
-    navigate('/table')
   }
 
   return (

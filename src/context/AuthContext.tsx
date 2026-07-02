@@ -20,7 +20,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
 
-    return onAuthStateChange(setSession)
+    return onAuthStateChange((s) => {
+      setSession(s)
+      setLoading(false)
+    })
   }, [])
 
   return <AuthContext.Provider value={{ session, loading }}>{children}</AuthContext.Provider>
