@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 export default function RecordsLayout() {
   return (
     <div className="relative min-h-[calc(100vh-57px)]">
-      <div className="mx-auto max-w-3xl px-4 pt-6 lg:max-w-5xl">
+      <div className="mx-auto max-w-3xl px-4 pt-6 pb-10 lg:max-w-5xl">
         <div className="mb-6 flex justify-center">
           <div className="flex rounded-full border border-line bg-surface p-1 text-sm font-semibold">
             <NavLink

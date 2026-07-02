@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import PageContainer from '../components/PageContainer'
 import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
 import { formatWon } from '../lib/format'
@@ -117,7 +118,7 @@ export default function EditPage() {
     }
 
     return (
-      <div className="mx-auto mt-10 w-full max-w-lg px-4">
+      <PageContainer>
         <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">방문 기록 수정</h1>
         <VisitForm
           initialValues={initialValues}
@@ -134,12 +135,12 @@ export default function EditPage() {
             </button>
           }
         />
-      </div>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-lg px-4">
+    <PageContainer>
       <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
 
       <div className="flex flex-col gap-6">
@@ -199,6 +200,6 @@ export default function EditPage() {
           삭제
         </button>
       </div>
-    </div>
+    </PageContainer>
   )
 }
