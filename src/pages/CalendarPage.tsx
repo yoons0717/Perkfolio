@@ -9,7 +9,7 @@ import type { Visit } from '../types/visit'
 
 const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
 
-function getMonthGrid(year: number, month: number): Date[] {
+export function getMonthGrid(year: number, month: number): Date[] {
   const firstOfMonth = new Date(year, month, 1)
   const start = new Date(year, month, 1 - firstOfMonth.getDay())
   return Array.from({ length: 42 }, (_, i) => {
