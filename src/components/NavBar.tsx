@@ -26,7 +26,7 @@ export default function NavBar() {
           to="/table"
           className={`transition-colors ${isRecordsActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
         >
-          기록
+          방문내역
         </Link>
         <Link
           to="/dashboard"
