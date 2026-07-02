@@ -9,7 +9,11 @@ function renderForm(onSubmit = vi.fn().mockResolvedValue(undefined)) {
   return { onSubmit }
 }
 
-async function fillRequiredFields() {
+async function fillRequiredFields(opts: { skip?: string[] } = {}) {
+  const skip = opts.skip ?? []
+  if (!skip.includes('플랫폼')) await userEvent.selectOptions(screen.getByLabelText('플랫폼'), '포포몬')
+  if (!skip.includes('카테고리')) await userEvent.selectOptions(screen.getByLabelText('카테고리'), '카페')
+  if (!skip.includes('상태')) await userEvent.selectOptions(screen.getByLabelText('상태'), '예정')
   await userEvent.type(screen.getByLabelText('업체명'), '카페 온도')
   await userEvent.type(screen.getByLabelText('가게 정보 URL'), 'https://store.example.com')
   await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
@@ -51,6 +55,19 @@ describe('VisitForm validation', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
+  it.each(['플랫폼', '카테고리', '상태'])(
+    'blocks submission when %s is left unselected (native required validation)',
+    async (label) => {
+      const { onSubmit } = renderForm()
+      await fillRequiredFields({ skip: [label] })
+      const select = screen.getByLabelText(label) as HTMLSelectElement
+      await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+      expect(select.validity.valueMissing).toBe(true)
+      expect(onSubmit).not.toHaveBeenCalled()
+    },
+  )
+
   it('submits when optional fields (포스팅 링크, 리뷰 마감일) are left empty', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields()
@@ -58,9 +75,11 @@ describe('VisitForm validation', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
-  it('defaults status to 예정 and extra payment to 0', () => {
+  it('starts with 플랫폼/카테고리/상태 unselected (placeholder), and extra payment defaulting to 0', () => {
     renderForm()
-    expect(screen.getByLabelText('상태')).toHaveValue('예정')
+    expect(screen.getByLabelText('플랫폼')).toHaveValue('')
+    expect(screen.getByLabelText('카테고리')).toHaveValue('')
+    expect(screen.getByLabelText('상태')).toHaveValue('')
     expect(screen.getByLabelText('추가 결제액')).toHaveValue(0)
   })
 })

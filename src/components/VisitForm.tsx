@@ -34,9 +34,9 @@ export default function VisitForm({
   const [visitDate, setVisitDate] = useState<Date | null>(
     initialValues ? parseDateString(initialValues.visitDate) : new Date(),
   )
-  const [platform, setPlatform] = useState<Platform>(initialValues?.platform ?? platforms[0])
+  const [platform, setPlatform] = useState<Platform | ''>(initialValues?.platform ?? '')
   const [storeName, setStoreName] = useState(initialValues?.storeName ?? '')
-  const [category, setCategory] = useState<Category>(initialValues?.category ?? categories[0])
+  const [category, setCategory] = useState<Category | ''>(initialValues?.category ?? '')
   const [sponsoredItems, setSponsoredItems] = useState(initialValues?.sponsoredItems ?? '')
   const [campaignUrl, setCampaignUrl] = useState(initialValues?.campaignUrl ?? '')
   const [storeInfoUrl, setStoreInfoUrl] = useState(initialValues?.storeInfoUrl ?? '')
@@ -46,7 +46,7 @@ export default function VisitForm({
   const [reviewDeadline, setReviewDeadline] = useState<Date | null>(
     initialValues?.reviewDeadline ? parseDateString(initialValues.reviewDeadline) : null,
   )
-  const [status, setStatus] = useState<VisitStatus>(initialValues?.status ?? '예정')
+  const [status, setStatus] = useState<VisitStatus | ''>(initialValues?.status ?? '')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -54,6 +54,18 @@ export default function VisitForm({
     e.preventDefault()
     if (!visitDate) {
       setError('방문일을 입력해주세요.')
+      return
+    }
+    if (!platform) {
+      setError('플랫폼을 선택해주세요.')
+      return
+    }
+    if (!category) {
+      setError('카테고리를 선택해주세요.')
+      return
+    }
+    if (!status) {
+      setError('상태를 선택해주세요.')
       return
     }
     setError(null)
@@ -100,10 +112,14 @@ export default function VisitForm({
             플랫폼
             <Select
               aria-label="플랫폼"
+              required
               value={platform}
               onChange={(e) => setPlatform(e.target.value as Platform)}
               className={selectClass}
             >
+              <option value="" disabled hidden>
+                선택하세요
+              </option>
               {platforms.map((p) => (
                 <option key={p} value={p}>
                   {p}
@@ -141,10 +157,14 @@ export default function VisitForm({
             카테고리
             <Select
               aria-label="카테고리"
+              required
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
               className={selectClass}
             >
+              <option value="" disabled hidden>
+                선택하세요
+              </option>
               {categories.map((c) => (
                 <option key={c} value={c}>
                   {c}
@@ -206,10 +226,14 @@ export default function VisitForm({
           상태
           <Select
             aria-label="상태"
+            required
             value={status}
             onChange={(e) => setStatus(e.target.value as VisitStatus)}
             className={selectClass}
           >
+            <option value="" disabled hidden>
+              선택하세요
+            </option>
             {statusOrder.map((s) => (
               <option key={s} value={s}>
                 {s}
