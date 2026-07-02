@@ -59,7 +59,7 @@ function DeadlineCell({ visit }: { visit: Visit }) {
 export default function TablePage() {
   const navigate = useNavigate()
   const { visits, setVisits, loading, error } = useVisits()
-  const { actionError, handleToggleStatus, handleDelete } = useVisitActions(setVisits)
+  const { actionError, handleToggleStatus } = useVisitActions(setVisits)
   const [statusFilter, setStatusFilter] = useState<'전체' | VisitStatus>('전체')
   const [platformFilter, setPlatformFilter] = useState<'전체' | Platform>('전체')
   const [sortKey, setSortKey] = useState<SortKey>('visitDate')
@@ -149,7 +149,6 @@ export default function TablePage() {
                   </th>
                 ))}
                 <th className="px-4 py-3 font-semibold">상태</th>
-                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -175,15 +174,6 @@ export default function TablePage() {
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={(e) => handleDelete(e, v, `"${v.storeName}" 기록을 삭제할까요?`)}
-                      className="text-xs text-muted hover:text-red-400"
-                    >
-                      삭제
-                    </button>
                   </td>
                 </tr>
               ))}

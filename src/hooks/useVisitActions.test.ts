@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useVisitActions } from './useVisitActions'
-import { deleteVisit, toggleStatus } from '../lib/visits'
+import { toggleStatus } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
 vi.mock('../lib/visits', () => ({
@@ -64,49 +64,5 @@ describe('handleToggleStatus', () => {
 
     expect(setVisits).not.toHaveBeenCalled()
     expect(result.current.actionError).toBe('상태 변경에 실패했습니다.')
-  })
-})
-
-describe('handleDelete', () => {
-  it('does nothing when the confirm dialog is dismissed', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
-    const setVisits = vi.fn()
-    const { result } = renderHook(() => useVisitActions(setVisits))
-
-    await act(async () => {
-      await result.current.handleDelete(fakeMouseEvent, visit, '삭제할까요?')
-    })
-
-    expect(deleteVisit).not.toHaveBeenCalled()
-    expect(setVisits).not.toHaveBeenCalled()
-  })
-
-  it('removes the visit on confirmed success', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
-    vi.mocked(deleteVisit).mockResolvedValue(undefined)
-    const setVisits = vi.fn()
-    const { result } = renderHook(() => useVisitActions(setVisits))
-
-    await act(async () => {
-      await result.current.handleDelete(fakeMouseEvent, visit, '삭제할까요?')
-    })
-
-    expect(deleteVisit).toHaveBeenCalledWith('1')
-    const updater = setVisits.mock.calls[0][0] as (prev: Visit[]) => Visit[]
-    expect(updater([visit, otherVisit('2')])).toEqual([otherVisit('2')])
-    expect(result.current.actionError).toBeNull()
-  })
-
-  it('sets actionError on delete failure', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
-    vi.mocked(deleteVisit).mockRejectedValue(new Error('network error'))
-    const setVisits = vi.fn()
-    const { result } = renderHook(() => useVisitActions(setVisits))
-
-    await act(async () => {
-      await result.current.handleDelete(fakeMouseEvent, visit, '삭제할까요?')
-    })
-
-    expect(result.current.actionError).toBe('삭제에 실패했습니다.')
   })
 })

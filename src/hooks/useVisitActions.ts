@@ -34,18 +34,5 @@ export function useVisitActions(setVisits: Dispatch<SetStateAction<Visit[]>>) {
     }
   }
 
-  async function handleDelete(e: React.MouseEvent, v: Visit, confirmMessage: string) {
-    e.stopPropagation()
-    await confirmAndDelete(
-      v.id,
-      confirmMessage,
-      () => {
-        setVisits((prev) => prev.filter((item) => item.id !== v.id))
-        setActionError(null)
-      },
-      setActionError,
-    )
-  }
-
-  return { actionError, handleToggleStatus, handleDelete }
+  return { actionError, handleToggleStatus }
 }

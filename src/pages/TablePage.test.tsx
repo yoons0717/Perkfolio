@@ -3,13 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import TablePage from './TablePage'
-import { deleteVisit, getVisits, toggleStatus } from '../lib/visits'
+import { getVisits, toggleStatus } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
 vi.mock('../lib/visits', () => ({
   getVisits: vi.fn(),
   toggleStatus: vi.fn(),
-  deleteVisit: vi.fn(),
 }))
 
 function makeVisit(overrides: Partial<Visit>): Visit {
@@ -96,7 +95,6 @@ describe('TablePage columns', () => {
       '₩5,000',
       '₩43,000',
       '예정',
-      '삭제',
     ])
   })
 
@@ -250,29 +248,6 @@ describe('TablePage row actions', () => {
     expect(toggleStatus).toHaveBeenCalledWith('1', '예정')
   })
 
-  it('confirms and calls deleteVisit when the delete button is clicked (thin wiring check)', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const visit = makeVisit({ storeName: '카페 온도' })
-    vi.mocked(getVisits).mockResolvedValue([visit])
-    vi.mocked(deleteVisit).mockResolvedValue(undefined)
-    renderTablePage()
-
-    await userEvent.click(await screen.findByText('삭제'))
-
-    expect(window.confirm).toHaveBeenCalledWith('"카페 온도" 기록을 삭제할까요?')
-    expect(deleteVisit).toHaveBeenCalledWith('1')
-  })
-
-  it('does not call deleteVisit when the confirm dialog is dismissed', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
-    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
-    renderTablePage()
-
-    await userEvent.click(await screen.findByText('삭제'))
-
-    expect(deleteVisit).not.toHaveBeenCalled()
-  })
-
   it('navigates to the detail page when a row is clicked', async () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({ id: '42', storeName: '카페 온도' })])
     renderTablePage()
@@ -282,15 +257,11 @@ describe('TablePage row actions', () => {
     expect(await screen.findByText('상세 화면')).toBeInTheDocument()
   })
 
-  it('does not navigate when the status badge or delete button is clicked', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
+  it('does not navigate when the status badge is clicked', async () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
     renderTablePage()
 
     await userEvent.click(await screen.findByRole('button', { name: '예정' }))
-    expect(screen.queryByText('상세 화면')).not.toBeInTheDocument()
-
-    await userEvent.click(screen.getByText('삭제'))
     expect(screen.queryByText('상세 화면')).not.toBeInTheDocument()
   })
 })
