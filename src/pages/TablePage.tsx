@@ -31,7 +31,7 @@ const columns: Column[] = [
   { key: 'storeName', label: '업체명' },
   { key: 'category', label: '카테고리' },
   { key: 'retailValue', label: '체험가' },
-  { key: 'extraPayment', label: '추가결제' },
+  { key: 'extraPayment', label: '추가결제액' },
   { key: 'netSaved', label: '순절감액' },
 ]
 

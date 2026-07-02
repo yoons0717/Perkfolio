@@ -28,8 +28,8 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText('업체명'), '카페 온도')
   await userEvent.type(screen.getByLabelText('가게 정보 URL'), 'https://store.example.com')
   await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
-  await userEvent.clear(screen.getByLabelText('정가'))
-  await userEvent.type(screen.getByLabelText('정가'), '48000')
+  await userEvent.clear(screen.getByLabelText('체험가'))
+  await userEvent.type(screen.getByLabelText('체험가'), '48000')
   await userEvent.type(screen.getByLabelText('체험단 URL'), 'https://campaign.example.com')
 }
 

@@ -223,7 +223,7 @@ export default function VisitForm({
 
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-sm">
-            정가
+            체험가
             <input
               type="number"
               min="0"
@@ -235,7 +235,7 @@ export default function VisitForm({
           </label>
 
           <label className="flex flex-col gap-1 text-sm">
-            추가 결제액
+            추가결제액
             <input
               type="number"
               min="0"

@@ -17,12 +17,12 @@ async function fillRequiredFields(opts: { skip?: string[] } = {}) {
   await userEvent.type(screen.getByLabelText('업체명'), '카페 온도')
   await userEvent.type(screen.getByLabelText('가게 정보 URL'), 'https://store.example.com')
   await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
-  await userEvent.clear(screen.getByLabelText('정가'))
-  await userEvent.type(screen.getByLabelText('정가'), '48000')
+  await userEvent.clear(screen.getByLabelText('체험가'))
+  await userEvent.type(screen.getByLabelText('체험가'), '48000')
   await userEvent.type(screen.getByLabelText('체험단 URL'), 'https://campaign.example.com')
 }
 
-const requiredFieldLabels = ['업체명', '가게 정보 URL', '체험 내역', '정가', '체험단 URL']
+const requiredFieldLabels = ['업체명', '가게 정보 URL', '체험 내역', '체험가', '체험단 URL']
 
 describe('VisitForm validation', () => {
   it('does not submit when required fields are empty', async () => {
@@ -75,7 +75,7 @@ describe('VisitForm validation', () => {
     expect(screen.getByLabelText('플랫폼')).toHaveValue('')
     expect(screen.getByLabelText('카테고리')).toHaveValue('')
     expect(screen.getByLabelText('상태')).toHaveValue('')
-    expect(screen.getByLabelText('추가 결제액')).toHaveValue(0)
+    expect(screen.getByLabelText('추가결제액')).toHaveValue(0)
   })
 })
 
@@ -86,8 +86,8 @@ describe('VisitForm submission payload', () => {
     await userEvent.selectOptions(screen.getByLabelText('플랫폼'), '캐시노트')
     await userEvent.selectOptions(screen.getByLabelText('카테고리'), '음식점')
     await userEvent.selectOptions(screen.getByLabelText('상태'), '방문완료')
-    await userEvent.clear(screen.getByLabelText('추가 결제액'))
-    await userEvent.type(screen.getByLabelText('추가 결제액'), '5000')
+    await userEvent.clear(screen.getByLabelText('추가결제액'))
+    await userEvent.type(screen.getByLabelText('추가결제액'), '5000')
 
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
@@ -201,8 +201,8 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('업체명')).toHaveValue('기존 업체')
     expect(screen.getByLabelText('가게 정보 URL')).toHaveValue('https://store.example.com/existing')
     expect(screen.getByLabelText('체험 내역')).toHaveValue('세트메뉴')
-    expect(screen.getByLabelText('정가')).toHaveValue(30000)
-    expect(screen.getByLabelText('추가 결제액')).toHaveValue(2000)
+    expect(screen.getByLabelText('체험가')).toHaveValue(30000)
+    expect(screen.getByLabelText('추가결제액')).toHaveValue(2000)
     expect(screen.getByLabelText('체험단 URL')).toHaveValue('https://campaign.example.com/existing')
     expect(screen.getByLabelText('포스팅 링크 (선택)')).toHaveValue('https://blog.example.com/post')
     expect(screen.getByLabelText('플랫폼')).toHaveValue('레뷰')

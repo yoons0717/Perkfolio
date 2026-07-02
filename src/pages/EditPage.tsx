@@ -153,8 +153,8 @@ export default function EditPage() {
           <ViewField label="체험 내역" value={visit.sponsoredItems} />
 
           <div className="grid grid-cols-2 gap-3">
-            <ViewField label="정가" value={formatWon(visit.retailValue)} />
-            <ViewField label="추가 결제액" value={formatWon(visit.extraPayment)} />
+            <ViewField label="체험가" value={formatWon(visit.retailValue)} />
+            <ViewField label="추가결제액" value={formatWon(visit.extraPayment)} />
           </div>
 
           <ViewField label="상태" value={visit.status} />
