@@ -100,6 +100,18 @@ describe('TablePage columns', () => {
     ])
   })
 
+  it('shows the net savings in red when extra payment exceeds retail value (a loss)', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', retailValue: 10000, extraPayment: 15000 }),
+    ])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    const netSavedCell = screen.getByText('₩-5,000')
+    expect(netSavedCell).toHaveClass('text-red-400')
+    expect(netSavedCell).not.toHaveClass('text-green')
+  })
+
   it('shows "-" for no deadline and "리뷰완료" when the review is done', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', storeName: '가게A', reviewDeadline: null }),

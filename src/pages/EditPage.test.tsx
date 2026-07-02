@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { createMemoryRouter, MemoryRouter, Route, RouterProvider, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import EditPage from './EditPage'
 import { deleteVisit, getVisit, updateVisit } from '../lib/visits'
@@ -52,6 +52,50 @@ describe('EditPage loading', () => {
     vi.mocked(getVisit).mockRejectedValue(new Error('not found'))
     renderEditPage()
     expect(await screen.findByText('기록을 불러오지 못했습니다.')).toBeInTheDocument()
+  })
+
+  it('clears a previous load error after navigating to a valid id', async () => {
+    vi.mocked(getVisit).mockRejectedValueOnce(new Error('not found'))
+    const router = createMemoryRouter(
+      [
+        { path: '/edit/:id', element: <EditPage /> },
+        { path: '/table', element: <div>표 화면</div> },
+      ],
+      { initialEntries: ['/edit/bad-id'] },
+    )
+    render(<RouterProvider router={router} />)
+    expect(await screen.findByText('기록을 불러오지 못했습니다.')).toBeInTheDocument()
+
+    vi.mocked(getVisit).mockResolvedValueOnce(makeVisit({ id: '2', storeName: '카페 온도' }))
+    await router.navigate('/edit/2')
+
+    expect(await screen.findByRole('heading', { name: '카페 온도' })).toBeInTheDocument()
+    expect(screen.queryByText('기록을 불러오지 못했습니다.')).not.toBeInTheDocument()
+  })
+
+  it('ignores a stale response for a previous id after navigating to a new id', async () => {
+    let resolveFirst!: (v: Visit) => void
+    const firstLoad = new Promise<Visit>((resolve) => {
+      resolveFirst = resolve
+    })
+    vi.mocked(getVisit).mockReturnValueOnce(firstLoad)
+    const router = createMemoryRouter(
+      [
+        { path: '/edit/:id', element: <EditPage /> },
+        { path: '/table', element: <div>표 화면</div> },
+      ],
+      { initialEntries: ['/edit/1'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    vi.mocked(getVisit).mockResolvedValueOnce(makeVisit({ id: '2', storeName: '가게B' }))
+    await router.navigate('/edit/2')
+    expect(await screen.findByRole('heading', { name: '가게B' })).toBeInTheDocument()
+
+    resolveFirst(makeVisit({ id: '1', storeName: '가게A' }))
+    await new Promise((r) => setTimeout(r, 20))
+
+    expect(screen.getByRole('heading', { name: '가게B' })).toBeInTheDocument()
   })
 })
 

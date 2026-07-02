@@ -69,9 +69,18 @@ export default function EditPage() {
 
   useEffect(() => {
     if (!id) return
+    let cancelled = false
+    setLoadError(false)
     getVisit(id)
-      .then(setVisit)
-      .catch(() => setLoadError(true))
+      .then((v) => {
+        if (!cancelled) setVisit(v)
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [id])
 
   async function handleSubmit(updated: NewVisit) {

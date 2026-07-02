@@ -175,7 +175,11 @@ export default function TablePage() {
                   <td className="px-4 py-3">{v.category}</td>
                   <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
                   <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
-                  <td className="px-4 py-3 font-mono font-semibold text-green">{formatWon(netSaved(v))}</td>
+                  <td
+                    className={`px-4 py-3 font-mono font-semibold ${netSaved(v) < 0 ? 'text-red-400' : 'text-green'}`}
+                  >
+                    {formatWon(netSaved(v))}
+                  </td>
                   <td className="px-4 py-3">
                     <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
                   </td>
