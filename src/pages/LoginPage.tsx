@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabaseClient'
+import { signInWithPassword } from '../lib/auth'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -15,7 +15,7 @@ export default function LoginPage() {
     setError(null)
     setSubmitting(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await signInWithPassword(email, password)
 
     setSubmitting(false)
 

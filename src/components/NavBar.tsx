@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { supabase } from '../lib/supabaseClient'
+import { signOut } from '../lib/auth'
 
 export default function NavBar() {
   const { session } = useAuth()
@@ -13,7 +13,7 @@ export default function NavBar() {
   const isDashboardActive = location.pathname === '/dashboard'
 
   async function handleLogout() {
-    await supabase.auth.signOut()
+    await signOut()
     navigate('/login')
   }
 
