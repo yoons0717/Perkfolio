@@ -40,11 +40,6 @@ describe('VisitForm validation', () => {
   })
 
   it('blocks submission when visit date is cleared (native required validation)', async () => {
-    // NOTE: VisitForm.tsx also has a custom `if (!visitDate) setError(...)`
-    // check, but it never runs in practice: the browser's native
-    // required-field validation blocks the submit event before that
-    // handler is reached. See bug report — this test documents the
-    // actual behavior, not the intended one.
     const { onSubmit } = renderForm()
     await fillRequiredFields()
     const dateInput = screen.getByLabelText('방문일') as HTMLInputElement

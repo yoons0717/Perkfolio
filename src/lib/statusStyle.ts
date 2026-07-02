@@ -21,7 +21,7 @@ export function statusDotClass(status: VisitStatus): string {
   return 'bg-blue'
 }
 
-export type DeadlineDisplay = { text: string; reviewed: boolean }
+type DeadlineDisplay = { text: string; reviewed: boolean }
 
 export function deadlineDisplay(status: VisitStatus, reviewDeadline: string | null): DeadlineDisplay | null {
   if (!reviewDeadline) return null

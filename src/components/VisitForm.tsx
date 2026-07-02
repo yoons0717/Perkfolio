@@ -52,37 +52,24 @@ export default function VisitForm({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!visitDate) {
-      setError('방문일을 입력해주세요.')
-      return
-    }
-    if (!platform) {
-      setError('플랫폼을 선택해주세요.')
-      return
-    }
-    if (!category) {
-      setError('카테고리를 선택해주세요.')
-      return
-    }
-    if (!status) {
-      setError('상태를 선택해주세요.')
-      return
-    }
+    // visitDate/platform/category/status are guaranteed non-empty here: each
+    // field is `required` (DatePicker/Select), so the browser blocks submit
+    // before this handler runs if any of them is empty.
     setError(null)
     setSubmitting(true)
 
     try {
       await onSubmit({
-        visitDate: toDateString(visitDate),
-        platform,
+        visitDate: toDateString(visitDate as Date),
+        platform: platform as Platform,
         storeName,
-        category,
+        category: category as Category,
         sponsoredItems,
         campaignUrl,
         storeInfoUrl,
         retailValue: Number(retailValue),
         extraPayment: Number(extraPayment),
-        status,
+        status: status as VisitStatus,
         postUrl: postUrl.trim() === '' ? null : postUrl.trim(),
         reviewDeadline: reviewDeadline ? toDateString(reviewDeadline) : null,
       })
