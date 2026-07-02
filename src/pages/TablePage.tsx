@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
 import StatusBadgeButton from '../components/StatusBadgeButton'
 import { useVisitActions } from '../hooks/useVisitActions'
+import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
 import { deadlineDisplay, statusOrder } from '../lib/statusStyle'
-import { getVisits } from '../lib/visits'
 import { platforms } from '../types/visit'
 import type { Platform, Visit, VisitStatus } from '../types/visit'
 
@@ -47,21 +47,12 @@ function sortValue(v: Visit, key: SortKey): string | number {
 
 export default function TablePage() {
   const navigate = useNavigate()
-  const [visits, setVisits] = useState<Visit[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { visits, setVisits, loading, error } = useVisits()
   const { actionError, handleToggleStatus, handleDelete } = useVisitActions(setVisits)
   const [statusFilter, setStatusFilter] = useState<'전체' | VisitStatus>('전체')
   const [platformFilter, setPlatformFilter] = useState<'전체' | Platform>('전체')
   const [sortKey, setSortKey] = useState<SortKey>('visitDate')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
-
-  useEffect(() => {
-    getVisits()
-      .then(setVisits)
-      .catch(() => setError('목록을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false))
-  }, [])
 
   const visible = useMemo(() => {
     let result = visits

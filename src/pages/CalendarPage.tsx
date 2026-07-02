@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StatusBadgeButton from '../components/StatusBadgeButton'
 import { useVisitActions } from '../hooks/useVisitActions'
+import { useVisits } from '../hooks/useVisits'
 import { toDateString } from '../lib/format'
 import { deadlineDisplay, statusDotClass } from '../lib/statusStyle'
-import { getVisits } from '../lib/visits'
 import type { Visit } from '../types/visit'
 
 const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
@@ -23,18 +23,9 @@ export default function CalendarPage() {
   const navigate = useNavigate()
   const today = new Date()
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
-  const [visits, setVisits] = useState<Visit[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { visits, setVisits, loading, error } = useVisits()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const { actionError, handleToggleStatus } = useVisitActions(setVisits)
-
-  useEffect(() => {
-    getVisits()
-      .then(setVisits)
-      .catch(() => setError('목록을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false))
-  }, [])
 
   const visitsByDate = useMemo(() => {
     const map = new Map<string, Visit[]>()
