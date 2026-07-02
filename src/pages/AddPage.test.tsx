@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import AddPage from './AddPage'
 import { addVisit } from '../lib/visits'
 import type { NewVisit } from '../types/visit'
@@ -29,6 +29,10 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText('정가'), '48000')
   await userEvent.type(screen.getByLabelText('체험단 URL'), 'https://campaign.example.com')
 }
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('AddPage', () => {
   it('calls addVisit with the form data and navigates to /table on success', async () => {

@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useVisitActions } from './useVisitActions'
 import { deleteVisit, toggleStatus } from '../lib/visits'
 import type { Visit } from '../types/visit'
@@ -32,7 +32,7 @@ function otherVisit(id: string): Visit {
   return { ...visit, id }
 }
 
-beforeEach(() => {
+afterEach(() => {
   vi.clearAllMocks()
 })
 
