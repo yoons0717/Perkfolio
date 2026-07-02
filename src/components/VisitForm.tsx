@@ -16,6 +16,38 @@ function parseDateString(value: string): Date {
   return new Date(year, month - 1, day)
 }
 
+type FormFields = {
+  visitDate: Date | null
+  platform: Platform | ''
+  storeName: string
+  category: Category | ''
+  sponsoredItems: string
+  campaignUrl: string
+  storeInfoUrl: string
+  retailValue: string
+  extraPayment: string
+  postUrl: string
+  reviewDeadline: Date | null
+  status: VisitStatus | ''
+}
+
+function initialFormFields(initialValues: NewVisit | undefined): FormFields {
+  return {
+    visitDate: initialValues ? parseDateString(initialValues.visitDate) : new Date(),
+    platform: initialValues?.platform ?? '',
+    storeName: initialValues?.storeName ?? '',
+    category: initialValues?.category ?? '',
+    sponsoredItems: initialValues?.sponsoredItems ?? '',
+    campaignUrl: initialValues?.campaignUrl ?? '',
+    storeInfoUrl: initialValues?.storeInfoUrl ?? '',
+    retailValue: String(initialValues?.retailValue ?? ''),
+    extraPayment: String(initialValues?.extraPayment ?? 0),
+    postUrl: initialValues?.postUrl ?? '',
+    reviewDeadline: initialValues?.reviewDeadline ? parseDateString(initialValues.reviewDeadline) : null,
+    status: initialValues?.status ?? '',
+  }
+}
+
 type VisitFormProps = {
   initialValues?: NewVisit
   onSubmit: (visit: NewVisit) => Promise<void>
@@ -31,24 +63,28 @@ export default function VisitForm({
   pendingLabel,
   footerExtra,
 }: VisitFormProps) {
-  const [visitDate, setVisitDate] = useState<Date | null>(
-    initialValues ? parseDateString(initialValues.visitDate) : new Date(),
-  )
-  const [platform, setPlatform] = useState<Platform | ''>(initialValues?.platform ?? '')
-  const [storeName, setStoreName] = useState(initialValues?.storeName ?? '')
-  const [category, setCategory] = useState<Category | ''>(initialValues?.category ?? '')
-  const [sponsoredItems, setSponsoredItems] = useState(initialValues?.sponsoredItems ?? '')
-  const [campaignUrl, setCampaignUrl] = useState(initialValues?.campaignUrl ?? '')
-  const [storeInfoUrl, setStoreInfoUrl] = useState(initialValues?.storeInfoUrl ?? '')
-  const [retailValue, setRetailValue] = useState(String(initialValues?.retailValue ?? ''))
-  const [extraPayment, setExtraPayment] = useState(String(initialValues?.extraPayment ?? 0))
-  const [postUrl, setPostUrl] = useState(initialValues?.postUrl ?? '')
-  const [reviewDeadline, setReviewDeadline] = useState<Date | null>(
-    initialValues?.reviewDeadline ? parseDateString(initialValues.reviewDeadline) : null,
-  )
-  const [status, setStatus] = useState<VisitStatus | ''>(initialValues?.status ?? '')
+  const [fields, setFields] = useState<FormFields>(() => initialFormFields(initialValues))
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  function updateField<K extends keyof FormFields>(key: K, value: FormFields[K]) {
+    setFields((f) => ({ ...f, [key]: value }))
+  }
+
+  const {
+    visitDate,
+    platform,
+    storeName,
+    category,
+    sponsoredItems,
+    campaignUrl,
+    storeInfoUrl,
+    retailValue,
+    extraPayment,
+    postUrl,
+    reviewDeadline,
+    status,
+  } = fields
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -88,7 +124,7 @@ export default function VisitForm({
             방문일
             <DatePicker
               selected={visitDate}
-              onChange={(date: Date | null) => setVisitDate(date)}
+              onChange={(date: Date | null) => updateField('visitDate', date)}
               dateFormat="yyyy-MM-dd"
               className={`w-full ${inputClass}`}
               required
@@ -101,7 +137,7 @@ export default function VisitForm({
               aria-label="플랫폼"
               required
               value={platform}
-              onChange={(e) => setPlatform(e.target.value as Platform)}
+              onChange={(e) => updateField('platform', e.target.value as Platform)}
               className={selectClass}
             >
               <option value="" disabled hidden>
@@ -120,7 +156,7 @@ export default function VisitForm({
           리뷰 마감일 (선택)
           <DatePicker
             selected={reviewDeadline}
-            onChange={(date: Date | null) => setReviewDeadline(date)}
+            onChange={(date: Date | null) => updateField('reviewDeadline', date)}
             dateFormat="yyyy-MM-dd"
             isClearable
             placeholderText="마감일 없음"
@@ -134,7 +170,7 @@ export default function VisitForm({
             <input
               type="text"
               value={storeName}
-              onChange={(e) => setStoreName(e.target.value)}
+              onChange={(e) => updateField('storeName', e.target.value)}
               required
               className={inputClass}
             />
@@ -146,7 +182,7 @@ export default function VisitForm({
               aria-label="카테고리"
               required
               value={category}
-              onChange={(e) => setCategory(e.target.value as Category)}
+              onChange={(e) => updateField('category', e.target.value as Category)}
               className={selectClass}
             >
               <option value="" disabled hidden>
@@ -166,7 +202,7 @@ export default function VisitForm({
           <input
             type="url"
             value={storeInfoUrl}
-            onChange={(e) => setStoreInfoUrl(e.target.value)}
+            onChange={(e) => updateField('storeInfoUrl', e.target.value)}
             required
             className={inputClass}
           />
@@ -178,7 +214,7 @@ export default function VisitForm({
             type="text"
             placeholder="예: 파스타 2, 음료 2"
             value={sponsoredItems}
-            onChange={(e) => setSponsoredItems(e.target.value)}
+            onChange={(e) => updateField('sponsoredItems', e.target.value)}
             required
             className={inputClass}
           />
@@ -191,7 +227,7 @@ export default function VisitForm({
               type="number"
               min="0"
               value={retailValue}
-              onChange={(e) => setRetailValue(e.target.value)}
+              onChange={(e) => updateField('retailValue', e.target.value)}
               required
               className={inputClass}
             />
@@ -203,7 +239,7 @@ export default function VisitForm({
               type="number"
               min="0"
               value={extraPayment}
-              onChange={(e) => setExtraPayment(e.target.value)}
+              onChange={(e) => updateField('extraPayment', e.target.value)}
               className={inputClass}
             />
           </label>
@@ -215,7 +251,7 @@ export default function VisitForm({
             aria-label="상태"
             required
             value={status}
-            onChange={(e) => setStatus(e.target.value as VisitStatus)}
+            onChange={(e) => updateField('status', e.target.value as VisitStatus)}
             className={selectClass}
           >
             <option value="" disabled hidden>
@@ -238,7 +274,7 @@ export default function VisitForm({
           <input
             type="url"
             value={campaignUrl}
-            onChange={(e) => setCampaignUrl(e.target.value)}
+            onChange={(e) => updateField('campaignUrl', e.target.value)}
             required
             className={inputClass}
           />
@@ -249,7 +285,7 @@ export default function VisitForm({
           <input
             type="url"
             value={postUrl}
-            onChange={(e) => setPostUrl(e.target.value)}
+            onChange={(e) => updateField('postUrl', e.target.value)}
             className={inputClass}
           />
         </label>

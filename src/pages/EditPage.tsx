@@ -105,26 +105,11 @@ export default function EditPage() {
   }
 
   if (mode === 'edit') {
-    const initialValues: NewVisit = {
-      visitDate: visit.visitDate,
-      platform: visit.platform,
-      storeName: visit.storeName,
-      category: visit.category,
-      sponsoredItems: visit.sponsoredItems,
-      campaignUrl: visit.campaignUrl,
-      storeInfoUrl: visit.storeInfoUrl,
-      retailValue: visit.retailValue,
-      extraPayment: visit.extraPayment,
-      status: visit.status,
-      postUrl: visit.postUrl,
-      reviewDeadline: visit.reviewDeadline,
-    }
-
     return (
       <PageContainer>
         <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">방문 기록 수정</h1>
         <VisitForm
-          initialValues={initialValues}
+          initialValues={visit}
           onSubmit={handleSubmit}
           submitLabel="저장"
           pendingLabel="저장 중..."

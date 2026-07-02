@@ -9,6 +9,11 @@ import type { Visit } from '../types/visit'
 
 const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
 
+function takeWithOverflow<T>(items: T[], limit: number): { shown: T[]; extra: number } {
+  const shown = items.slice(0, limit)
+  return { shown, extra: items.length - shown.length }
+}
+
 export function getMonthGrid(year: number, month: number): Date[] {
   const firstOfMonth = new Date(year, month, 1)
   const start = new Date(year, month, 1 - firstOfMonth.getDay())
@@ -97,18 +102,18 @@ export default function CalendarPage() {
           const isSelected = dateStr === selectedDate
           const dayVisits = visitsByDate.get(dateStr) ?? []
           const dayDeadlines = deadlinesByDate.get(dateStr) ?? []
-          const shown = dayVisits.slice(0, 2)
-          const extra = dayVisits.length - shown.length
-          const shownDeadlines = dayDeadlines.slice(0, 2)
-          const extraDeadlines = dayDeadlines.length - shownDeadlines.length
-          const dots = [
-            ...dayVisits.map((v) => ({ key: v.id, color: statusDotClass(v.status) })),
-            ...dayDeadlines.map((v) => ({
-              key: `dl-${v.id}`,
-              color: deadlineDisplay(v.status, v.reviewDeadline)?.reviewed ? 'bg-green' : 'bg-red-500',
-            })),
-          ].slice(0, 4)
-          const dotsExtra = dayVisits.length + dayDeadlines.length - dots.length
+          const { shown, extra } = takeWithOverflow(dayVisits, 2)
+          const { shown: shownDeadlines, extra: extraDeadlines } = takeWithOverflow(dayDeadlines, 2)
+          const { shown: dots, extra: dotsExtra } = takeWithOverflow(
+            [
+              ...dayVisits.map((v) => ({ key: v.id, color: statusDotClass(v.status) })),
+              ...dayDeadlines.map((v) => ({
+                key: `dl-${v.id}`,
+                color: deadlineDisplay(v.status, v.reviewDeadline)?.reviewed ? 'bg-green' : 'bg-red-500',
+              })),
+            ],
+            4,
+          )
 
           return (
             <button

@@ -45,6 +45,17 @@ function sortValue(v: Visit, key: SortKey): string | number {
   return v[key]
 }
 
+function DeadlineCell({ visit }: { visit: Visit }) {
+  const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
+  if (!deadline) return <span className="text-muted">-</span>
+  if (deadline.reviewed) return <span className="text-green">{deadline.text}</span>
+  return (
+    <span className="text-red-400">
+      {visit.reviewDeadline} <span className="text-[10px] text-muted">({deadline.text})</span>
+    </span>
+  )
+}
+
 export default function TablePage() {
   const navigate = useNavigate()
   const { visits, setVisits, loading, error } = useVisits()
@@ -150,16 +161,7 @@ export default function TablePage() {
                 >
                   <td className="px-4 py-3 font-mono text-ink">{v.visitDate}</td>
                   <td className="px-4 py-3 font-mono">
-                    {(() => {
-                      const deadline = deadlineDisplay(v.status, v.reviewDeadline)
-                      if (!deadline) return <span className="text-muted">-</span>
-                      if (deadline.reviewed) return <span className="text-green">{deadline.text}</span>
-                      return (
-                        <span className="text-red-400">
-                          {v.reviewDeadline} <span className="text-[10px] text-muted">({deadline.text})</span>
-                        </span>
-                      )
-                    })()}
+                    <DeadlineCell visit={v} />
                   </td>
                   <td className="px-4 py-3">{v.platform}</td>
                   <td className="px-4 py-3">{v.storeName}</td>
