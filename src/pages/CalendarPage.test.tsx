@@ -110,12 +110,12 @@ describe('CalendarPage', () => {
     expect(await screen.findByRole('button', { name: status })).toBeInTheDocument()
   })
 
-  it('shows each visit platform in the day panel', async () => {
-    vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15, platform: '캐시노트' })])
+  it('shows each visit platform and category in the day panel', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15, platform: '캐시노트', category: '카페' })])
     renderCalendar()
 
     await userEvent.click(await screen.findByText('15'))
-    expect(await screen.findByText('캐시노트 · 카페 온도')).toBeInTheDocument()
+    expect(await screen.findByText('캐시노트 · 카페')).toBeInTheDocument()
   })
 
   it('shows "+N개" when more than 2 visits fall on the same day', async () => {

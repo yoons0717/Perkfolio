@@ -181,9 +181,15 @@ export default function CalendarPage() {
                   onClick={() => navigate(`/edit/${v.id}`)}
                   className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
                 >
-                  <span>
-                    {v.platform} · {v.storeName}
-                  </span>
+                  <div className="flex items-start gap-2">
+                    <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${statusDotClass(v.status)}`} />
+                    <div>
+                      <p className="text-ink">{v.storeName}</p>
+                      <p className="mt-0.5 text-xs text-muted">
+                        {v.platform} · {v.category}
+                      </p>
+                    </div>
+                  </div>
                   <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
                 </div>
               ))}
