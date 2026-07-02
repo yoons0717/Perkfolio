@@ -4,6 +4,7 @@ import { createMemoryRouter, MemoryRouter, Route, RouterProvider, Routes } from 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import EditPage from './EditPage'
 import { deleteVisit, getVisit, updateVisit } from '../lib/visits'
+import { makeVisit } from '../test/factories'
 import type { Visit } from '../types/visit'
 
 vi.mock('../lib/visits', () => ({
@@ -11,26 +12,6 @@ vi.mock('../lib/visits', () => ({
   updateVisit: vi.fn(),
   deleteVisit: vi.fn(),
 }))
-
-function makeVisit(overrides: Partial<Visit>): Visit {
-  return {
-    id: '1',
-    visitDate: '2026-01-10',
-    platform: '포포몬',
-    storeName: '카페 온도',
-    category: '카페',
-    sponsoredItems: '음료 2',
-    campaignUrl: 'https://campaign.example.com',
-    storeInfoUrl: 'https://store.example.com',
-    retailValue: 10000,
-    extraPayment: 0,
-    status: '예정',
-    postUrl: null,
-    reviewDeadline: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    ...overrides,
-  }
-}
 
 function renderEditPage(id = '1') {
   return render(

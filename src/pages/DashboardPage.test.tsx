@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import DashboardPage from './DashboardPage'
 import { getVisits } from '../lib/visits'
+import { makeVisit as makeBaseVisit } from '../test/factories'
 import type { Visit } from '../types/visit'
 
 vi.mock('../lib/visits', () => ({
@@ -17,24 +18,10 @@ function thisMonthDate(day = 15): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
-function makeVisit(overrides: Partial<Visit>): Visit {
-  return {
-    id: '1',
-    visitDate: thisMonthDate(),
-    platform: '포포몬',
-    storeName: '카페 온도',
-    category: '카페',
-    sponsoredItems: '음료 2',
-    campaignUrl: 'https://campaign.example.com',
-    storeInfoUrl: 'https://store.example.com',
-    retailValue: 10000,
-    extraPayment: 0,
-    status: '방문완료',
-    postUrl: null,
-    reviewDeadline: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    ...overrides,
-  }
+// Dashboard totals exclude 예정 visits (see confirmedVisits), so tests here
+// default to a confirmed status unlike the shared factory's plain 예정.
+function makeVisit(overrides: Partial<Visit> = {}): Visit {
+  return makeBaseVisit({ visitDate: thisMonthDate(), status: '방문완료', ...overrides })
 }
 
 function renderDashboard() {

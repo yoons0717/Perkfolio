@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useVisits } from './useVisits'
 import { getVisits } from '../lib/visits'
-import type { Visit } from '../types/visit'
+import { makeVisit } from '../test/factories'
 
 vi.mock('../lib/visits', () => ({
   getVisits: vi.fn(),
@@ -12,22 +12,7 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
-const visit: Visit = {
-  id: '1',
-  visitDate: '2026-01-01',
-  platform: '포포몬',
-  storeName: '카페 온도',
-  category: '카페',
-  sponsoredItems: '음료 2',
-  campaignUrl: 'https://campaign.example.com',
-  storeInfoUrl: 'https://store.example.com',
-  retailValue: 10000,
-  extraPayment: 0,
-  status: '예정',
-  postUrl: null,
-  reviewDeadline: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-}
+const visit = makeVisit({ visitDate: '2026-01-01' })
 
 describe('useVisits', () => {
   it('starts loading, then exposes the fetched visits', async () => {
