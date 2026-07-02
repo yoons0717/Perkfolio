@@ -45,6 +45,24 @@ function sortValue(v: Visit, key: SortKey): string | number {
   return v[key]
 }
 
+function Chevron({ className }: { className?: string }) {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  )
+}
+
 function DeadlineCell({ visit }: { visit: Visit }) {
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
   if (!deadline) return <span className="text-muted">-</span>
@@ -142,10 +160,16 @@ export default function TablePage() {
                   <th
                     key={col.key}
                     onClick={() => handleSort(col.key)}
-                    className="cursor-pointer select-none px-4 py-3 font-semibold"
+                    className={`cursor-pointer select-none px-4 py-3 font-semibold transition-colors hover:text-ink ${
+                      sortKey === col.key ? 'text-ink' : ''
+                    }`}
                   >
-                    {col.label}
-                    {sortKey === col.key && (sortDir === 'asc' ? ' ▲' : ' ▼')}
+                    {col.label}{' '}
+                    <Chevron
+                      className={`inline-block transition-transform ${
+                        sortKey === col.key ? `text-blue ${sortDir === 'asc' ? 'rotate-180' : ''}` : 'text-muted/40'
+                      }`}
+                    />
                   </th>
                 ))}
                 <th className="px-4 py-3 font-semibold">상태</th>
