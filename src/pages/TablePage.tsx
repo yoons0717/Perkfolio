@@ -97,6 +97,7 @@ export default function TablePage() {
       <div className="mb-4 flex gap-3">
         <div className="w-36">
           <Select
+            aria-label="상태 필터"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as '전체' | VisitStatus)}
             className="rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink"
@@ -111,6 +112,7 @@ export default function TablePage() {
         </div>
         <div className="w-36">
           <Select
+            aria-label="플랫폼 필터"
             value={platformFilter}
             onChange={(e) => setPlatformFilter(e.target.value as '전체' | Platform)}
             className="rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink"

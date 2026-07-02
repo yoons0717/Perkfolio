@@ -99,6 +99,7 @@ export default function VisitForm({
           <label className="flex flex-col gap-1 text-sm">
             플랫폼
             <Select
+              aria-label="플랫폼"
               value={platform}
               onChange={(e) => setPlatform(e.target.value as Platform)}
               className={selectClass}
@@ -139,6 +140,7 @@ export default function VisitForm({
           <label className="flex flex-col gap-1 text-sm">
             카테고리
             <Select
+              aria-label="카테고리"
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
               className={selectClass}
@@ -203,6 +205,7 @@ export default function VisitForm({
         <label className="flex flex-col gap-1 text-sm">
           상태
           <Select
+            aria-label="상태"
             value={status}
             onChange={(e) => setStatus(e.target.value as VisitStatus)}
             className={selectClass}
