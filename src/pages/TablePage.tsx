@@ -169,7 +169,7 @@ export default function TablePage() {
                     />
                   </th>
                 ))}
-                <th className="px-4 py-3 font-semibold">상태</th>
+                <th className="py-3 pr-6 pl-4 font-semibold">상태</th>
               </tr>
             </thead>
             <tbody>
@@ -193,7 +193,7 @@ export default function TablePage() {
                   >
                     {formatWon(netSaved(v))}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="py-3 pr-6 pl-4">
                     <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
                   </td>
                 </tr>
