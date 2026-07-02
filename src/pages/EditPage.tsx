@@ -131,7 +131,7 @@ export default function EditPage() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <ViewField label="방문일" value={visit.visitDate} />
+            <ViewField label="방문(예정)일" value={visit.visitDate} />
             <ViewField label="플랫폼" value={visit.platform} />
           </div>
 
@@ -160,7 +160,7 @@ export default function EditPage() {
           <ViewField label="상태" value={visit.status} />
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-line pt-6">
+        <div className="flex flex-col gap-3 pt-3">
           <p className={sectionLabelClass}>링크</p>
           <ViewLinkField label="체험단 URL" href={visit.campaignUrl} />
           <ViewLinkField label="포스팅 링크" href={visit.postUrl} />

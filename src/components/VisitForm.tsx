@@ -122,7 +122,7 @@ export default function VisitForm({
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-sm">
-            방문일
+            방문(예정)일
             <DatePicker
               selected={visitDate}
               onChange={(date: Date | null) => updateField('visitDate', date)}

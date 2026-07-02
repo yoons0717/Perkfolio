@@ -42,7 +42,7 @@ describe('VisitForm validation', () => {
   it('blocks submission when visit date is cleared (native required validation)', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields()
-    const dateInput = screen.getByLabelText('방문일') as HTMLInputElement
+    const dateInput = screen.getByLabelText('방문(예정)일') as HTMLInputElement
     await userEvent.clear(dateInput)
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
@@ -208,7 +208,7 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('플랫폼')).toHaveValue('레뷰')
     expect(screen.getByLabelText('카테고리')).toHaveValue('음식점')
     expect(screen.getByLabelText('상태')).toHaveValue('방문완료')
-    expect(screen.getByLabelText('방문일')).toHaveValue('2026-08-15')
+    expect(screen.getByLabelText('방문(예정)일')).toHaveValue('2026-08-15')
     expect(screen.getByLabelText('마감일 (선택)')).toHaveValue('2026-08-20')
   })
 })

@@ -26,7 +26,7 @@ type Column = {
 }
 
 const columns: Column[] = [
-  { key: 'visitDate', label: '날짜' },
+  { key: 'visitDate', label: '방문(예정)일' },
   { key: 'reviewDeadline', label: '마감일' },
   { key: 'platform', label: '플랫폼' },
   { key: 'storeName', label: '업체명' },

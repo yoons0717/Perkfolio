@@ -105,6 +105,7 @@ describe('EditPage view mode', () => {
     renderEditPage()
 
     await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('방문(예정)일')).toBeInTheDocument()
     expect(screen.getByText('2026-01-10')).toBeInTheDocument()
     expect(screen.getByText('포포몬')).toBeInTheDocument()
     expect(screen.getByText('카페')).toBeInTheDocument()
