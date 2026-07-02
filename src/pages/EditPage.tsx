@@ -10,7 +10,7 @@ import { confirmAndDelete } from '../hooks/useVisitActions'
 import { getVisit, updateVisit } from '../lib/visits'
 import type { NewVisit, Visit } from '../types/visit'
 
-const viewBoxClass = 'border-b border-line px-3 py-3 text-ink'
+const viewBoxClass = 'border-b border-line px-3 py-2 text-ink'
 
 function LinkIcon() {
   return (
@@ -108,7 +108,7 @@ export default function EditPage() {
   if (mode === 'edit') {
     return (
       <PageContainer>
-        <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">방문 기록 수정</h1>
+        <h1 className="mb-4 font-display text-2xl font-extrabold text-ink">방문 기록 수정</h1>
         <VisitForm
           initialValues={visit}
           onSubmit={handleSubmit}
@@ -126,9 +126,9 @@ export default function EditPage() {
 
   return (
     <PageContainer>
-      <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
+      <h1 className="mb-4 font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
             <ViewField label="방문(예정)일" value={visit.visitDate} />

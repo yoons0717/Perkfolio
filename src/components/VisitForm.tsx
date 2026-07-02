@@ -12,6 +12,12 @@ import type { Category, NewVisit, Platform, VisitStatus } from '../types/visit'
 
 const categories: Category[] = ['카페', '음식점', '술집', '기타']
 
+// Slightly shorter than the shared inputClass/selectClass so the whole form
+// fits on one screen without scrolling; other pages keep the taller default
+// since they match it against buttons/selects elsewhere.
+const compactInputClass = inputClass.replace('py-3', 'py-2')
+const compactSelectClass = selectClass.replace('py-3', 'py-2')
+
 function parseDateString(value: string): Date {
   const [year, month, day] = value.split('-').map(Number)
   return new Date(year, month - 1, day)
@@ -118,7 +124,7 @@ export default function VisitForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-sm">
@@ -127,7 +133,7 @@ export default function VisitForm({
               selected={visitDate}
               onChange={(date: Date | null) => updateField('visitDate', date)}
               dateFormat="yyyy-MM-dd"
-              className={`w-full ${inputClass}`}
+              className={`w-full ${compactInputClass}`}
               required
             />
           </label>
@@ -139,7 +145,7 @@ export default function VisitForm({
               required
               value={platform}
               onChange={(e) => updateField('platform', e.target.value as Platform)}
-              className={selectClass}
+              className={compactSelectClass}
             >
               <option value="" disabled hidden>
                 선택하세요
@@ -161,7 +167,7 @@ export default function VisitForm({
             dateFormat="yyyy-MM-dd"
             isClearable
             placeholderText="마감일 없음"
-            className={`w-full ${inputClass}`}
+            className={`w-full ${compactInputClass}`}
           />
         </label>
 
@@ -173,7 +179,7 @@ export default function VisitForm({
               value={storeName}
               onChange={(e) => updateField('storeName', e.target.value)}
               required
-              className={inputClass}
+              className={compactInputClass}
             />
           </label>
 
@@ -184,7 +190,7 @@ export default function VisitForm({
               required
               value={category}
               onChange={(e) => updateField('category', e.target.value as Category)}
-              className={selectClass}
+              className={compactSelectClass}
             >
               <option value="" disabled hidden>
                 선택하세요
@@ -205,7 +211,7 @@ export default function VisitForm({
             value={storeInfoUrl}
             onChange={(e) => updateField('storeInfoUrl', e.target.value)}
             required
-            className={inputClass}
+            className={compactInputClass}
           />
         </label>
 
@@ -217,7 +223,7 @@ export default function VisitForm({
             value={sponsoredItems}
             onChange={(e) => updateField('sponsoredItems', e.target.value)}
             required
-            className={inputClass}
+            className={compactInputClass}
           />
         </label>
 
@@ -230,7 +236,7 @@ export default function VisitForm({
               value={retailValue}
               onChange={(e) => updateField('retailValue', e.target.value)}
               required
-              className={inputClass}
+              className={compactInputClass}
             />
           </label>
 
@@ -241,7 +247,7 @@ export default function VisitForm({
               min="0"
               value={extraPayment}
               onChange={(e) => updateField('extraPayment', e.target.value)}
-              className={inputClass}
+              className={compactInputClass}
             />
           </label>
         </div>
@@ -253,7 +259,7 @@ export default function VisitForm({
             required
             value={status}
             onChange={(e) => updateField('status', e.target.value as VisitStatus)}
-            className={selectClass}
+            className={compactSelectClass}
           >
             <option value="" disabled hidden>
               선택하세요
@@ -267,7 +273,7 @@ export default function VisitForm({
         </label>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-line pt-6">
+      <div className="flex flex-col gap-3 border-t border-line pt-4">
         <p className={sectionLabelClass}>링크</p>
 
         <label className="flex flex-col gap-1 text-sm">
@@ -277,7 +283,7 @@ export default function VisitForm({
             value={campaignUrl}
             onChange={(e) => updateField('campaignUrl', e.target.value)}
             required
-            className={inputClass}
+            className={compactInputClass}
           />
         </label>
 
@@ -287,7 +293,7 @@ export default function VisitForm({
             type="url"
             value={postUrl}
             onChange={(e) => updateField('postUrl', e.target.value)}
-            className={inputClass}
+            className={compactInputClass}
           />
         </label>
       </div>
