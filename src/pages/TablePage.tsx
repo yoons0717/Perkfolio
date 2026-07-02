@@ -6,6 +6,7 @@ import { useVisitActions } from '../hooks/useVisitActions'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
 import { deadlineDisplay, statusOrder } from '../lib/statusStyle'
+import { netSaved } from '../lib/visitStats'
 import { platforms } from '../types/visit'
 import type { Platform, Visit, VisitStatus } from '../types/visit'
 
@@ -34,10 +35,6 @@ const columns: Column[] = [
   { key: 'extraPayment', label: '추가결제액' },
   { key: 'netSaved', label: '순절감액' },
 ]
-
-function netSaved(v: Visit): number {
-  return v.retailValue - v.extraPayment
-}
 
 function sortValue(v: Visit, key: SortKey): string | number {
   if (key === 'netSaved') return netSaved(v)
