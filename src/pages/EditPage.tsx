@@ -5,7 +5,8 @@ import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
 import { formatWon } from '../lib/format'
 import { deadlineDisplay } from '../lib/statusStyle'
-import { deleteVisit, getVisit, updateVisit } from '../lib/visits'
+import { confirmAndDelete } from '../hooks/useVisitActions'
+import { getVisit, updateVisit } from '../lib/visits'
 import type { NewVisit, Visit } from '../types/visit'
 
 const viewBoxClass = 'border-b border-line px-3 py-3 text-ink'
@@ -92,14 +93,7 @@ export default function EditPage() {
 
   async function handleDelete() {
     if (!id) return
-    if (!window.confirm('이 방문 기록을 삭제할까요?')) return
-    try {
-      await deleteVisit(id)
-      navigate('/table')
-    } catch (err) {
-      console.error(err)
-      setDeleteError('삭제에 실패했습니다.')
-    }
+    await confirmAndDelete(id, '이 방문 기록을 삭제할까요?', () => navigate('/table'), setDeleteError)
   }
 
   if (loadError) {
