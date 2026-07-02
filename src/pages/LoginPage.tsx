@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Button from '../components/Button'
 import { signInWithPassword } from '../lib/auth'
 
 export default function LoginPage() {
@@ -53,13 +54,9 @@ export default function LoginPage() {
           className="rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder-muted focus:border-blue focus:outline-none"
         />
         {error && <p className="text-sm text-red-400">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="mt-1 rounded-lg bg-blue px-3 py-2 font-display text-sm font-bold text-white disabled:opacity-50"
-        >
+        <Button type="submit" disabled={submitting} className="mt-1">
           {submitting ? '로그인 중...' : '로그인'}
-        </button>
+        </Button>
       </form>
     </div>
   )

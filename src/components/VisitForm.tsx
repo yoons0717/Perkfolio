@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import Button from './Button'
 import Select from './Select'
 import { inputClass, selectClass, sectionLabelClass } from './formStyles'
 import { toDateString } from '../lib/format'
@@ -294,13 +295,9 @@ export default function VisitForm({
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="flex-1 rounded-lg bg-blue px-3 py-2 font-display text-sm font-bold text-white disabled:opacity-50"
-        >
+        <Button type="submit" disabled={submitting} className="flex-1">
           {submitting ? pendingLabel : submitLabel}
-        </button>
+        </Button>
         {footerExtra}
       </div>
     </form>

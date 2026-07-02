@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import Button from './Button'
 import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/auth'
 
@@ -21,15 +22,21 @@ export default function NavBar() {
     <nav className="flex items-center justify-between border-b border-line bg-surface px-6 py-3">
       <span className="font-display text-lg font-extrabold text-ink">Perkfolio</span>
       <div className="flex items-center gap-5 font-display text-sm font-semibold">
-        <Link to="/table" className={isRecordsActive ? 'text-ink' : 'text-muted'}>
+        <Link
+          to="/table"
+          className={`transition-colors ${isRecordsActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+        >
           기록
         </Link>
-        <Link to="/dashboard" className={isDashboardActive ? 'text-ink' : 'text-muted'}>
+        <Link
+          to="/dashboard"
+          className={`transition-colors ${isDashboardActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+        >
           대시보드
         </Link>
-        <button type="button" onClick={handleLogout} className="text-sm font-normal text-muted">
+        <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
           로그아웃
-        </button>
+        </Button>
       </div>
     </nav>
   )

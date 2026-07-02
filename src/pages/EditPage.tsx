@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import Button from '../components/Button'
 import PageContainer from '../components/PageContainer'
 import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
@@ -114,13 +115,9 @@ export default function EditPage() {
           submitLabel="저장"
           pendingLabel="저장 중..."
           footerExtra={
-            <button
-              type="button"
-              onClick={() => setMode('view')}
-              className="rounded-lg border border-line px-3 py-2 text-sm text-muted"
-            >
+            <Button variant="secondary" onClick={() => setMode('view')} className="text-muted">
               취소
-            </button>
+            </Button>
           }
         />
       </PageContainer>
@@ -173,20 +170,12 @@ export default function EditPage() {
       {deleteError && <p className="mt-3 text-sm text-red-400">{deleteError}</p>}
 
       <div className="mt-6 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => setMode('edit')}
-          className="flex-1 rounded-lg bg-blue px-3 py-2 font-display text-sm font-bold text-white"
-        >
+        <Button onClick={() => setMode('edit')} className="flex-1">
           수정
-        </button>
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="rounded-lg border border-line px-3 py-2 text-sm text-red-400"
-        >
+        </Button>
+        <Button variant="secondary" onClick={handleDelete} className="text-red-400">
           삭제
-        </button>
+        </Button>
       </div>
     </PageContainer>
   )

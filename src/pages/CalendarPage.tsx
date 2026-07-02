@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Button from '../components/Button'
 import StatusBadgeButton from '../components/StatusBadgeButton'
 import { useVisitActions } from '../hooks/useVisitActions'
 import { useVisits } from '../hooks/useVisits'
@@ -67,23 +68,23 @@ export default function CalendarPage() {
       {actionError && <p className="mb-3 text-sm text-red-400">{actionError}</p>}
 
       <div className="mb-4 flex items-center justify-between">
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
-          className="px-2 text-muted"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-white/5 hover:text-ink"
         >
           ‹
-        </button>
+        </Button>
         <span className="font-display font-bold text-ink">
           {cursor.getFullYear()}년 {cursor.getMonth() + 1}월
         </span>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
-          className="px-2 text-muted"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-white/5 hover:text-ink"
         >
           ›
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted">
