@@ -32,7 +32,7 @@
 
 ## Phase 2: 데이터 스키마 + 입력 폼 (`/add`) ✅
 - Supabase `visits` 테이블, RLS로 `auth.uid()` 기준 행 단위 격리 (마이그레이션은 `supabase/migrations/`에 누적 관리)
-- 필드: 방문일, 리뷰 마감일(선택, 방문일과 별개 날짜), 플랫폼(select), 업체명, 가게 정보 URL(필수), 카테고리(카페/음식점/술집/기타), 체험 내역, 체험가, 추가결제액(기본값 0), 체험단 URL(필수), 포스팅 링크(선택), 상태(기본값 '예정')
+- 필드: 방문일, 마감일(선택, 방문일과 별개 날짜), 플랫폼(select), 업체명, 가게 정보 URL(필수), 카테고리(카페/음식점/술집/기타), 체험 내역, 체험가, 추가결제액(기본값 0), 체험단 URL(필수), 포스팅 링크(선택), 상태(기본값 '예정')
 - 상태는 3단계: 예정 → 방문완료 → 리뷰완료
 - `src/lib/visits.ts`: getVisits / getVisit / addVisit / updateVisit / deleteVisit / toggleStatus(3단계 순환)
 - 폼은 "기본 정보"(2열 그리드) + "링크" 두 섹션으로 구성 (`src/components/VisitForm.tsx`), `src/components/formStyles.ts`로 입력창 스타일 공유

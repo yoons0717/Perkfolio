@@ -63,7 +63,7 @@ describe('VisitForm validation', () => {
     },
   )
 
-  it('submits when optional fields (포스팅 링크, 리뷰 마감일) are left empty', async () => {
+  it('submits when optional fields (포스팅 링크, 마감일) are left empty', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields()
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
@@ -112,7 +112,7 @@ describe('VisitForm submission payload', () => {
   it('submits a filled review deadline as a date string', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields()
-    await userEvent.type(screen.getByLabelText('리뷰 마감일 (선택)'), '2026-09-01{enter}')
+    await userEvent.type(screen.getByLabelText('마감일 (선택)'), '2026-09-01{enter}')
 
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
@@ -209,6 +209,6 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('카테고리')).toHaveValue('음식점')
     expect(screen.getByLabelText('상태')).toHaveValue('방문완료')
     expect(screen.getByLabelText('방문일')).toHaveValue('2026-08-15')
-    expect(screen.getByLabelText('리뷰 마감일 (선택)')).toHaveValue('2026-08-20')
+    expect(screen.getByLabelText('마감일 (선택)')).toHaveValue('2026-08-20')
   })
 })

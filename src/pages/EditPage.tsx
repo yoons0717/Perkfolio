@@ -136,7 +136,7 @@ export default function EditPage() {
           </div>
 
           <ViewField
-            label="리뷰 마감일"
+            label="마감일"
             value={
               !visit.reviewDeadline
                 ? '없음'

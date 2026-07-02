@@ -154,7 +154,7 @@ export default function VisitForm({
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
-          리뷰 마감일 (선택)
+          마감일 (선택)
           <DatePicker
             selected={reviewDeadline}
             onChange={(date: Date | null) => updateField('reviewDeadline', date)}
