@@ -14,6 +14,7 @@ dist-ssr
 
 supabase/.temp
 .claude/scheduled_tasks.lock
+.husky/_
 
 # Editor directories and files
 .vscode/*

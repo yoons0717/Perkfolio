@@ -34,11 +34,14 @@
 - `npm run dev` — 개발 서버 실행
 - `npm run build` — 프로덕션 빌드
 - `npm run lint` — oxlint 검사
-- `npm test` — Vitest 테스트 실행
+- `npm test` — Vitest watch 모드 실행
+- `npm run test:run` — Vitest 1회 실행 (CI/pre-commit용)
 
 ## 테스트
 - 도구: Vitest + React Testing Library
 - 테스트 파일은 대상 파일과 같은 위치에 `*.test.tsx`(또는 `.test.ts`)로 둠
+- 여러 테스트가 같은 `vi.mock`을 공유하면 `afterEach(() => vi.clearAllMocks())`로 정리 — `vi.restoreAllMocks()`는 이 프로젝트에서 vi.mock 팩토리로 만든 함수의 호출 기록을 지우지 못하는 걸 확인했으니 쓰지 말 것
+- Husky pre-commit 훅(`.husky/pre-commit`)이 커밋 전 `npm run test:run`을 실행 — 테스트 실패 시 커밋이 막힘
 
 ## 규칙
 - 요청받지 않은 기능/화면 추가 금지
