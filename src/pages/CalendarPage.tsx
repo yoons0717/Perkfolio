@@ -201,12 +201,17 @@ export default function CalendarPage() {
                     onClick={() => navigate(`/edit/${v.id}`)}
                     className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
                   >
-                    <span>
-                      <span className="font-medium text-ink">{v.storeName}</span>
-                      <span className={`ml-2 text-xs ${deadline.reviewed ? 'text-green' : 'text-red-400'}`}>
-                        {deadline.reviewed ? '리뷰완료' : '리뷰 마감'}
-                      </span>
-                    </span>
+                    <div className="flex items-start gap-2">
+                      <span
+                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${deadline.reviewed ? 'bg-green' : 'bg-red-500'}`}
+                      />
+                      <div>
+                        <p className="text-ink">{v.storeName}</p>
+                        <p className={`mt-0.5 text-xs ${deadline.reviewed ? 'text-green' : 'text-red-400'}`}>
+                          {deadline.reviewed ? '리뷰완료' : '리뷰 마감'}
+                        </p>
+                      </div>
+                    </div>
                     <span
                       className={`rounded-full px-3 py-1 font-mono text-xs ${
                         deadline.reviewed ? 'bg-green-bg text-green' : 'bg-red-500/10 text-red-400'

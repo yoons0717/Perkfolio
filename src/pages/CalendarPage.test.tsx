@@ -83,6 +83,24 @@ describe('CalendarPage', () => {
     expect(await screen.findByText(/마감/)).toBeInTheDocument()
   })
 
+  it.each([
+    ['예정', 'bg-red-500', '리뷰 마감'],
+    ['리뷰완료', 'bg-green', '리뷰완료'],
+  ] as const)(
+    'shows a status dot on the panel deadline row matching its reviewed state (%s)',
+    async (status, colorClass, label) => {
+      vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_16, status })])
+      renderCalendar()
+
+      await userEvent.click(await screen.findByText('16'))
+      const panelHeader = await screen.findByText(DAY_16)
+      const panel = within(panelHeader.parentElement!)
+      const deadlineLabel = panel.getByText(label, { selector: 'p' })
+      const dot = deadlineLabel.parentElement!.previousElementSibling as HTMLElement
+      expect(dot.className).toContain(colorClass)
+    },
+  )
+
   it('shows the exact D-day count for a review deadline', async () => {
     // Computed from the same formatDDay the app uses, against the real
     // current date — no system-time mocking needed, and this still
