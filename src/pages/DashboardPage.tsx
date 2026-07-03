@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import FloatingAddButton from '../components/FloatingAddButton'
 import { inputClass } from '../components/formStyles'
 import InfoTooltip from '../components/InfoTooltip'
 import Select from '../components/Select'
@@ -219,6 +220,8 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
       </div>
+
+      <FloatingAddButton />
     </div>
   )
 }

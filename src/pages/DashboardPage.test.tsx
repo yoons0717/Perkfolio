@@ -129,4 +129,12 @@ describe('DashboardPage', () => {
 
     expect(await screen.findByText('임박한 마감이 없습니다.')).toBeInTheDocument()
   })
+
+  it('shows a floating button linking to the add-visit page', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
+    renderDashboard()
+
+    await screen.findByText('총 방문')
+    expect(screen.getByRole('link', { name: '방문 추가' })).toHaveAttribute('href', '/add')
+  })
 })
