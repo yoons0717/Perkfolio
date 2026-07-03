@@ -189,7 +189,11 @@ export default function TablePage() {
                   <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
                   <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
                   <td
-                    className={`px-4 py-3 font-mono font-semibold ${netSaved(v) < 0 ? 'text-red-400' : 'text-green'}`}
+                    className={`px-4 py-3 font-mono ${
+                      v.status === '예정'
+                        ? 'text-muted'
+                        : `font-semibold ${netSaved(v) < 0 ? 'text-red-400' : 'text-green'}`
+                    }`}
                   >
                     {formatWon(netSaved(v))}
                   </td>

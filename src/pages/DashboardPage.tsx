@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { inputClass } from '../components/formStyles'
+import InfoTooltip from '../components/InfoTooltip'
 import Select from '../components/Select'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
@@ -101,9 +102,10 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <p className="mb-3 font-display text-xs font-bold tracking-wide text-muted uppercase">
-        {periodLabel[period]} 요약
-      </p>
+      <div className="mb-3 flex items-center gap-1.5">
+        <p className="font-display text-base font-extrabold text-ink">{periodLabel[period]} 요약</p>
+        <InfoTooltip text="예정 상태는 금액 집계에서 제외" />
+      </div>
 
       <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
         <StatCard label="총 방문" value={`${totals.count}건`} />
@@ -142,7 +144,10 @@ export default function DashboardPage() {
       </p>
 
       <div className="mb-3 rounded-xl border border-line bg-surface p-4">
-        <p className="mb-3 font-display text-sm font-bold text-ink">마감 임박 (D-3 이내)</p>
+        <div className="mb-3 flex items-baseline gap-2">
+          <p className="font-display text-sm font-bold text-ink">마감 임박 (D-3 이내)</p>
+          <p className="text-xs text-muted">예정 포함</p>
+        </div>
         {upcomingDeadlines.length === 0 ? (
           <p className="text-sm text-muted">임박한 마감이 없습니다.</p>
         ) : (
