@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { inputClass } from '../components/formStyles'
 import InfoTooltip from '../components/InfoTooltip'
 import Select from '../components/Select'
@@ -186,7 +186,11 @@ export default function DashboardPage() {
                 labelStyle={{ color: '#e7e9ec' }}
                 formatter={(value: number) => formatWon(value)}
               />
-              <Bar dataKey="avgNet" name="평균 절감액" fill="#5b8def" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]}>
+                {platformRanking.map((entry) => (
+                  <Cell key={entry.platform} fill={entry.avgNet < 0 ? '#f87171' : '#5b8def'} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
