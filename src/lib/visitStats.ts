@@ -1,9 +1,8 @@
 import { deadlineDisplay, statusOrder } from './statusStyle'
+import { categories } from '../types/visit'
 import type { Category, Visit, VisitStatus } from '../types/visit'
 
 export type Period = 'thisMonth' | 'lastMonth' | 'thisYear' | 'lastYear' | 'all' | 'custom'
-
-const categories: Category[] = ['카페', '음식점', '술집', '기타']
 
 export function netSaved(visit: Visit): number {
   return visit.retailValue - visit.extraPayment

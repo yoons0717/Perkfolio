@@ -7,10 +7,8 @@ import Select from './Select'
 import { inputClass, selectClass, sectionLabelClass } from './formStyles'
 import { toDateString } from '../lib/format'
 import { statusOrder } from '../lib/statusStyle'
-import { platforms } from '../types/visit'
+import { categories, platforms } from '../types/visit'
 import type { Category, NewVisit, Platform, VisitStatus } from '../types/visit'
-
-const categories: Category[] = ['카페', '음식점', '술집', '기타']
 
 // Slightly shorter than the shared inputClass/selectClass so the whole form
 // fits on one screen without scrolling; other pages keep the taller default
