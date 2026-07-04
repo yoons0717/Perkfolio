@@ -55,10 +55,11 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('카페 온도')).toBeInTheDocument()
   })
 
-  it('labels a visit-date cell "방문", distinguishing it from a deadline cell', async () => {
-    vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15 })])
+  it('labels a visit-date cell with its actual status, not a generic "방문" that would contradict the status color', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15, status: '리뷰완료' })])
     renderCalendar()
-    expect(await screen.findByText('방문')).toBeInTheDocument()
+    expect(await screen.findByText('리뷰완료')).toBeInTheDocument()
+    expect(screen.queryByText('방문')).not.toBeInTheDocument()
   })
 
   it('shows a review deadline on a different cell than the visit date', async () => {
@@ -123,7 +124,9 @@ describe('CalendarPage', () => {
     expect(dot.className).toContain(colorClass)
 
     await userEvent.click(screen.getByText('15'))
-    expect(await screen.findByText(status)).toBeInTheDocument()
+    const panelHeader = await screen.findByText(DAY_15)
+    const panel = within(panelHeader.parentElement!)
+    expect(panel.getByText(status)).toBeInTheDocument()
   })
 
   it('shows each visit platform and category in the day panel', async () => {

@@ -138,7 +138,7 @@ export default function CalendarPage() {
                     <span className={`w-[3px] rounded-sm ${statusDotClass(v.status)}`} />
                     <span className="truncate self-center text-[10px]">
                       <span className="text-ink">{v.storeName}</span>{' '}
-                      <span className={statusTextClass(v.status)}>방문</span>
+                      <span className={statusTextClass(v.status)}>{v.status}</span>
                     </span>
                   </div>
                 ))}
