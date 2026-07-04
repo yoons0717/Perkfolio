@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Button from '../components/Button'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useVisits } from '../hooks/useVisits'
-import { formatWon } from '../lib/format'
+import { downloadCsv, visitsToCsv } from '../lib/csvExport'
+import { formatWon, toDateString } from '../lib/format'
 import { deadlineDisplay, statusOrder } from '../lib/statusStyle'
 import { netSaved } from '../lib/visitStats'
 import { platforms } from '../types/visit'
@@ -159,6 +161,10 @@ export default function TablePage() {
     }
   }
 
+  function handleExportCsv() {
+    downloadCsv(`perkfolio_visits_${toDateString(new Date())}.csv`, visitsToCsv(visible))
+  }
+
   if (loading) return null
   if (error) return <p className="text-sm text-red-400">{error}</p>
 
@@ -195,6 +201,9 @@ export default function TablePage() {
             ))}
           </Select>
         </div>
+        <Button variant="secondary" onClick={handleExportCsv} disabled={visible.length === 0} className="ml-auto">
+          CSV 내보내기
+        </Button>
       </div>
 
       {visible.length === 0 ? (

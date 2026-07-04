@@ -4,12 +4,18 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import TablePage from './TablePage'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { downloadCsv, visitsToCsv } from '../lib/csvExport'
 import { getVisits } from '../lib/visits'
 import { makeVisit } from '../test/factories'
 
 vi.mock('../lib/visits', () => ({
   getVisits: vi.fn(),
 }))
+
+vi.mock('../lib/csvExport', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/csvExport')>()
+  return { ...actual, downloadCsv: vi.fn() }
+})
 
 vi.mock('../hooks/useIsMobile', () => ({
   useIsMobile: vi.fn().mockReturnValue(false),
@@ -244,6 +250,32 @@ describe('TablePage row actions', () => {
     await userEvent.click(await screen.findByText('카페 온도'))
 
     expect(await screen.findByText('상세 화면')).toBeInTheDocument()
+  })
+})
+
+describe('TablePage CSV export', () => {
+  it('exports the currently filtered list, not the full unfiltered list', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', storeName: '가게A', status: '예정' }),
+      makeVisit({ id: '2', storeName: '가게B', status: '리뷰완료' }),
+    ])
+    renderTablePage()
+    await screen.findByText('가게A')
+
+    await userEvent.selectOptions(screen.getByLabelText('상태 필터'), '리뷰완료')
+    await userEvent.click(screen.getByRole('button', { name: 'CSV 내보내기' }))
+
+    expect(downloadCsv).toHaveBeenCalledTimes(1)
+    const [filename, csv] = vi.mocked(downloadCsv).mock.calls[0]
+    expect(filename).toMatch(/^perkfolio_visits_\d{4}-\d{2}-\d{2}\.csv$/)
+    expect(csv).toBe(visitsToCsv([makeVisit({ id: '2', storeName: '가게B', status: '리뷰완료' })]))
+  })
+
+  it('disables the export button when there is nothing to export', async () => {
+    vi.mocked(getVisits).mockResolvedValue([])
+    renderTablePage()
+
+    expect(await screen.findByRole('button', { name: 'CSV 내보내기' })).toBeDisabled()
   })
 })
 
