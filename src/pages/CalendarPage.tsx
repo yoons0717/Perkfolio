@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
-import StatusBadgeButton from '../components/StatusBadgeButton'
-import { useVisitActions } from '../hooks/useVisitActions'
+import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
 import { toDateString } from '../lib/format'
 import { deadlineDisplay, statusDotClass, statusTextClass } from '../lib/statusStyle'
@@ -29,9 +28,8 @@ export default function CalendarPage() {
   const navigate = useNavigate()
   const today = new Date()
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
-  const { visits, setVisits, loading, error } = useVisits()
+  const { visits, loading, error } = useVisits()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const { actionError, handleToggleStatus } = useVisitActions(setVisits)
 
   const visitsByDate = useMemo(() => {
     const map = new Map<string, Visit[]>()
@@ -65,8 +63,6 @@ export default function CalendarPage() {
 
   return (
     <div>
-      {actionError && <p className="mb-3 text-sm text-red-400">{actionError}</p>}
-
       <div className="mb-4 flex items-center justify-between">
         <Button
           variant="ghost"
@@ -193,7 +189,7 @@ export default function CalendarPage() {
                       </p>
                     </div>
                   </div>
-                  <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
+                  <StatusBadge status={v.status} />
                 </div>
               ))}
               {selectedDeadlines.map((v) => {

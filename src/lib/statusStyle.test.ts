@@ -1,18 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { deadlineDisplay, nextStatus, statusBadgeClass, statusDotClass, statusOrder } from './statusStyle'
-
-describe('nextStatus', () => {
-  it('cycles 예정 → 방문완료 → 리뷰완료 → 예정', () => {
-    expect(nextStatus('예정')).toBe('방문완료')
-    expect(nextStatus('방문완료')).toBe('리뷰완료')
-    expect(nextStatus('리뷰완료')).toBe('예정')
-  })
-
-  it('throws for a status not in statusOrder instead of silently resetting to 예정', () => {
-    // simulates a stale DB value from a pre-migration status string (e.g. '완료')
-    expect(() => nextStatus('완료' as unknown as (typeof statusOrder)[number])).toThrow()
-  })
-})
+import { deadlineDisplay, statusBadgeClass, statusDotClass, statusOrder } from './statusStyle'
 
 describe('statusBadgeClass / statusDotClass', () => {
   it.each(statusOrder)('returns a distinct class for %s', (status) => {

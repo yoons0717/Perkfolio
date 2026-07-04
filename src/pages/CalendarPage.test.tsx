@@ -4,14 +4,12 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CalendarPage, { getMonthGrid } from './CalendarPage'
 import { formatDDay } from '../lib/format'
-import { getVisits, toggleStatus } from '../lib/visits'
+import { getVisits } from '../lib/visits'
 import { makeVisit as makeBaseVisit } from '../test/factories'
 import type { Visit } from '../types/visit'
 
 vi.mock('../lib/visits', () => ({
   getVisits: vi.fn(),
-  toggleStatus: vi.fn(),
-  deleteVisit: vi.fn(),
 }))
 
 // Days 15/16 are never part of the leading/trailing padding cells from
@@ -125,7 +123,7 @@ describe('CalendarPage', () => {
     expect(dot.className).toContain(colorClass)
 
     await userEvent.click(screen.getByText('15'))
-    expect(await screen.findByRole('button', { name: status })).toBeInTheDocument()
+    expect(await screen.findByText(status)).toBeInTheDocument()
   })
 
   it('shows each visit platform and category in the day panel', async () => {
@@ -173,18 +171,6 @@ describe('CalendarPage', () => {
     await userEvent.click(panel.getByText(/카페 온도/))
 
     expect(await screen.findByText('상세 화면')).toBeInTheDocument()
-  })
-
-  it('calls toggleStatus when the panel status badge is clicked (thin wiring check)', async () => {
-    const visit = makeVisit({ visitDate: DAY_15 })
-    vi.mocked(getVisits).mockResolvedValue([visit])
-    vi.mocked(toggleStatus).mockResolvedValue({ ...visit, status: '방문완료' })
-    renderCalendar()
-
-    await userEvent.click(await screen.findByText('15'))
-    await userEvent.click(await screen.findByRole('button', { name: '예정' }))
-
-    expect(toggleStatus).toHaveBeenCalledWith('1', '예정')
   })
 })
 

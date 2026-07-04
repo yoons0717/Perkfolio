@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
-import StatusBadgeButton from '../components/StatusBadgeButton'
+import StatusBadge from '../components/StatusBadge'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { useVisitActions } from '../hooks/useVisitActions'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
 import { deadlineDisplay, statusOrder } from '../lib/statusStyle'
@@ -78,15 +77,7 @@ const categoryIcon: Record<Category, string> = {
   기타: '✨',
 }
 
-function VisitCard({
-  visit,
-  onNavigate,
-  onToggleStatus,
-}: {
-  visit: Visit
-  onNavigate: () => void
-  onToggleStatus: (e: React.MouseEvent) => void
-}) {
+function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void }) {
   const net = netSaved(visit)
   const netColor = visit.status === '예정' ? 'text-muted' : net < 0 ? 'text-red-400' : 'text-green'
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
@@ -108,7 +99,7 @@ function VisitCard({
             </p>
           </div>
         </div>
-        <StatusBadgeButton status={visit.status} onClick={onToggleStatus} />
+        <StatusBadge status={visit.status} />
       </div>
 
       {deadline && (
@@ -138,8 +129,7 @@ function VisitCard({
 export default function TablePage() {
   const navigate = useNavigate()
   const isMobile = useIsMobile()
-  const { visits, setVisits, loading, error } = useVisits()
-  const { actionError, handleToggleStatus } = useVisitActions(setVisits)
+  const { visits, loading, error } = useVisits()
   const [statusFilter, setStatusFilter] = useState<'전체' | VisitStatus>('전체')
   const [platformFilter, setPlatformFilter] = useState<'전체' | Platform>('전체')
   const [sortKey, setSortKey] = useState<SortKey>('visitDate')
@@ -174,8 +164,6 @@ export default function TablePage() {
 
   return (
     <div>
-      {actionError && <p className="mb-3 text-sm text-red-400">{actionError}</p>}
-
       <div className="mb-4 flex gap-3">
         <div className="w-36">
           <Select
@@ -216,12 +204,7 @@ export default function TablePage() {
       ) : isMobile ? (
         <div className="flex flex-col gap-3">
           {visible.map((v) => (
-            <VisitCard
-              key={v.id}
-              visit={v}
-              onNavigate={() => navigate(`/edit/${v.id}`)}
-              onToggleStatus={(e) => handleToggleStatus(e, v)}
-            />
+            <VisitCard key={v.id} visit={v} onNavigate={() => navigate(`/edit/${v.id}`)} />
           ))}
         </div>
       ) : (
@@ -274,7 +257,7 @@ export default function TablePage() {
                     {formatWon(netSaved(v))}
                   </td>
                   <td className="py-3 pr-6 pl-4">
-                    <StatusBadgeButton status={v.status} onClick={(e) => handleToggleStatus(e, v)} />
+                    <StatusBadge status={v.status} />
                   </td>
                 </tr>
               ))}
