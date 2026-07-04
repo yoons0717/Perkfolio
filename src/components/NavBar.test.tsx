@@ -47,4 +47,15 @@ describe('NavBar', () => {
     expect(signOut).toHaveBeenCalled()
     expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
+
+  it('renders nothing during a password-recovery session, even though a session exists', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      session: { user: { id: '1' } },
+      loading: false,
+      isPasswordRecovery: true,
+    } as never)
+    const { container } = renderNavBar()
+
+    expect(container).toBeEmptyDOMElement()
+  })
 })

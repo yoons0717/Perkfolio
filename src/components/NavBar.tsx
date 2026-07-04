@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/auth'
 
 export default function NavBar() {
-  const { session } = useAuth()
+  const { session, isPasswordRecovery } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  if (!session) return null
+  if (!session || isPasswordRecovery) return null
 
   const isRecordsActive = location.pathname === '/table' || location.pathname === '/calendar'
   const isDashboardActive = location.pathname === '/dashboard'

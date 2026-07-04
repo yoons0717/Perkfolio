@@ -3,6 +3,9 @@ import NavBar from './components/NavBar'
 import ProtectedRoute from './components/ProtectedRoute'
 import RecordsLayout from './components/RecordsLayout'
 import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import AddPage from './pages/AddPage'
 import EditPage from './pages/EditPage'
 import TablePage from './pages/TablePage'
@@ -16,6 +19,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/table" replace />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/add"
           element={
