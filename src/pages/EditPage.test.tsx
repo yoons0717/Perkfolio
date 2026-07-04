@@ -139,6 +139,23 @@ describe('EditPage view mode', () => {
     await screen.findByRole('heading', { name: '카페 온도' })
     expect(screen.getByText('2099-01-01 (완료)')).toBeInTheDocument()
   })
+
+  it('navigates back to the previous page when the back button is clicked', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({}))
+    render(
+      <MemoryRouter initialEntries={['/table', '/edit/1']} initialIndex={1}>
+        <Routes>
+          <Route path="/edit/:id" element={<EditPage />} />
+          <Route path="/table" element={<div>표 화면</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    await screen.findByRole('heading', { name: '카페 온도' })
+
+    await userEvent.click(screen.getByRole('button', { name: '뒤로가기' }))
+
+    expect(await screen.findByText('표 화면')).toBeInTheDocument()
+  })
 })
 
 describe('EditPage edit mode', () => {
@@ -151,6 +168,16 @@ describe('EditPage edit mode', () => {
 
     expect(screen.getByRole('heading', { name: '카페 온도' })).toBeInTheDocument()
     expect(screen.getByText('수정 중')).toBeInTheDocument()
+  })
+
+  it('also shows the back button while editing', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ storeName: '카페 온도' }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+
+    await userEvent.click(screen.getByRole('button', { name: '수정' }))
+
+    expect(screen.getByRole('button', { name: '뒤로가기' })).toBeInTheDocument()
   })
 
   it('switches to a pre-filled form, and cancel returns to view without saving', async () => {

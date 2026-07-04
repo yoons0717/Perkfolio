@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import BackButton from '../components/BackButton'
 import Button from '../components/Button'
 import PageContainer from '../components/PageContainer'
 import StatusBadge from '../components/StatusBadge'
@@ -124,7 +125,8 @@ export default function EditPage() {
   if (mode === 'edit') {
     return (
       <PageContainer>
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex items-center gap-3">
+          <BackButton />
           <h1 className="font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
           <span className="rounded-full bg-line px-2 py-0.5 font-mono text-xs text-muted">수정 중</span>
         </div>
@@ -145,7 +147,10 @@ export default function EditPage() {
 
   return (
     <PageContainer>
-      <h1 className="mb-4 font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
+      <div className="mb-4 flex items-center gap-3">
+        <BackButton />
+        <h1 className="font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
+      </div>
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3">

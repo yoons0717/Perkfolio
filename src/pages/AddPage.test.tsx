@@ -68,4 +68,19 @@ describe('AddPage', () => {
     expect(await screen.findByText('저장에 실패했습니다. 잠시 후 다시 시도해주세요.')).toBeInTheDocument()
     expect(screen.queryByText('표 화면')).not.toBeInTheDocument()
   })
+
+  it('navigates back to the previous page when the back button is clicked', async () => {
+    render(
+      <MemoryRouter initialEntries={['/table', '/add']} initialIndex={1}>
+        <Routes>
+          <Route path="/add" element={<AddPage />} />
+          <Route path="/table" element={<div>표 화면</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: '뒤로가기' }))
+
+    expect(await screen.findByText('표 화면')).toBeInTheDocument()
+  })
 })
