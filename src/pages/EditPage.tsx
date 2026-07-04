@@ -69,7 +69,7 @@ function LinkChip({ label, href }: { label: string; href: string | null }) {
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-full bg-blue-bg px-3 py-1.5 text-xs font-semibold text-blue hover:opacity-80"
+      className="inline-flex items-center gap-1.5 rounded-full bg-blue-bg px-3 py-1.5 text-xs font-semibold text-blue transition-colors hover:bg-blue/20"
     >
       <LinkIcon />
       {label}
@@ -177,7 +177,7 @@ export default function EditPage() {
             <ViewField label="추가결제액" value={formatWon(visit.extraPayment)} />
           </div>
 
-          <div className="flex flex-col gap-1 text-sm">
+          <div className="flex flex-col items-start gap-1 text-sm">
             <span className="text-muted">상태</span>
             <StatusBadge status={visit.status} />
           </div>
