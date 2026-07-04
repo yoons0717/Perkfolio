@@ -145,6 +145,16 @@ export default function TablePage() {
     if (platformFilter !== '전체') result = result.filter((v) => v.platform === platformFilter)
 
     result = [...result].sort((a, b) => {
+      // 예정 visits don't show a real 순절감액 (displayed as "-", since the
+      // amount isn't confirmed yet), so sorting by that column pins them to
+      // the end regardless of asc/desc — otherwise the unconfirmed
+      // placeholder rows would interleave with the real sorted values.
+      if (sortKey === 'netSaved') {
+        const aPending = a.status === '예정'
+        const bPending = b.status === '예정'
+        if (aPending || bPending) return aPending && bPending ? 0 : aPending ? 1 : -1
+      }
+
       const av = sortValue(a, sortKey)
       const bv = sortValue(b, sortKey)
       const cmp = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv))

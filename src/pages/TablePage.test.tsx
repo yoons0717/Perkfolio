@@ -154,15 +154,31 @@ describe('TablePage sorting', () => {
 
   it('sorts by 순절감액, the computed (retailValue - extraPayment) column', async () => {
     vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({ id: '1', storeName: '가게A', retailValue: 10000, extraPayment: 0 }), // net 10000
-      makeVisit({ id: '2', storeName: '가게B', retailValue: 30000, extraPayment: 25000 }), // net 5000
-      makeVisit({ id: '3', storeName: '가게C', retailValue: 20000, extraPayment: 5000 }), // net 15000
+      makeVisit({ id: '1', storeName: '가게A', retailValue: 10000, extraPayment: 0, status: '방문완료' }), // net 10000
+      makeVisit({ id: '2', storeName: '가게B', retailValue: 30000, extraPayment: 25000, status: '방문완료' }), // net 5000
+      makeVisit({ id: '3', storeName: '가게C', retailValue: 20000, extraPayment: 5000, status: '방문완료' }), // net 15000
     ])
     renderTablePage()
     await screen.findByText('가게A')
 
     await userEvent.click(screen.getByText(/순절감액/))
     expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게A', '가게B'])
+  })
+
+  it('always sorts 예정 visits to the end when sorting by 순절감액, regardless of direction, since their amount is not confirmed', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', storeName: '가게A', status: '예정', retailValue: 999999, extraPayment: 0 }),
+      makeVisit({ id: '2', storeName: '가게B', status: '방문완료', retailValue: 10000, extraPayment: 0 }), // net 10000
+      makeVisit({ id: '3', storeName: '가게C', status: '리뷰완료', retailValue: 5000, extraPayment: 0 }), // net 5000
+    ])
+    renderTablePage()
+    await screen.findByText('가게A')
+
+    await userEvent.click(screen.getByText(/순절감액/)) // desc
+    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게B', '가게C', '가게A'])
+
+    await userEvent.click(screen.getByText(/순절감액/)) // asc
+    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게B', '가게A'])
   })
 
   it('sorts by 마감일, treating visits without a deadline as coming last (desc)', async () => {
