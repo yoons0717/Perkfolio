@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { InputHTMLAttributes } from 'react'
+import Button from './Button'
 
 function EyeIcon() {
   return (
@@ -27,14 +28,14 @@ export default function PasswordInput({ className = '', ...props }: Props) {
   return (
     <div className="relative">
       <input type={visible ? 'text' : 'password'} className={`w-full pr-10 ${className}`} {...props} />
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? '비밀번호 숨기기' : '비밀번호 표시'}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink"
       >
         {visible ? <EyeOffIcon /> : <EyeIcon />}
-      </button>
+      </Button>
     </div>
   )
 }
