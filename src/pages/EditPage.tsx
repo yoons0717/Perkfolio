@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Button from '../components/Button'
 import PageContainer from '../components/PageContainer'
+import StatusBadge from '../components/StatusBadge'
 import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
 import { formatWon } from '../lib/format'
@@ -31,6 +32,27 @@ function LinkIcon() {
   )
 }
 
+function TrashIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  )
+}
+
 function ViewField({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1 text-sm">
@@ -40,24 +62,18 @@ function ViewField({ label, value }: { label: string; value: string }) {
   )
 }
 
-function ViewLinkField({ label, href }: { label: string; href: string | null }) {
+function LinkChip({ label, href }: { label: string; href: string | null }) {
+  if (!href) return null
   return (
-    <div className="flex flex-col gap-1 text-sm">
-      <span className="text-muted">{label}</span>
-      {href ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          className={`${viewBoxClass} flex items-center gap-1.5 text-blue`}
-        >
-          <LinkIcon />
-          바로가기
-        </a>
-      ) : (
-        <div className={`${viewBoxClass} text-muted`}>없음</div>
-      )}
-    </div>
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex items-center gap-1.5 rounded-full bg-blue-bg px-3 py-1.5 text-xs font-semibold text-blue hover:opacity-80"
+    >
+      <LinkIcon />
+      {label}
+    </a>
   )
 }
 
@@ -108,7 +124,10 @@ export default function EditPage() {
   if (mode === 'edit') {
     return (
       <PageContainer>
-        <h1 className="mb-4 font-display text-2xl font-extrabold text-ink">방문 기록 수정</h1>
+        <div className="mb-4 flex items-center gap-2">
+          <h1 className="font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
+          <span className="rounded-full bg-line px-2 py-0.5 font-mono text-xs text-muted">수정 중</span>
+        </div>
         <VisitForm
           initialValues={visit}
           onSubmit={handleSubmit}
@@ -151,7 +170,6 @@ export default function EditPage() {
             <ViewField label="카테고리" value={visit.category} />
           </div>
 
-          <ViewLinkField label="가게 정보 URL" href={visit.storeInfoUrl} />
           <ViewField label="체험 내역" value={visit.sponsoredItems} />
 
           <div className="grid grid-cols-2 gap-3">
@@ -159,13 +177,19 @@ export default function EditPage() {
             <ViewField label="추가결제액" value={formatWon(visit.extraPayment)} />
           </div>
 
-          <ViewField label="상태" value={visit.status} />
+          <div className="flex flex-col gap-1 text-sm">
+            <span className="text-muted">상태</span>
+            <StatusBadge status={visit.status} />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-3 pt-3">
+        <div className="flex flex-col gap-2 pt-3">
           <p className={sectionLabelClass}>링크</p>
-          <ViewLinkField label="체험단 URL" href={visit.campaignUrl} />
-          <ViewLinkField label="포스팅 링크" href={visit.postUrl} />
+          <div className="flex flex-wrap gap-2">
+            <LinkChip label="가게정보" href={visit.storeInfoUrl} />
+            <LinkChip label="체험단" href={visit.campaignUrl} />
+            <LinkChip label="포스팅" href={visit.postUrl} />
+          </div>
         </div>
       </div>
 
@@ -175,7 +199,12 @@ export default function EditPage() {
         <Button onClick={() => setMode('edit')} className="flex-1">
           수정
         </Button>
-        <Button variant="secondary" onClick={handleDelete} className="text-red-400">
+        <Button
+          variant="danger"
+          onClick={handleDelete}
+          className="inline-flex items-center gap-1.5"
+        >
+          <TrashIcon />
           삭제
         </Button>
       </div>

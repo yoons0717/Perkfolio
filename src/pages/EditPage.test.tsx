@@ -95,17 +95,22 @@ describe('EditPage view mode', () => {
     expect(screen.getByText('예정')).toBeInTheDocument()
   })
 
-  it('shows "바로가기" for filled links and "없음" for an empty one', async () => {
-    // fix reviewDeadline to a real date so its own "없음" doesn't collide
-    // with postUrl's "없음" in this assertion
-    vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrl: null, reviewDeadline: '2099-01-01' }))
+  it('shows a link chip for each filled link, and omits the chip for a missing one', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrl: null }))
     renderEditPage()
 
     await screen.findByRole('heading', { name: '카페 온도' })
-    // storeInfoUrl and campaignUrl are filled -> 2 "바로가기" links
-    expect(screen.getAllByText('바로가기')).toHaveLength(2)
-    // postUrl is null -> "없음"
-    expect(screen.getByText('없음')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /가게정보/ })).toHaveAttribute('href', 'https://store.example.com')
+    expect(screen.getByRole('link', { name: /체험단/ })).toHaveAttribute('href', 'https://campaign.example.com')
+    expect(screen.queryByRole('link', { name: /포스팅/ })).not.toBeInTheDocument()
+  })
+
+  it('shows a chip for 포스팅 링크 once it is filled', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrl: 'https://blog.example.com' }))
+    renderEditPage()
+
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByRole('link', { name: /포스팅/ })).toHaveAttribute('href', 'https://blog.example.com')
   })
 
   it('shows "없음" when there is no review deadline', async () => {
@@ -137,6 +142,17 @@ describe('EditPage view mode', () => {
 })
 
 describe('EditPage edit mode', () => {
+  it('keeps the store name as the heading instead of replacing it, and shows a small "수정 중" badge', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ storeName: '카페 온도' }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+
+    await userEvent.click(screen.getByRole('button', { name: '수정' }))
+
+    expect(screen.getByRole('heading', { name: '카페 온도' })).toBeInTheDocument()
+    expect(screen.getByText('수정 중')).toBeInTheDocument()
+  })
+
   it('switches to a pre-filled form, and cancel returns to view without saving', async () => {
     vi.mocked(getVisit).mockResolvedValue(makeVisit({ storeName: '카페 온도' }))
     renderEditPage()
