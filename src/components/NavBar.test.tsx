@@ -37,6 +37,13 @@ describe('NavBar', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  it('links the Perkfolio logo to /table (home)', () => {
+    vi.mocked(useAuth).mockReturnValue({ session: { user: { id: '1' } }, loading: false } as never)
+    renderNavBar()
+
+    expect(screen.getByRole('link', { name: 'Perkfolio' })).toHaveAttribute('href', '/table')
+  })
+
   it('logs out and navigates to /login when clicked', async () => {
     vi.mocked(useAuth).mockReturnValue({ session: { user: { id: '1' } }, loading: false } as never)
     vi.mocked(signOut).mockResolvedValue({ error: null } as never)

@@ -20,7 +20,9 @@ export default function NavBar() {
 
   return (
     <nav className="flex items-center justify-between border-b border-line bg-surface px-6 py-3">
-      <span className="font-display text-lg font-extrabold text-ink">Perkfolio</span>
+      <Link to="/table" className="font-display text-lg font-extrabold text-ink">
+        Perkfolio
+      </Link>
       <div className="flex items-center gap-5 font-display text-sm font-semibold">
         <Link
           to="/table"
