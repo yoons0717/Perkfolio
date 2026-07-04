@@ -2,13 +2,14 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from '../components/Select'
 import StatusBadgeButton from '../components/StatusBadgeButton'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { useVisitActions } from '../hooks/useVisitActions'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
 import { deadlineDisplay, statusOrder } from '../lib/statusStyle'
 import { netSaved } from '../lib/visitStats'
 import { platforms } from '../types/visit'
-import type { Platform, Visit, VisitStatus } from '../types/visit'
+import type { Category, Platform, Visit, VisitStatus } from '../types/visit'
 
 type SortKey =
   | 'visitDate'
@@ -70,8 +71,73 @@ function DeadlineCell({ visit }: { visit: Visit }) {
   )
 }
 
+const categoryIcon: Record<Category, string> = {
+  카페: '☕',
+  음식점: '🍚',
+  술집: '🍺',
+  기타: '✨',
+}
+
+function VisitCard({
+  visit,
+  onNavigate,
+  onToggleStatus,
+}: {
+  visit: Visit
+  onNavigate: () => void
+  onToggleStatus: (e: React.MouseEvent) => void
+}) {
+  const net = netSaved(visit)
+  const netColor = visit.status === '예정' ? 'text-muted' : net < 0 ? 'text-red-400' : 'text-green'
+  const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
+
+  return (
+    <div
+      onClick={onNavigate}
+      className="flex cursor-pointer flex-col gap-4 rounded-2xl border border-line bg-surface p-5 shadow-sm shadow-black/10 transition-colors hover:border-blue/50"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-line text-base">
+            {categoryIcon[visit.category]}
+          </span>
+          <div>
+            <p className="font-display text-base font-extrabold text-ink">{visit.storeName}</p>
+            <p className="mt-0.5 text-xs text-muted">
+              {visit.platform} · {visit.visitDate}
+            </p>
+          </div>
+        </div>
+        <StatusBadgeButton status={visit.status} onClick={onToggleStatus} />
+      </div>
+
+      {deadline && (
+        <p className={`flex items-center gap-1.5 text-xs ${deadline.reviewed ? 'text-muted' : 'text-red-400'}`}>
+          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${deadline.reviewed ? 'bg-muted' : 'bg-red-500'}`} />
+          {deadline.reviewed ? '리뷰 완료' : `마감 ${visit.reviewDeadline} (${deadline.text})`}
+        </p>
+      )}
+
+      <div className="flex items-end justify-between border-t border-line pt-3">
+        <div className="flex flex-col gap-0.5 font-mono text-xs text-muted">
+          <div className="flex justify-between gap-4">
+            <span>체험가</span>
+            <span>{formatWon(visit.retailValue)}</span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span>추가결제</span>
+            <span>{formatWon(visit.extraPayment)}</span>
+          </div>
+        </div>
+        <span className={`font-mono text-lg font-bold ${netColor}`}>{formatWon(net)}</span>
+      </div>
+    </div>
+  )
+}
+
 export default function TablePage() {
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
   const { visits, setVisits, loading, error } = useVisits()
   const { actionError, handleToggleStatus } = useVisitActions(setVisits)
   const [statusFilter, setStatusFilter] = useState<'전체' | VisitStatus>('전체')
@@ -147,6 +213,17 @@ export default function TablePage() {
         <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-muted">
           아직 등록된 방문 기록이 없습니다.
         </p>
+      ) : isMobile ? (
+        <div className="flex flex-col gap-3">
+          {visible.map((v) => (
+            <VisitCard
+              key={v.id}
+              visit={v}
+              onNavigate={() => navigate(`/edit/${v.id}`)}
+              onToggleStatus={(e) => handleToggleStatus(e, v)}
+            />
+          ))}
+        </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-line">
           <table className="w-full min-w-[860px] border-collapse whitespace-nowrap text-sm">

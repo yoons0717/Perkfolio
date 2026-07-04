@@ -3,12 +3,17 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import TablePage from './TablePage'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { getVisits, toggleStatus } from '../lib/visits'
 import { makeVisit } from '../test/factories'
 
 vi.mock('../lib/visits', () => ({
   getVisits: vi.fn(),
   toggleStatus: vi.fn(),
+}))
+
+vi.mock('../hooks/useIsMobile', () => ({
+  useIsMobile: vi.fn().mockReturnValue(false),
 }))
 
 function renderTablePage() {
@@ -24,6 +29,7 @@ function renderTablePage() {
 
 afterEach(() => {
   vi.clearAllMocks()
+  vi.mocked(useIsMobile).mockReturnValue(false)
 })
 
 // Status/platform values also appear as <option> text in the filter
@@ -257,6 +263,43 @@ describe('TablePage row actions', () => {
     renderTablePage()
 
     await userEvent.click(await screen.findByRole('button', { name: '예정' }))
+    expect(screen.queryByText('상세 화면')).not.toBeInTheDocument()
+  })
+})
+
+describe('TablePage mobile card view', () => {
+  it('shows visits as cards instead of a table on mobile', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', retailValue: 48000, extraPayment: 5000 }),
+    ])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.getByText('₩43,000')).toBeInTheDocument()
+  })
+
+  it('navigates to the detail page when a card is clicked', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ id: '42', storeName: '카페 온도' })])
+    renderTablePage()
+
+    await userEvent.click(await screen.findByText('카페 온도'))
+
+    expect(await screen.findByText('상세 화면')).toBeInTheDocument()
+  })
+
+  it('toggles status from a card without navigating', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    const visit = makeVisit({})
+    vi.mocked(getVisits).mockResolvedValue([visit])
+    vi.mocked(toggleStatus).mockResolvedValue({ ...visit, status: '방문완료' })
+    renderTablePage()
+
+    await userEvent.click(await screen.findByRole('button', { name: '예정' }))
+
+    expect(toggleStatus).toHaveBeenCalledWith('1', '예정')
     expect(screen.queryByText('상세 화면')).not.toBeInTheDocument()
   })
 })
