@@ -8,7 +8,7 @@ type VisitRow = {
   store_name: string
   category: Visit['category']
   sponsored_items: string
-  campaign_url: string
+  campaign_url: string | null
   store_info_url: string
   retail_value: number
   extra_payment: number

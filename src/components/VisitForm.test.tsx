@@ -19,10 +19,12 @@ async function fillRequiredFields(opts: { skip?: string[] } = {}) {
   await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
   await userEvent.clear(screen.getByLabelText('체험가'))
   await userEvent.type(screen.getByLabelText('체험가'), '48000')
-  await userEvent.type(screen.getByLabelText('체험단 URL'), 'https://campaign.example.com')
+  if (!skip.includes('체험단 URL')) {
+    await userEvent.type(screen.getByLabelText('체험단 URL (선택)'), 'https://campaign.example.com')
+  }
 }
 
-const requiredFieldLabels = ['업체명', '가게 정보 URL', '체험 내역', '체험가', '체험단 URL']
+const requiredFieldLabels = ['업체명', '가게 정보 URL', '체험 내역', '체험가']
 
 describe('VisitForm validation', () => {
   it('does not submit when required fields are empty', async () => {
@@ -63,9 +65,9 @@ describe('VisitForm validation', () => {
     },
   )
 
-  it('submits when optional fields (포스팅 링크, 마감일) are left empty', async () => {
+  it('submits when optional fields (포스팅 링크, 마감일, 체험단 URL) are left empty', async () => {
     const { onSubmit } = renderForm()
-    await fillRequiredFields()
+    await fillRequiredFields({ skip: ['체험단 URL'] })
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
@@ -142,6 +144,27 @@ describe('VisitForm submission payload', () => {
     expect(submitted.postUrl).toBeNull()
   })
 
+  it('submits an empty 체험단 URL as null, since a campaign post can disappear before it is captured', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields({ skip: ['체험단 URL'] })
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.campaignUrl).toBeNull()
+  })
+
+  it('submits a whitespace-only 체험단 URL as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields({ skip: ['체험단 URL'] })
+    await userEvent.type(screen.getByLabelText('체험단 URL (선택)'), '   ')
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.campaignUrl).toBeNull()
+  })
+
   it('shows an error message when onSubmit rejects', async () => {
     const onSubmit = vi.fn().mockRejectedValue(new Error('network error'))
     renderForm(onSubmit)
@@ -203,7 +226,7 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('체험 내역')).toHaveValue('세트메뉴')
     expect(screen.getByLabelText('체험가')).toHaveValue(30000)
     expect(screen.getByLabelText('추가결제액')).toHaveValue(2000)
-    expect(screen.getByLabelText('체험단 URL')).toHaveValue('https://campaign.example.com/existing')
+    expect(screen.getByLabelText('체험단 URL (선택)')).toHaveValue('https://campaign.example.com/existing')
     expect(screen.getByLabelText('포스팅 링크 (선택)')).toHaveValue('https://blog.example.com/post')
     expect(screen.getByLabelText('플랫폼')).toHaveValue('레뷰')
     expect(screen.getByLabelText('카테고리')).toHaveValue('음식점')

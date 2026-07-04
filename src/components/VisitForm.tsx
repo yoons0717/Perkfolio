@@ -106,7 +106,7 @@ export default function VisitForm({
         storeName,
         category: category as Category,
         sponsoredItems,
-        campaignUrl,
+        campaignUrl: campaignUrl.trim() === '' ? null : campaignUrl.trim(),
         storeInfoUrl,
         retailValue: Number(retailValue),
         extraPayment: Number(extraPayment),
@@ -275,12 +275,11 @@ export default function VisitForm({
         <p className={sectionLabelClass}>링크</p>
 
         <label className="flex flex-col gap-1 text-sm">
-          체험단 URL
+          체험단 URL (선택)
           <input
             type="url"
             value={campaignUrl}
             onChange={(e) => updateField('campaignUrl', e.target.value)}
-            required
             className={compactInputClass}
           />
         </label>

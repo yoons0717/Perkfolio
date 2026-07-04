@@ -30,7 +30,7 @@ export type Visit = {
   storeName: string
   category: Category
   sponsoredItems: string
-  campaignUrl: string
+  campaignUrl: string | null
   storeInfoUrl: string
   retailValue: number
   extraPayment: number

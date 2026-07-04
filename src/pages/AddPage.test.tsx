@@ -30,7 +30,7 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
   await userEvent.clear(screen.getByLabelText('체험가'))
   await userEvent.type(screen.getByLabelText('체험가'), '48000')
-  await userEvent.type(screen.getByLabelText('체험단 URL'), 'https://campaign.example.com')
+  await userEvent.type(screen.getByLabelText('체험단 URL (선택)'), 'https://campaign.example.com')
 }
 
 afterEach(() => {
