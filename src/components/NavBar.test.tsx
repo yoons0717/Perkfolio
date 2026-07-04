@@ -31,7 +31,7 @@ function renderNavBar() {
 
 describe('NavBar', () => {
   it('renders nothing when there is no session', () => {
-    vi.mocked(useAuth).mockReturnValue({ session: null, loading: false })
+    vi.mocked(useAuth).mockReturnValue({ session: null, loading: false, isPasswordRecovery: false })
     const { container } = renderNavBar()
 
     expect(container).toBeEmptyDOMElement()

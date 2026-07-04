@@ -11,6 +11,7 @@ import {
   netSaved,
 } from './visitStats'
 import { makeVisit } from '../test/factories'
+import type { Platform } from '../types/visit'
 
 describe('confirmedVisits', () => {
   it('excludes 예정 visits, since they have not actually happened yet', () => {
@@ -221,10 +222,10 @@ describe('computePlatformRanking', () => {
 
   it('is not skewed by visit count (many small visits do not outrank one big one)', () => {
     const visits = [
-      makeVisit({ platform: '많이쓴곳', retailValue: 1000, extraPayment: 0 }),
-      makeVisit({ platform: '많이쓴곳', retailValue: 1000, extraPayment: 0 }),
-      makeVisit({ platform: '많이쓴곳', retailValue: 1000, extraPayment: 0 }),
-      makeVisit({ platform: '한번쓴곳', retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ platform: '많이쓴곳' as Platform, retailValue: 1000, extraPayment: 0 }),
+      makeVisit({ platform: '많이쓴곳' as Platform, retailValue: 1000, extraPayment: 0 }),
+      makeVisit({ platform: '많이쓴곳' as Platform, retailValue: 1000, extraPayment: 0 }),
+      makeVisit({ platform: '한번쓴곳' as Platform, retailValue: 10000, extraPayment: 0 }),
     ]
     expect(computePlatformRanking(visits)[0].platform).toBe('한번쓴곳')
   })

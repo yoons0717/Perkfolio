@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { AuthProvider, useAuth } from './AuthContext'
 import { getSession, isRecoverySession, onAuthStateChange } from '../lib/auth'
 
@@ -12,6 +13,10 @@ vi.mock('../lib/auth', () => ({
 afterEach(() => {
   vi.clearAllMocks()
 })
+
+function fakeSession(id: string): Session {
+  return { user: { id } } as unknown as Session
+}
 
 function Probe() {
   const { session, loading, isPasswordRecovery } = useAuth()
@@ -47,7 +52,7 @@ describe('AuthProvider', () => {
 
   it('stops loading once onAuthStateChange delivers a session, even if getSession never resolves', async () => {
     vi.mocked(getSession).mockReturnValue(new Promise(() => {}) as never)
-    let handler!: (event: string, session: unknown) => void
+    let handler!: (event: AuthChangeEvent, session: Session | null) => void
     vi.mocked(onAuthStateChange).mockImplementation((cb) => {
       handler = cb
       return vi.fn()
@@ -60,14 +65,14 @@ describe('AuthProvider', () => {
     )
     expect(screen.getByText('로딩 중')).toBeInTheDocument()
 
-    handler('SIGNED_IN', { user: { id: '1' } })
+    handler('SIGNED_IN', fakeSession('1'))
 
     expect(await screen.findByText('로그인: 1')).toBeInTheDocument()
   })
 
   it('updates the session when onAuthStateChange fires', async () => {
     vi.mocked(getSession).mockResolvedValue(null)
-    let handler!: (event: string, session: unknown) => void
+    let handler!: (event: AuthChangeEvent, session: Session | null) => void
     vi.mocked(onAuthStateChange).mockImplementation((cb) => {
       handler = cb
       return vi.fn()
@@ -80,14 +85,14 @@ describe('AuthProvider', () => {
     )
     await screen.findByText('세션 없음')
 
-    handler('SIGNED_IN', { user: { id: '2' } })
+    handler('SIGNED_IN', fakeSession('2'))
 
     expect(await screen.findByText('로그인: 2')).toBeInTheDocument()
   })
 
   it('flags isPasswordRecovery when a PASSWORD_RECOVERY event fires, so a reset link is not treated as a normal login', async () => {
     vi.mocked(getSession).mockResolvedValue(null)
-    let handler!: (event: string, session: unknown) => void
+    let handler!: (event: AuthChangeEvent, session: Session | null) => void
     vi.mocked(onAuthStateChange).mockImplementation((cb) => {
       handler = cb
       return vi.fn()
@@ -100,14 +105,14 @@ describe('AuthProvider', () => {
     )
     await screen.findByText('세션 없음')
 
-    handler('PASSWORD_RECOVERY', { user: { id: '1' } })
+    handler('PASSWORD_RECOVERY', fakeSession('1'))
 
     expect(await screen.findByText('로그인: 1 (복구 세션)')).toBeInTheDocument()
   })
 
   it('clears isPasswordRecovery once a real SIGNED_IN event follows a recovery session', async () => {
     vi.mocked(getSession).mockResolvedValue(null)
-    let handler!: (event: string, session: unknown) => void
+    let handler!: (event: AuthChangeEvent, session: Session | null) => void
     vi.mocked(onAuthStateChange).mockImplementation((cb) => {
       handler = cb
       return vi.fn()
@@ -120,10 +125,10 @@ describe('AuthProvider', () => {
     )
     await screen.findByText('세션 없음')
 
-    handler('PASSWORD_RECOVERY', { user: { id: '1' } })
+    handler('PASSWORD_RECOVERY', fakeSession('1'))
     await screen.findByText('로그인: 1 (복구 세션)')
 
-    handler('SIGNED_IN', { user: { id: '1' } })
+    handler('SIGNED_IN', fakeSession('1'))
 
     expect(await screen.findByText('로그인: 1')).toBeInTheDocument()
   })

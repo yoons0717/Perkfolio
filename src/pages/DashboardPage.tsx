@@ -186,7 +186,7 @@ export default function DashboardPage() {
                 contentStyle={{ background: '#1d2027', border: '1px solid #2a2e37', borderRadius: 8 }}
                 labelStyle={{ color: '#e7e9ec' }}
                 itemStyle={{ color: '#e7e9ec' }}
-                formatter={(value: number) => formatWon(value)}
+                formatter={(value) => formatWon(Number(value))}
               />
               <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]}>
                 {platformRanking.map((entry) => (
@@ -215,7 +215,7 @@ export default function DashboardPage() {
                 contentStyle={{ background: '#1d2027', border: '1px solid #2a2e37', borderRadius: 8 }}
                 labelStyle={{ color: '#e7e9ec' }}
                 itemStyle={{ color: '#e7e9ec' }}
-                formatter={(value: number) => formatWon(value)}
+                formatter={(value) => formatWon(Number(value))}
               />
               <Line type="monotone" dataKey="net" name="순절감액" stroke="#5b8def" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
