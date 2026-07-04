@@ -39,14 +39,18 @@ export default function ForgotPasswordPage() {
         <p className="text-sm text-ink">비밀번호 재설정 링크를 이메일로 보냈습니다.</p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            type="email"
-            placeholder="이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder-muted focus:border-blue focus:outline-none"
-          />
+          <label className="flex flex-col gap-1 text-sm">
+            이메일
+            <input
+              type="email"
+              placeholder="이메일"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder-muted focus:border-blue focus:outline-none"
+            />
+          </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={submitting} className="mt-1">
             {submitting ? '전송 중...' : '재설정 링크 보내기'}

@@ -71,7 +71,7 @@ export default function DashboardPage() {
   if (error) return <p className="text-sm text-red-400">{error}</p>
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-6 pb-10 lg:max-w-5xl">
+    <div className="mx-auto max-w-3xl px-4 pt-6 pb-24 lg:max-w-5xl">
       <h1 className="mb-3 font-display text-2xl font-extrabold text-ink">대시보드</h1>
 
       <div className="mb-6 flex flex-wrap items-center gap-2">

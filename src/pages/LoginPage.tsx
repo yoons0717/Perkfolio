@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import PasswordInput from '../components/PasswordInput'
 import { signInWithPassword } from '../lib/auth'
 
 export default function LoginPage() {
@@ -55,22 +56,29 @@ export default function LoginPage() {
         <p className="mb-3 text-sm text-green">비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.</p>
       )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          type="email"
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder-muted focus:border-blue focus:outline-none"
-        />
-        <input
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder-muted focus:border-blue focus:outline-none"
-        />
+        <label className="flex flex-col gap-1 text-sm">
+          이메일
+          <input
+            type="email"
+            placeholder="이메일"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder-muted focus:border-blue focus:outline-none"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          비밀번호
+          <PasswordInput
+            placeholder="비밀번호"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder-muted focus:border-blue focus:outline-none"
+          />
+        </label>
         {error && <p className="text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={submitting} className="mt-1">
           {submitting ? '로그인 중...' : '로그인'}
