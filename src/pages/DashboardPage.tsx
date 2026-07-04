@@ -185,6 +185,7 @@ export default function DashboardPage() {
                 wrapperStyle={{ zIndex: 10 }}
                 contentStyle={{ background: '#1d2027', border: '1px solid #2a2e37', borderRadius: 8 }}
                 labelStyle={{ color: '#e7e9ec' }}
+                itemStyle={{ color: '#e7e9ec' }}
                 formatter={(value: number) => formatWon(value)}
               />
               <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]}>
@@ -213,6 +214,7 @@ export default function DashboardPage() {
                 wrapperStyle={{ zIndex: 10 }}
                 contentStyle={{ background: '#1d2027', border: '1px solid #2a2e37', borderRadius: 8 }}
                 labelStyle={{ color: '#e7e9ec' }}
+                itemStyle={{ color: '#e7e9ec' }}
                 formatter={(value: number) => formatWon(value)}
               />
               <Line type="monotone" dataKey="net" name="순절감액" stroke="#5b8def" strokeWidth={2} dot={{ r: 3 }} />
