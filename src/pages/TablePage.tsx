@@ -122,7 +122,9 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
             <span>{formatWon(visit.extraPayment)}</span>
           </div>
         </div>
-        <span className={`font-mono text-lg font-bold ${netColor}`}>{formatWon(net)}</span>
+        <span className={`font-mono text-lg font-bold ${netColor}`}>
+          {visit.status === '예정' ? '-' : formatWon(net)}
+        </span>
       </div>
     </div>
   )
@@ -263,7 +265,7 @@ export default function TablePage() {
                         : `font-semibold ${netSaved(v) < 0 ? 'text-red-400' : 'text-green'}`
                     }`}
                   >
-                    {formatWon(netSaved(v))}
+                    {v.status === '예정' ? '-' : formatWon(netSaved(v))}
                   </td>
                   <td className="py-3 pr-6 pl-4">
                     <StatusBadge status={v.status} />

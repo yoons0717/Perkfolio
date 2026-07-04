@@ -70,6 +70,7 @@ describe('TablePage columns', () => {
         category: '카페',
         retailValue: 48000,
         extraPayment: 5000,
+        status: '방문완료',
       }),
     ])
     renderTablePage()
@@ -85,7 +86,7 @@ describe('TablePage columns', () => {
       '₩48,000',
       '₩5,000',
       '₩43,000',
-      '예정',
+      '방문완료',
     ])
   })
 
@@ -101,17 +102,17 @@ describe('TablePage columns', () => {
     expect(netSavedCell).not.toHaveClass('text-green')
   })
 
-  it('mutes the net savings color for 예정 visits, since the amount is not confirmed yet', async () => {
+  it('shows "-" instead of a computed net savings for 예정 visits, since the amount is not confirmed yet', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ storeName: '카페 온도', retailValue: 48000, extraPayment: 5000, status: '예정' }),
     ])
     renderTablePage()
 
     await screen.findByText('카페 온도')
-    const netSavedCell = screen.getByText('₩43,000')
+    expect(screen.queryByText('₩43,000')).not.toBeInTheDocument()
+    const netSavedCell = getRowCells('카페 온도')[7]
+    expect(netSavedCell).toHaveTextContent('-')
     expect(netSavedCell).toHaveClass('text-muted')
-    expect(netSavedCell).not.toHaveClass('text-green')
-    expect(netSavedCell).not.toHaveClass('text-red-400')
   })
 
   it('shows "-" for no deadline, and keeps the original deadline date (marked 완료) once reviewed', async () => {
@@ -283,13 +284,25 @@ describe('TablePage mobile card view', () => {
   it('shows visits as cards instead of a table on mobile', async () => {
     vi.mocked(useIsMobile).mockReturnValue(true)
     vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({ storeName: '카페 온도', retailValue: 48000, extraPayment: 5000 }),
+      makeVisit({ storeName: '카페 온도', retailValue: 48000, extraPayment: 5000, status: '방문완료' }),
     ])
     renderTablePage()
 
     await screen.findByText('카페 온도')
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
     expect(screen.getByText('₩43,000')).toBeInTheDocument()
+  })
+
+  it('shows "-" instead of a computed net savings for 예정 visits', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', retailValue: 48000, extraPayment: 5000, status: '예정' }),
+    ])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    expect(screen.queryByText('₩43,000')).not.toBeInTheDocument()
+    expect(screen.getByText('-')).toBeInTheDocument()
   })
 
   it('navigates to the detail page when a card is clicked', async () => {

@@ -42,11 +42,19 @@ describe('visitsToCsv', () => {
   })
 
   it('shows a negative net savings as a plain negative number', () => {
-    const visit = makeVisit({ retailValue: 10000, extraPayment: 15000 })
+    const visit = makeVisit({ retailValue: 10000, extraPayment: 15000, status: '방문완료' })
 
     const csv = visitsToCsv([visit])
 
     expect(csv.split('\r\n')[1]).toContain(',-5000,')
+  })
+
+  it('leaves 순절감액 blank for 예정 visits instead of a computed figure that has not happened yet', () => {
+    const visit = makeVisit({ retailValue: 10000, extraPayment: 0, status: '예정' })
+
+    const csv = visitsToCsv([visit])
+
+    expect(csv.split('\r\n')[1]).toBe('2026-01-10,,포포몬,카페 온도,카페,10000,0,,예정')
   })
 
   it('quotes a field containing a comma', () => {

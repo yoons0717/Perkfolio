@@ -20,7 +20,7 @@ function visitToRow(visit: Visit): string {
     visit.category,
     visit.retailValue,
     visit.extraPayment,
-    netSaved(visit),
+    visit.status === '예정' ? '' : netSaved(visit),
     visit.status,
   ]
     .map(escapeCsvField)
