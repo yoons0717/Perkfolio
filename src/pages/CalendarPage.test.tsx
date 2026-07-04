@@ -57,6 +57,12 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('카페 온도')).toBeInTheDocument()
   })
 
+  it('labels a visit-date cell "방문", distinguishing it from a deadline cell', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15 })])
+    renderCalendar()
+    expect(await screen.findByText('방문')).toBeInTheDocument()
+  })
+
   it('shows a review deadline on a different cell than the visit date', async () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_16 })])
     renderCalendar()
@@ -70,7 +76,7 @@ describe('CalendarPage', () => {
 
   it.each([
     ['예정', 'bg-red-500', '리뷰 마감'],
-    ['리뷰완료', 'bg-green', '리뷰완료'],
+    ['리뷰완료', 'bg-muted', '리뷰 완료'],
   ] as const)(
     'shows a status dot on the panel deadline row matching its reviewed state (%s)',
     async (status, colorClass, label) => {
@@ -97,6 +103,15 @@ describe('CalendarPage', () => {
     expect(await screen.findByText(`마감 ${expectedDDay}`)).toBeInTheDocument()
   })
 
+  it('labels a reviewed deadline cell "리뷰 완료", so it reads as a deadline card rather than another visit card', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_16, status: '리뷰완료' }),
+    ])
+    renderCalendar()
+
+    expect(await screen.findByText('리뷰 완료')).toBeInTheDocument()
+  })
+
   it.each([
     ['예정', 'bg-blue'],
     ['방문완료', 'bg-amber'],
@@ -106,7 +121,7 @@ describe('CalendarPage', () => {
     renderCalendar()
 
     const storeNameEl = await screen.findByText('카페 온도')
-    const dot = storeNameEl.previousElementSibling as HTMLElement
+    const dot = storeNameEl.parentElement!.previousElementSibling as HTMLElement
     expect(dot.className).toContain(colorClass)
 
     await userEvent.click(screen.getByText('15'))

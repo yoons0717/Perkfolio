@@ -103,7 +103,7 @@ describe('TablePage columns', () => {
     expect(netSavedCell).not.toHaveClass('text-red-400')
   })
 
-  it('shows "-" for no deadline and "리뷰완료" when the review is done', async () => {
+  it('shows "-" for no deadline, and keeps the original deadline date (marked 완료) once reviewed', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', storeName: '가게A', reviewDeadline: null }),
       makeVisit({ id: '2', storeName: '가게B', reviewDeadline: '2099-01-01', status: '리뷰완료' }),
@@ -112,7 +112,9 @@ describe('TablePage columns', () => {
 
     await screen.findByText('가게A')
     expect(getRowCells('가게A')[1]).toHaveTextContent('-')
-    expect(getRowCells('가게B')[1]).toHaveTextContent('리뷰완료')
+    const deadlineCell = getRowCells('가게B')[1]
+    expect(deadlineCell).toHaveTextContent('2099-01-01')
+    expect(deadlineCell).toHaveTextContent('완료')
   })
 })
 

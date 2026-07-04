@@ -21,6 +21,12 @@ export function statusDotClass(status: VisitStatus): string {
   return 'bg-blue'
 }
 
+export function statusTextClass(status: VisitStatus): string {
+  if (status === '리뷰완료') return 'text-green'
+  if (status === '방문완료') return 'text-amber'
+  return 'text-blue'
+}
+
 type DeadlineDisplay = { text: string; reviewed: boolean }
 
 export function deadlineDisplay(status: VisitStatus, reviewDeadline: string | null): DeadlineDisplay | null {

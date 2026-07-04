@@ -63,10 +63,9 @@ function Chevron({ className }: { className?: string }) {
 function DeadlineCell({ visit }: { visit: Visit }) {
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
   if (!deadline) return <span className="text-muted">-</span>
-  if (deadline.reviewed) return <span className="text-green">{deadline.text}</span>
   return (
-    <span className="text-red-400">
-      {visit.reviewDeadline} <span className="text-[10px] text-muted">({deadline.text})</span>
+    <span className={deadline.reviewed ? 'text-green' : 'text-red-400'}>
+      {visit.reviewDeadline} <span className="text-[10px] text-muted">({deadline.reviewed ? '완료' : deadline.text})</span>
     </span>
   )
 }
