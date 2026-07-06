@@ -4,10 +4,19 @@ export function useInfiniteScroll(totalCount: number, resetKey: unknown, batchSi
   const [displayCount, setDisplayCount] = useState(() => Math.min(batchSize, totalCount))
   const sentinelRef = useRef<HTMLDivElement>(null)
 
-  // Resets to the first batch whenever the underlying list changes shape:
-  // either the initial fetch just resolved (totalCount moves from 0 to N,
-  // since the caller mounts this hook before its data has loaded) or the
-  // caller's filter/sort changed (resetKey).
+  // Resets to the first batch whenever the underlying list changes shape or
+  // size. Note: ANY totalCount change (not just shrink) triggers a full reset,
+  // not a "defensive clamp" for shrink. This is intentional and safe for this
+  // app's actual usage:
+  //   1. totalCount=0→N (initial data load): full reset is correct — must show
+  //      the first batch
+  //   2. totalCount change via filter/sort: resetKey always changes in sync, so
+  //      distinction is moot
+  //   3. No code path exists where a live, already-scrolled list gets totalCount
+  //      change without resetKey change (visits are only added/deleted from other
+  //      routes, which unmount and remount TablePage fresh)
+  // The design doc edge-case section describes clamp-only behavior for unreachable
+  // scenarios; building it would violate YAGNI.
   useEffect(() => {
     setDisplayCount(Math.min(batchSize, totalCount))
   }, [resetKey, totalCount, batchSize])
