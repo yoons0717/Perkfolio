@@ -73,23 +73,19 @@ describe('CalendarPage', () => {
     expect(await screen.findByText(/마감/)).toBeInTheDocument()
   })
 
-  it.each([
-    ['예정', 'bg-red-500', '리뷰 마감'],
-    ['리뷰완료', 'bg-muted', '리뷰 완료'],
-  ] as const)(
-    'shows a status dot on the panel deadline row matching its reviewed state (%s)',
-    async (status, colorClass, label) => {
-      vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_16, status })])
-      renderCalendar()
+  it('shows a red status dot on the panel deadline row for an unreviewed deadline', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_16, status: '예정' }),
+    ])
+    renderCalendar()
 
-      await userEvent.click(await screen.findByText('16'))
-      const panelHeader = await screen.findByText(DAY_16)
-      const panel = within(panelHeader.parentElement!)
-      const deadlineLabel = panel.getByText(label, { selector: 'p' })
-      const dot = deadlineLabel.parentElement!.previousElementSibling as HTMLElement
-      expect(dot.className).toContain(colorClass)
-    },
-  )
+    await userEvent.click(await screen.findByText('16'))
+    const panelHeader = await screen.findByText(DAY_16)
+    const panel = within(panelHeader.parentElement!)
+    const deadlineLabel = panel.getByText('리뷰 마감', { selector: 'p' })
+    const dot = deadlineLabel.parentElement!.previousElementSibling as HTMLElement
+    expect(dot.className).toContain('bg-red-500')
+  })
 
   it('shows the exact D-day count for a review deadline', async () => {
     // Computed from the same formatDDay the app uses, against the real
@@ -102,13 +98,28 @@ describe('CalendarPage', () => {
     expect(await screen.findByText(`마감 ${expectedDDay}`)).toBeInTheDocument()
   })
 
-  it('labels a reviewed deadline cell "리뷰 완료", so it reads as a deadline card rather than another visit card', async () => {
+  it('moves a reviewed visit from its visit-date cell to its deadline-date cell, so it is not shown twice', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_16, status: '리뷰완료' }),
     ])
     renderCalendar()
 
+    // only the deadline cell renders a card for this visit
+    expect(await screen.findAllByText('카페 온도')).toHaveLength(1)
     expect(await screen.findByText('리뷰 완료')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('15'))
+    expect(await screen.findByText('이 날짜에 등록된 방문이 없습니다.')).toBeInTheDocument()
+  })
+
+  it('keeps a reviewed visit on its visit-date cell when it has no review deadline set', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ visitDate: DAY_15, reviewDeadline: null, status: '리뷰완료' }),
+    ])
+    renderCalendar()
+
+    expect(await screen.findByText('카페 온도')).toBeInTheDocument()
+    expect(await screen.findByText('리뷰완료')).toBeInTheDocument()
   })
 
   it.each([
@@ -149,6 +160,21 @@ describe('CalendarPage', () => {
     expect(screen.getByText('가게2')).toBeInTheDocument()
     expect(screen.queryByText('가게3')).not.toBeInTheDocument()
     expect(screen.getByText('+1개')).toBeInTheDocument()
+  })
+
+  it('shows a neutral "+N개" (not "+N개 마감") when more than 2 deadlines fall on the same day, since a hidden one may already be reviewed', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', storeName: '가게1', reviewDeadline: DAY_16, status: '리뷰완료' }),
+      makeVisit({ id: '2', storeName: '가게2', reviewDeadline: DAY_16, status: '리뷰완료' }),
+      makeVisit({ id: '3', storeName: '가게3', reviewDeadline: DAY_16, status: '리뷰완료' }),
+    ])
+    renderCalendar()
+
+    expect(await screen.findByText('가게1')).toBeInTheDocument()
+    expect(screen.getByText('가게2')).toBeInTheDocument()
+    expect(screen.queryByText('가게3')).not.toBeInTheDocument()
+    expect(screen.getByText('+1개')).toBeInTheDocument()
+    expect(screen.queryByText(/마감$/)).not.toBeInTheDocument()
   })
 
   it('shows the day panel with its visits, and an empty message for days with none', async () => {

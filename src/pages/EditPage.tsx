@@ -164,9 +164,9 @@ export default function EditPage() {
             value={
               !visit.reviewDeadline
                 ? '없음'
-                : `${visit.reviewDeadline} (${
-                    visit.status === '리뷰완료' ? '완료' : deadlineDisplay(visit.status, visit.reviewDeadline)?.text
-                  })`
+                : visit.status === '리뷰완료'
+                  ? visit.reviewDeadline
+                  : `${visit.reviewDeadline} (${deadlineDisplay(visit.status, visit.reviewDeadline)?.text})`
             }
           />
 

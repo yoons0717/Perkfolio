@@ -66,9 +66,10 @@ function Chevron({ className }: { className?: string }) {
 function DeadlineCell({ visit }: { visit: Visit }) {
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
   if (!deadline) return <span className="text-muted">-</span>
+  if (deadline.reviewed) return <span className="text-green">{visit.reviewDeadline}</span>
   return (
-    <span className={deadline.reviewed ? 'text-green' : 'text-red-400'}>
-      {visit.reviewDeadline} <span className="text-[10px] text-muted">({deadline.reviewed ? '완료' : deadline.text})</span>
+    <span className="text-red-400">
+      {visit.reviewDeadline} <span className="text-[10px] text-muted">({deadline.text})</span>
     </span>
   )
 }
@@ -105,10 +106,10 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
         <StatusBadge status={visit.status} />
       </div>
 
-      {deadline && (
-        <p className={`flex items-center gap-1.5 text-xs ${deadline.reviewed ? 'text-muted' : 'text-red-400'}`}>
-          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${deadline.reviewed ? 'bg-muted' : 'bg-red-500'}`} />
-          {deadline.reviewed ? '리뷰 완료' : `마감 ${visit.reviewDeadline} (${deadline.text})`}
+      {deadline && !deadline.reviewed && (
+        <p className="flex items-center gap-1.5 text-xs text-red-400">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+          {`마감 ${visit.reviewDeadline} (${deadline.text})`}
         </p>
       )}
 

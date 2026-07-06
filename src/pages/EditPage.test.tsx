@@ -131,13 +131,13 @@ describe('EditPage view mode', () => {
     expect(screen.getByText(/2099-01-01 \(D-/)).toBeInTheDocument()
   })
 
-  it('marks a reviewed deadline "(완료)" instead of the raw status name, matching the table view', async () => {
+  it('shows a reviewed deadline as just the date, since the 상태 badge below already says 리뷰완료', async () => {
     vi.mocked(getVisit).mockResolvedValue(
       makeVisit({ reviewDeadline: '2099-01-01', status: '리뷰완료' }),
     )
     renderEditPage()
     await screen.findByRole('heading', { name: '카페 온도' })
-    expect(screen.getByText('2099-01-01 (완료)')).toBeInTheDocument()
+    expect(screen.getByText('2099-01-01')).toBeInTheDocument()
   })
 
   it('navigates back to the previous page when the back button is clicked', async () => {

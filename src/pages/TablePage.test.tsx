@@ -117,7 +117,7 @@ describe('TablePage columns', () => {
     expect(netSavedCell).toHaveClass('text-muted')
   })
 
-  it('shows "-" for no deadline, and keeps the original deadline date (marked 완료) once reviewed', async () => {
+  it('shows "-" for no deadline, and the original deadline date without a redundant 완료 tag once reviewed', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', storeName: '가게A', reviewDeadline: null }),
       makeVisit({ id: '2', storeName: '가게B', reviewDeadline: '2099-01-01', status: '리뷰완료' }),
@@ -128,7 +128,7 @@ describe('TablePage columns', () => {
     expect(getRowCells('가게A')[1]).toHaveTextContent('-')
     const deadlineCell = getRowCells('가게B')[1]
     expect(deadlineCell).toHaveTextContent('2099-01-01')
-    expect(deadlineCell).toHaveTextContent('완료')
+    expect(deadlineCell).not.toHaveTextContent('완료')
   })
 })
 
