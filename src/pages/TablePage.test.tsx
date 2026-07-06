@@ -82,9 +82,7 @@ describe('TablePage columns', () => {
     expect(cells.map((c) => c.textContent)).toEqual([
       '2026-01-10',
       '-',
-      '캐시노트',
-      '카페 온도',
-      '카페',
+      '카페 온도캐시노트 · 카페',
       '₩48,000',
       '₩5,000',
       '₩43,000',
@@ -112,7 +110,7 @@ describe('TablePage columns', () => {
 
     await screen.findByText('카페 온도')
     expect(screen.queryByText('₩43,000')).not.toBeInTheDocument()
-    const netSavedCell = getRowCells('카페 온도')[7]
+    const netSavedCell = getRowCells('카페 온도')[5]
     expect(netSavedCell).toHaveTextContent('-')
     expect(netSavedCell).toHaveClass('text-muted')
   })

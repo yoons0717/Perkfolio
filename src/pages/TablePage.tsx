@@ -10,6 +10,7 @@ import { downloadCsv, visitsToCsv } from '../lib/csvExport'
 import { formatWon, toDateString } from '../lib/format'
 import {
   deadlineDisplay,
+  deadlineUrgentBadgeClass,
   deadlineUrgentDotClass,
   deadlineUrgentTextClass,
   statusOrder,
@@ -21,9 +22,7 @@ import type { Category, Platform, Visit, VisitStatus } from '../types/visit'
 type SortKey =
   | 'visitDate'
   | 'reviewDeadline'
-  | 'platform'
   | 'storeName'
-  | 'category'
   | 'retailValue'
   | 'extraPayment'
   | 'netSaved'
@@ -36,9 +35,7 @@ type Column = {
 const columns: Column[] = [
   { key: 'visitDate', label: '방문(예정)일' },
   { key: 'reviewDeadline', label: '마감일' },
-  { key: 'platform', label: '플랫폼' },
   { key: 'storeName', label: '업체명' },
-  { key: 'category', label: '카테고리' },
   { key: 'retailValue', label: '체험가' },
   { key: 'extraPayment', label: '추가결제액' },
   { key: 'netSaved', label: '순절감액' },
@@ -76,9 +73,12 @@ function DeadlineCell({ visit }: { visit: Visit }) {
   // would be redundant (unlike CalendarPage, which has no separate badge).
   if (deadline.reviewed) return <span className="text-muted">{visit.reviewDeadline}</span>
   return (
-    <span className={deadlineUrgentTextClass}>
-      {visit.reviewDeadline} <span className="text-[10px] font-semibold">({deadline.text})</span>
-    </span>
+    <div className="flex flex-col items-start gap-1">
+      <span className="text-ink">{visit.reviewDeadline}</span>
+      <span className={`rounded-full px-1.5 py-0.5 font-mono text-[10px] font-semibold ${deadlineUrgentBadgeClass}`}>
+        {deadline.text}
+      </span>
+    </div>
   )
 }
 
@@ -279,9 +279,12 @@ export default function TablePage() {
                       <td className="px-4 py-3 font-mono">
                         <DeadlineCell visit={v} />
                       </td>
-                      <td className="px-4 py-3">{v.platform}</td>
-                      <td className="px-4 py-3">{v.storeName}</td>
-                      <td className="px-4 py-3">{v.category}</td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-ink">{v.storeName}</div>
+                        <div className="text-xs text-muted">
+                          {v.platform} · {v.category}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
                       <td
