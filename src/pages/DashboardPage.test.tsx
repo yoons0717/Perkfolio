@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import DashboardPage from './DashboardPage'
+import { toDateString } from '../lib/format'
 import { getVisits } from '../lib/visits'
 import { makeVisit as makeBaseVisit } from '../test/factories'
 import type { Visit } from '../types/visit'
@@ -15,7 +16,7 @@ vi.mock('../lib/visits', () => ({
 // months, so it's always "이번 달" relative to whenever tests run.
 const now = new Date()
 function thisMonthDate(day = 15): string {
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  return toDateString(new Date(now.getFullYear(), now.getMonth(), day))
 }
 
 // Dashboard totals exclude 예정 visits (see confirmedVisits), so tests here
@@ -103,16 +104,13 @@ describe('DashboardPage', () => {
   it('shows an upcoming deadline regardless of the selected stats period', async () => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
-    const y = tomorrow.getFullYear()
-    const m = String(tomorrow.getMonth() + 1).padStart(2, '0')
-    const d = String(tomorrow.getDate()).padStart(2, '0')
 
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({
         id: '42',
         storeName: '카페 온도',
         visitDate: '2020-01-01', // outside the default 이번 달 period
-        reviewDeadline: `${y}-${m}-${d}`,
+        reviewDeadline: toDateString(tomorrow),
         status: '예정',
       }),
     ])

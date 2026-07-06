@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CalendarPage, { getMonthGrid } from './CalendarPage'
-import { formatDDay } from '../lib/format'
+import { formatDDay, toDateString } from '../lib/format'
 import { getVisits } from '../lib/visits'
 import { makeVisit as makeBaseVisit } from '../test/factories'
 import type { Visit } from '../types/visit'
@@ -18,7 +18,7 @@ vi.mock('../lib/visits', () => ({
 // guaranteeing the visit renders in the initially-displayed grid.
 const now = new Date()
 function thisMonthDate(day: number): string {
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  return toDateString(new Date(now.getFullYear(), now.getMonth(), day))
 }
 const DAY_15 = thisMonthDate(15)
 const DAY_16 = thisMonthDate(16)

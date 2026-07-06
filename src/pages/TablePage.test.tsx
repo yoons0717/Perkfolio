@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import TablePage from './TablePage'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { downloadCsv, visitsToCsv } from '../lib/csvExport'
+import { toDateString } from '../lib/format'
 import { getVisits } from '../lib/visits'
 import { makeVisit } from '../test/factories'
 import { FakeIntersectionObserver } from '../test/fakeIntersectionObserver'
@@ -334,8 +335,7 @@ describe('TablePage mobile card view', () => {
 })
 
 function dateFor(i: number): string {
-  const d = new Date(2026, 0, i + 1)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return toDateString(new Date(2026, 0, i + 1))
 }
 
 describe('TablePage infinite scroll', () => {
