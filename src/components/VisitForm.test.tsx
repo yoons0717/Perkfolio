@@ -19,6 +19,9 @@ async function fillRequiredFields(opts: { skip?: string[] } = {}) {
   await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
   await userEvent.clear(screen.getByLabelText('체험가'))
   await userEvent.type(screen.getByLabelText('체험가'), '48000')
+  if (!skip.includes('마감일')) {
+    await userEvent.type(screen.getByLabelText('마감일'), '2026-09-01{enter}')
+  }
   if (!skip.includes('체험단 URL')) {
     await userEvent.type(screen.getByLabelText('체험단 URL (선택)'), 'https://campaign.example.com')
   }
@@ -52,6 +55,17 @@ describe('VisitForm validation', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
+  it('blocks submission when review deadline is cleared (native required validation)', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields()
+    const deadlineInput = screen.getByLabelText('마감일') as HTMLInputElement
+    await userEvent.clear(deadlineInput)
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(deadlineInput.validity.valueMissing).toBe(true)
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it.each(['플랫폼', '카테고리', '상태'])(
     'blocks submission when %s is left unselected (native required validation)',
     async (label) => {
@@ -65,7 +79,7 @@ describe('VisitForm validation', () => {
     },
   )
 
-  it('submits when optional fields (포스팅 링크, 마감일, 체험단 URL) are left empty', async () => {
+  it('submits when optional fields (포스팅 링크, 체험단 URL) are left empty', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields({ skip: ['체험단 URL'] })
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
@@ -105,7 +119,7 @@ describe('VisitForm submission payload', () => {
       extraPayment: 5000,
       campaignUrl: 'https://campaign.example.com',
       postUrl: null,
-      reviewDeadline: null,
+      reviewDeadline: '2026-09-01',
       status: '방문완료',
     })
     expect(submitted.visitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/)
@@ -113,13 +127,13 @@ describe('VisitForm submission payload', () => {
 
   it('submits a filled review deadline as a date string', async () => {
     const { onSubmit } = renderForm()
-    await fillRequiredFields()
-    await userEvent.type(screen.getByLabelText('마감일 (선택)'), '2026-09-01{enter}')
+    await fillRequiredFields({ skip: ['마감일'] })
+    await userEvent.type(screen.getByLabelText('마감일'), '2026-10-15{enter}')
 
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
     const submitted = onSubmit.mock.calls[0][0] as NewVisit
-    expect(submitted.reviewDeadline).toBe('2026-09-01')
+    expect(submitted.reviewDeadline).toBe('2026-10-15')
   })
 
   it('submits a filled post URL as-is', async () => {
@@ -232,6 +246,6 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('카테고리')).toHaveValue('음식점')
     expect(screen.getByLabelText('상태')).toHaveValue('방문완료')
     expect(screen.getByLabelText('방문(예정)일')).toHaveValue('2026-08-15')
-    expect(screen.getByLabelText('마감일 (선택)')).toHaveValue('2026-08-20')
+    expect(screen.getByLabelText('마감일')).toHaveValue('2026-08-20')
   })
 })

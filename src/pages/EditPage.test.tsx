@@ -195,7 +195,7 @@ describe('EditPage edit mode', () => {
   })
 
   it('saves via updateVisit and shows the updated value back in view mode', async () => {
-    const visit = makeVisit({ storeName: '카페 온도' })
+    const visit = makeVisit({ storeName: '카페 온도', reviewDeadline: '2026-09-01' })
     vi.mocked(getVisit).mockResolvedValue(visit)
     vi.mocked(updateVisit).mockResolvedValue({ ...visit, storeName: '변경된 이름' })
     renderEditPage()

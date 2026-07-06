@@ -93,9 +93,9 @@ export default function VisitForm({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    // visitDate/platform/category/status are guaranteed non-empty here: each
-    // field is `required` (DatePicker/Select), so the browser blocks submit
-    // before this handler runs if any of them is empty.
+    // visitDate/platform/category/status/reviewDeadline are guaranteed
+    // non-empty here: each field is `required` (DatePicker/Select), so the
+    // browser blocks submit before this handler runs if any of them is empty.
     setError(null)
     setSubmitting(true)
 
@@ -112,7 +112,7 @@ export default function VisitForm({
         extraPayment: Number(extraPayment),
         status: status as VisitStatus,
         postUrl: postUrl.trim() === '' ? null : postUrl.trim(),
-        reviewDeadline: reviewDeadline ? toDateString(reviewDeadline) : null,
+        reviewDeadline: toDateString(reviewDeadline as Date),
       })
     } catch {
       setError('저장에 실패했습니다. 잠시 후 다시 시도해주세요.')
@@ -158,14 +158,13 @@ export default function VisitForm({
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
-          마감일 (선택)
+          마감일
           <DatePicker
             selected={reviewDeadline}
             onChange={(date: Date | null) => updateField('reviewDeadline', date)}
             dateFormat="yyyy-MM-dd"
-            isClearable
-            placeholderText="마감일 없음"
             className={`w-full ${compactInputClass}`}
+            required
           />
         </label>
 
