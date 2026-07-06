@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
+import { getMonthGrid } from '../lib/calendarGrid'
 import { toDateString } from '../lib/format'
 import { deadlineDisplay, statusDotClass, statusTextClass } from '../lib/statusStyle'
 import type { Visit } from '../types/visit'
@@ -12,16 +13,6 @@ const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
 function takeWithOverflow<T>(items: T[], limit: number): { shown: T[]; extra: number } {
   const shown = items.slice(0, limit)
   return { shown, extra: items.length - shown.length }
-}
-
-export function getMonthGrid(year: number, month: number): Date[] {
-  const firstOfMonth = new Date(year, month, 1)
-  const start = new Date(year, month, 1 - firstOfMonth.getDay())
-  return Array.from({ length: 42 }, (_, i) => {
-    const d = new Date(start)
-    d.setDate(start.getDate() + i)
-    return d
-  })
 }
 
 export default function CalendarPage() {
