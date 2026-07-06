@@ -82,9 +82,9 @@ describe('downloadCsv', () => {
     const revokeObjectURL = vi.fn()
     vi.stubGlobal('URL', { ...URL, createObjectURL, revokeObjectURL })
 
-    downloadCsv('perkfolio_visits_2026-07-04.csv', 'a,b\r\n1,2\r\n')
+    downloadCsv('perktrack_visits_2026-07-04.csv', 'a,b\r\n1,2\r\n')
 
-    expect(anchor.download).toBe('perkfolio_visits_2026-07-04.csv')
+    expect(anchor.download).toBe('perktrack_visits_2026-07-04.csv')
     expect(anchor.click).toHaveBeenCalledTimes(1)
 
     const blob = createObjectURL.mock.calls[0][0] as Blob

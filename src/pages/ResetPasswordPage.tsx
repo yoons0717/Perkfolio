@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import Logo from '../components/Logo'
 import PasswordInput from '../components/PasswordInput'
 import { signOut, updatePassword } from '../lib/auth'
 
@@ -50,6 +51,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="mx-auto mt-24 w-full max-w-sm px-4">
+      <Logo />
       <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">비밀번호 재설정</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <label className="flex flex-col gap-1 text-sm">

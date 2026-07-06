@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import Logo from '../components/Logo'
 import PasswordInput from '../components/PasswordInput'
 import { signUpWithPassword } from '../lib/auth'
 
@@ -52,6 +53,7 @@ export default function SignupPage() {
 
   return (
     <div className="mx-auto mt-24 w-full max-w-sm px-4">
+      <Logo />
       <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">회원가입</h1>
       {confirmationSent ? (
         <p className="text-sm text-ink">가입 확인 이메일을 보냈습니다. 메일함을 확인해주세요.</p>

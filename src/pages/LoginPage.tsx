@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import Logo from '../components/Logo'
 import PasswordInput from '../components/PasswordInput'
 import { signInWithPassword } from '../lib/auth'
 
@@ -51,6 +52,7 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto mt-24 w-full max-w-sm px-4">
+      <Logo />
       <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">로그인</h1>
       {passwordResetSuccess && (
         <p className="mb-3 text-sm text-green">비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.</p>

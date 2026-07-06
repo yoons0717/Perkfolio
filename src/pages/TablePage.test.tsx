@@ -285,7 +285,7 @@ describe('TablePage CSV export', () => {
 
     expect(downloadCsv).toHaveBeenCalledTimes(1)
     const [filename, csv] = vi.mocked(downloadCsv).mock.calls[0]
-    expect(filename).toMatch(/^perkfolio_visits_\d{4}-\d{2}-\d{2}\.csv$/)
+    expect(filename).toMatch(/^perktrack_visits_\d{4}-\d{2}-\d{2}\.csv$/)
     expect(csv).toBe(visitsToCsv([makeVisit({ id: '2', storeName: '가게B', status: '리뷰완료' })]))
   })
 

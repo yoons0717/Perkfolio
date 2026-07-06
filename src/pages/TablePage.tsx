@@ -179,7 +179,7 @@ export default function TablePage() {
   }
 
   function handleExportCsv() {
-    downloadCsv(`perkfolio_visits_${toDateString(new Date())}.csv`, visitsToCsv(visible))
+    downloadCsv(`perktrack_visits_${toDateString(new Date())}.csv`, visitsToCsv(visible))
   }
 
   if (loading) return null

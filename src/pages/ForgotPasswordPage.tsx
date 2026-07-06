@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
+import Logo from '../components/Logo'
 import { resetPasswordForEmail } from '../lib/auth'
 
 export default function ForgotPasswordPage() {
@@ -34,6 +35,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="mx-auto mt-24 w-full max-w-sm px-4">
+      <Logo />
       <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">비밀번호 찾기</h1>
       {sent ? (
         <p className="text-sm text-ink">비밀번호 재설정 링크를 이메일로 보냈습니다.</p>
