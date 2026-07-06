@@ -23,6 +23,14 @@ export default function RecordsLayout() {
             >
               캘린더
             </NavLink>
+            <NavLink
+              to="/list"
+              className={({ isActive }) =>
+                `rounded-full px-5 py-2 ${isActive ? 'bg-blue text-white' : 'text-muted'}`
+              }
+            >
+              리스트
+            </NavLink>
           </div>
         </div>
 
