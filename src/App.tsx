@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
+import ErrorFallback from './components/ErrorFallback'
 import NavBar from './components/NavBar'
 import ProtectedRoute from './components/ProtectedRoute'
 import RecordsLayout from './components/RecordsLayout'
@@ -16,47 +18,49 @@ function App() {
   return (
     <>
       <NavBar />
-      <Routes>
-        <Route path="/" element={<Navigate to="/table" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route
-          path="/add"
-          element={
-            <ProtectedRoute>
-              <AddPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/edit/:id"
-          element={
-            <ProtectedRoute>
-              <EditPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          element={
-            <ProtectedRoute>
-              <RecordsLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/table" element={<TablePage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-        </Route>
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/table" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/add"
+            element={
+              <ProtectedRoute>
+                <AddPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit/:id"
+            element={
+              <ProtectedRoute>
+                <EditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            element={
+              <ProtectedRoute>
+                <RecordsLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/table" element={<TablePage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+          </Route>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </ErrorBoundary>
     </>
   )
 }
