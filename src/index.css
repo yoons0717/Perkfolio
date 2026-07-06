@@ -5,20 +5,20 @@
   --font-sans: 'Pretendard Variable', 'Pretendard', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --color-bg: #14161a;
-  --color-surface: #1d2027;
-  --color-line: #2a2e37;
-  --color-ink: #e7e9ec;
-  --color-muted: #7a8290;
+  --color-bg: #0f1618;
+  --color-surface: #172023;
+  --color-line: #233034;
+  --color-ink: #e4edee;
+  --color-muted: #82989c;
 
-  --color-blue: #5b8def;
-  --color-blue-bg: rgba(91, 141, 239, 0.14);
+  --color-blue: #2f9e93;
+  --color-blue-bg: rgba(47, 158, 147, 0.16);
 
-  --color-green: #34d399;
-  --color-green-bg: rgba(52, 211, 153, 0.14);
+  --color-green: #5cc98a;
+  --color-green-bg: rgba(92, 201, 138, 0.14);
 
-  --color-amber: #f0b429;
-  --color-amber-bg: rgba(240, 180, 41, 0.14);
+  --color-amber: #e0b04a;
+  --color-amber-bg: rgba(224, 176, 74, 0.14);
 }
 
 body {

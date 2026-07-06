@@ -172,10 +172,10 @@ export default function DashboardPage() {
           <p className="mb-3 font-display text-sm font-bold text-ink">플랫폼별 평균 절감액</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={platformRanking}>
-              <CartesianGrid stroke="#2a2e37" vertical={false} />
-              <XAxis dataKey="platform" tick={{ fill: '#7a8290', fontSize: 11 }} axisLine={{ stroke: '#2a2e37' }} tickLine={false} />
+              <CartesianGrid stroke="#233034" vertical={false} />
+              <XAxis dataKey="platform" tick={{ fill: '#82989c', fontSize: 11 }} axisLine={{ stroke: '#233034' }} tickLine={false} />
               <YAxis
-                tick={{ fill: '#7a8290', fontSize: 11 }}
+                tick={{ fill: '#82989c', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(value: number) => value.toLocaleString('ko-KR')}
@@ -183,14 +183,14 @@ export default function DashboardPage() {
               <Tooltip
                 cursor={{ fill: 'rgba(255,255,255,0.06)' }}
                 wrapperStyle={{ zIndex: 10 }}
-                contentStyle={{ background: '#1d2027', border: '1px solid #2a2e37', borderRadius: 8 }}
-                labelStyle={{ color: '#e7e9ec' }}
-                itemStyle={{ color: '#e7e9ec' }}
+                contentStyle={{ background: '#172023', border: '1px solid #233034', borderRadius: 8 }}
+                labelStyle={{ color: '#e4edee' }}
+                itemStyle={{ color: '#e4edee' }}
                 formatter={(value) => formatWon(Number(value))}
               />
               <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]}>
                 {platformRanking.map((entry) => (
-                  <Cell key={entry.platform} fill={entry.avgNet < 0 ? '#f87171' : '#5b8def'} />
+                  <Cell key={entry.platform} fill={entry.avgNet < 0 ? '#f87171' : '#2f9e93'} />
                 ))}
               </Bar>
             </BarChart>
@@ -201,23 +201,23 @@ export default function DashboardPage() {
           <p className="mb-3 font-display text-sm font-bold text-ink">월별 절감액 트렌드</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={monthlyTrend}>
-              <CartesianGrid stroke="#2a2e37" vertical={false} />
-              <XAxis dataKey="month" tick={{ fill: '#7a8290', fontSize: 11 }} axisLine={{ stroke: '#2a2e37' }} tickLine={false} />
+              <CartesianGrid stroke="#233034" vertical={false} />
+              <XAxis dataKey="month" tick={{ fill: '#82989c', fontSize: 11 }} axisLine={{ stroke: '#233034' }} tickLine={false} />
               <YAxis
-                tick={{ fill: '#7a8290', fontSize: 11 }}
+                tick={{ fill: '#82989c', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(value: number) => value.toLocaleString('ko-KR')}
               />
               <Tooltip
-                cursor={{ stroke: '#2a2e37' }}
+                cursor={{ stroke: '#233034' }}
                 wrapperStyle={{ zIndex: 10 }}
-                contentStyle={{ background: '#1d2027', border: '1px solid #2a2e37', borderRadius: 8 }}
-                labelStyle={{ color: '#e7e9ec' }}
-                itemStyle={{ color: '#e7e9ec' }}
+                contentStyle={{ background: '#172023', border: '1px solid #233034', borderRadius: 8 }}
+                labelStyle={{ color: '#e4edee' }}
+                itemStyle={{ color: '#e4edee' }}
                 formatter={(value) => formatWon(Number(value))}
               />
-              <Line type="monotone" dataKey="net" name="순절감액" stroke="#5b8def" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="net" name="순절감액" stroke="#2f9e93" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
