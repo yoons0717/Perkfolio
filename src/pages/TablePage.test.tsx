@@ -1,12 +1,13 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import TablePage from './TablePage'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { downloadCsv, visitsToCsv } from '../lib/csvExport'
 import { getVisits } from '../lib/visits'
 import { makeVisit } from '../test/factories'
+import { FakeIntersectionObserver } from '../test/fakeIntersectionObserver'
 
 vi.mock('../lib/visits', () => ({
   getVisits: vi.fn(),
@@ -329,5 +330,34 @@ describe('TablePage mobile card view', () => {
     await userEvent.click(await screen.findByText('카페 온도'))
 
     expect(await screen.findByText('상세 화면')).toBeInTheDocument()
+  })
+})
+
+function dateFor(i: number): string {
+  const d = new Date(2026, 0, i + 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+describe('TablePage infinite scroll', () => {
+  beforeEach(() => {
+    FakeIntersectionObserver.instances = []
+  })
+
+  it('renders only the first 20 visits initially, and more after the sentinel intersects', async () => {
+    const visits = Array.from({ length: 25 }, (_, i) =>
+      makeVisit({ id: String(i), storeName: `가게${String(i).padStart(2, '0')}`, visitDate: dateFor(i) }),
+    )
+    vi.mocked(getVisits).mockResolvedValue(visits)
+    renderTablePage()
+
+    // default sort is visitDate desc, so the highest i (latest date) renders first
+    await screen.findByText('가게24')
+    expect(screen.getAllByRole('row')).toHaveLength(21) // header + first 20
+    expect(screen.queryByText('가게04')).not.toBeInTheDocument()
+
+    FakeIntersectionObserver.intersect()
+
+    expect(await screen.findByText('가게04')).toBeInTheDocument()
+    expect(screen.getAllByRole('row')).toHaveLength(26) // header + all 25
   })
 })

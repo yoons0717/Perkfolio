@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useVisits } from '../hooks/useVisits'
 import { downloadCsv, visitsToCsv } from '../lib/csvExport'
@@ -164,6 +165,10 @@ export default function TablePage() {
     return result
   }, [visits, statusFilter, platformFilter, sortKey, sortDir])
 
+  const resetKey = `${statusFilter}|${platformFilter}|${sortKey}|${sortDir}`
+  const { displayCount, sentinelRef } = useInfiniteScroll(visible.length, resetKey)
+  const pageVisits = visible.slice(0, displayCount)
+
   function handleSort(key: SortKey) {
     if (key === sortKey) {
       setSortDir((dir) => (dir === 'asc' ? 'desc' : 'asc'))
@@ -222,69 +227,74 @@ export default function TablePage() {
         <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-muted">
           아직 등록된 방문 기록이 없습니다.
         </p>
-      ) : isMobile ? (
-        <div className="flex flex-col gap-3">
-          {visible.map((v) => (
-            <VisitCard key={v.id} visit={v} onNavigate={() => navigate(`/edit/${v.id}`)} />
-          ))}
-        </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line">
-          <table className="w-full min-w-[860px] border-collapse whitespace-nowrap text-sm">
-            <thead>
-              <tr className="border-b border-line bg-surface text-left text-muted">
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    onClick={() => handleSort(col.key)}
-                    className={`cursor-pointer select-none px-4 py-3 font-semibold transition-colors hover:text-ink ${
-                      sortKey === col.key ? 'text-ink' : ''
-                    }`}
-                  >
-                    {col.label}{' '}
-                    <Chevron
-                      className={`inline-block transition-transform ${
-                        sortKey === col.key ? `text-blue ${sortDir === 'asc' ? 'rotate-180' : ''}` : 'text-muted/40'
-                      }`}
-                    />
-                  </th>
-                ))}
-                <th className="py-3 pr-6 pl-4 font-semibold">상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((v) => (
-                <tr
-                  key={v.id}
-                  onClick={() => navigate(`/edit/${v.id}`)}
-                  className="cursor-pointer border-b border-line last:border-b-0 hover:bg-surface"
-                >
-                  <td className="px-4 py-3 font-mono text-ink">{v.visitDate}</td>
-                  <td className="px-4 py-3 font-mono">
-                    <DeadlineCell visit={v} />
-                  </td>
-                  <td className="px-4 py-3">{v.platform}</td>
-                  <td className="px-4 py-3">{v.storeName}</td>
-                  <td className="px-4 py-3">{v.category}</td>
-                  <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
-                  <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
-                  <td
-                    className={`px-4 py-3 font-mono ${
-                      v.status === '예정'
-                        ? 'text-muted'
-                        : `font-semibold ${netSaved(v) < 0 ? 'text-red-400' : 'text-green'}`
-                    }`}
-                  >
-                    {v.status === '예정' ? '-' : formatWon(netSaved(v))}
-                  </td>
-                  <td className="py-3 pr-6 pl-4">
-                    <StatusBadge status={v.status} />
-                  </td>
-                </tr>
+        <>
+          {isMobile ? (
+            <div className="flex flex-col gap-3">
+              {pageVisits.map((v) => (
+                <VisitCard key={v.id} visit={v} onNavigate={() => navigate(`/edit/${v.id}`)} />
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border border-line">
+              <table className="w-full min-w-[860px] border-collapse whitespace-nowrap text-sm">
+                <thead>
+                  <tr className="border-b border-line bg-surface text-left text-muted">
+                    {columns.map((col) => (
+                      <th
+                        key={col.key}
+                        onClick={() => handleSort(col.key)}
+                        className={`cursor-pointer select-none px-4 py-3 font-semibold transition-colors hover:text-ink ${
+                          sortKey === col.key ? 'text-ink' : ''
+                        }`}
+                      >
+                        {col.label}{' '}
+                        <Chevron
+                          className={`inline-block transition-transform ${
+                            sortKey === col.key ? `text-blue ${sortDir === 'asc' ? 'rotate-180' : ''}` : 'text-muted/40'
+                          }`}
+                        />
+                      </th>
+                    ))}
+                    <th className="py-3 pr-6 pl-4 font-semibold">상태</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pageVisits.map((v) => (
+                    <tr
+                      key={v.id}
+                      onClick={() => navigate(`/edit/${v.id}`)}
+                      className="cursor-pointer border-b border-line last:border-b-0 hover:bg-surface"
+                    >
+                      <td className="px-4 py-3 font-mono text-ink">{v.visitDate}</td>
+                      <td className="px-4 py-3 font-mono">
+                        <DeadlineCell visit={v} />
+                      </td>
+                      <td className="px-4 py-3">{v.platform}</td>
+                      <td className="px-4 py-3">{v.storeName}</td>
+                      <td className="px-4 py-3">{v.category}</td>
+                      <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
+                      <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
+                      <td
+                        className={`px-4 py-3 font-mono ${
+                          v.status === '예정'
+                            ? 'text-muted'
+                            : `font-semibold ${netSaved(v) < 0 ? 'text-red-400' : 'text-green'}`
+                        }`}
+                      >
+                        {v.status === '예정' ? '-' : formatWon(netSaved(v))}
+                      </td>
+                      <td className="py-3 pr-6 pl-4">
+                        <StatusBadge status={v.status} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div ref={sentinelRef} />
+        </>
       )}
     </div>
   )
