@@ -14,11 +14,14 @@
   --color-blue: #2f9e93;
   --color-blue-bg: rgba(47, 158, 147, 0.16);
 
-  --color-green: #64983e;
-  --color-green-bg: rgba(100, 152, 62, 0.14);
+  --color-green: #4f8ef7;
+  --color-green-bg: rgba(79, 142, 247, 0.14);
 
   --color-amber: #e0b04a;
   --color-amber-bg: rgba(224, 176, 74, 0.14);
+
+  --color-violet: #8285d6;
+  --color-violet-bg: rgba(130, 133, 214, 0.16);
 }
 
 body {

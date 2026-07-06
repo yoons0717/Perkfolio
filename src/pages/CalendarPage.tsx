@@ -5,7 +5,15 @@ import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
 import { getMonthGrid } from '../lib/calendarGrid'
 import { toDateString } from '../lib/format'
-import { deadlineDisplay, statusDotClass, statusTextClass } from '../lib/statusStyle'
+import {
+  deadlineDisplay,
+  deadlineUrgentBadgeClass,
+  deadlineUrgentDotClass,
+  deadlineUrgentTextClass,
+  statusBadgeClass,
+  statusDotClass,
+  statusTextClass,
+} from '../lib/statusStyle'
 import type { Visit } from '../types/visit'
 
 const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
@@ -100,7 +108,9 @@ export default function CalendarPage() {
               ...dayVisits.map((v) => ({ key: v.id, color: statusDotClass(v.status) })),
               ...dayDeadlines.map((v) => ({
                 key: `dl-${v.id}`,
-                color: deadlineDisplay(v.status, v.reviewDeadline)?.reviewed ? 'bg-green' : 'bg-red-500',
+                color: deadlineDisplay(v.status, v.reviewDeadline)?.reviewed
+                  ? statusDotClass('리뷰완료')
+                  : deadlineUrgentDotClass,
               })),
             ],
             4,
@@ -142,10 +152,12 @@ export default function CalendarPage() {
                   const deadline = deadlineDisplay(v.status, v.reviewDeadline)!
                   return (
                     <div key={`dl-${v.id}`} className="flex h-5 items-stretch gap-1 rounded bg-white/5 px-1 py-0.5">
-                      <span className={`w-[3px] rounded-sm ${deadline.reviewed ? 'bg-green' : 'bg-red-500'}`} />
+                      <span
+                        className={`w-[3px] rounded-sm ${deadline.reviewed ? statusDotClass('리뷰완료') : deadlineUrgentDotClass}`}
+                      />
                       <span className="truncate self-center text-[10px]">
                         <span className="text-ink">{v.storeName}</span>{' '}
-                        <span className={deadline.reviewed ? 'text-green' : 'text-red-400'}>
+                        <span className={deadline.reviewed ? statusTextClass('리뷰완료') : deadlineUrgentTextClass}>
                           {deadline.reviewed ? '리뷰 완료' : `마감 ${deadline.text}`}
                         </span>
                       </span>
@@ -196,21 +208,19 @@ export default function CalendarPage() {
                   >
                     <div className="flex items-start gap-2">
                       <span
-                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${deadline.reviewed ? 'bg-green' : 'bg-red-500'}`}
+                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${deadline.reviewed ? statusDotClass('리뷰완료') : deadlineUrgentDotClass}`}
                       />
                       <div>
                         <p className="text-ink">{v.storeName}</p>
-                        <p className={`mt-0.5 text-xs ${deadline.reviewed ? 'text-green' : 'text-red-400'}`}>
+                        <p className={`mt-0.5 text-xs ${deadline.reviewed ? statusTextClass('리뷰완료') : deadlineUrgentTextClass}`}>
                           {deadline.reviewed ? '리뷰 완료' : '리뷰 마감'}
                         </p>
                       </div>
                     </div>
                     <span
-                      className={`rounded-full px-3 py-1 font-mono text-xs ${
-                        deadline.reviewed ? 'bg-green-bg text-green' : 'bg-red-500/10 text-red-400'
-                      }`}
+                      className={`rounded-full px-3 py-1 font-mono text-xs ${deadline.reviewed ? statusBadgeClass('리뷰완료') : deadlineUrgentBadgeClass}`}
                     >
-                      {deadline.reviewed ? '완료' : deadline.text}
+                      {deadline.reviewed ? '리뷰완료' : deadline.text}
                     </span>
                   </div>
                 )

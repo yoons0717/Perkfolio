@@ -7,10 +7,10 @@ describe('statusBadgeClass / statusDotClass', () => {
     expect(statusDotClass(status)).toMatch(/^bg-\S+$/)
   })
 
-  it('uses green for 리뷰완료, amber for 방문완료, blue for 예정', () => {
-    expect(statusBadgeClass('리뷰완료')).toContain('green')
+  it('uses violet for 리뷰완료, amber for 방문완료, a neutral tone for 예정', () => {
+    expect(statusBadgeClass('리뷰완료')).toContain('violet')
     expect(statusBadgeClass('방문완료')).toContain('amber')
-    expect(statusBadgeClass('예정')).toContain('blue')
+    expect(statusBadgeClass('예정')).toContain('muted')
   })
 })
 

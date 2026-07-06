@@ -8,7 +8,12 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { useVisits } from '../hooks/useVisits'
 import { downloadCsv, visitsToCsv } from '../lib/csvExport'
 import { formatWon, toDateString } from '../lib/format'
-import { deadlineDisplay, statusOrder } from '../lib/statusStyle'
+import {
+  deadlineDisplay,
+  deadlineUrgentDotClass,
+  deadlineUrgentTextClass,
+  statusOrder,
+} from '../lib/statusStyle'
 import { netSaved } from '../lib/visitStats'
 import { platforms } from '../types/visit'
 import type { Category, Platform, Visit, VisitStatus } from '../types/visit'
@@ -66,10 +71,13 @@ function Chevron({ className }: { className?: string }) {
 function DeadlineCell({ visit }: { visit: Visit }) {
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
   if (!deadline) return <span className="text-muted">-</span>
-  if (deadline.reviewed) return <span className="text-green">{visit.reviewDeadline}</span>
+  // Reviewed deadlines stay plain here — the row's own status badge already
+  // shows 리뷰완료 in violet, so repeating that color in this column too
+  // would be redundant (unlike CalendarPage, which has no separate badge).
+  if (deadline.reviewed) return <span className="text-muted">{visit.reviewDeadline}</span>
   return (
-    <span className="text-red-400">
-      {visit.reviewDeadline} <span className="text-[10px] text-muted">({deadline.text})</span>
+    <span className={deadlineUrgentTextClass}>
+      {visit.reviewDeadline} <span className="text-[10px] font-semibold">({deadline.text})</span>
     </span>
   )
 }
@@ -107,8 +115,8 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
       </div>
 
       {deadline && !deadline.reviewed && (
-        <p className="flex items-center gap-1.5 text-xs text-red-400">
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+        <p className={`flex items-center gap-1.5 text-xs ${deadlineUrgentTextClass}`}>
+          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${deadlineUrgentDotClass}`} />
           {`마감 ${visit.reviewDeadline} (${deadline.text})`}
         </p>
       )}
