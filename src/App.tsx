@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorFallback from './components/ErrorFallback'
 import NavBar from './components/NavBar'
 import ProtectedRoute from './components/ProtectedRoute'
 import RecordsLayout from './components/RecordsLayout'
+import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
@@ -20,7 +21,7 @@ function App() {
       <NavBar />
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Routes>
-          <Route path="/" element={<Navigate to="/table" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

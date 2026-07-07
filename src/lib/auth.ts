@@ -35,6 +35,10 @@ export function updatePassword(password: string) {
   return supabase.auth.updateUser({ password })
 }
 
+export function markOnboardingSeen() {
+  return supabase.auth.updateUser({ data: { has_seen_onboarding: true } })
+}
+
 function decodeJwtPayload(jwt: string): Record<string, unknown> | null {
   try {
     const base64 = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')

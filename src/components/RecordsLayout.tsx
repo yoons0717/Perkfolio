@@ -1,9 +1,17 @@
+import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import FloatingAddButton from './FloatingAddButton'
+import WelcomeModal from './WelcomeModal'
+import { useAuth } from '../context/AuthContext'
 
 export default function RecordsLayout() {
+  const { session } = useAuth()
+  const [dismissed, setDismissed] = useState(false)
+  const showWelcome = !dismissed && !session?.user.user_metadata?.has_seen_onboarding
+
   return (
     <div className="relative min-h-[calc(100vh-57px)]">
+      {showWelcome && <WelcomeModal onDismiss={() => setDismissed(true)} />}
       <div className="mx-auto max-w-3xl px-4 pt-6 pb-24 lg:max-w-6xl xl:max-w-[88rem]">
         <div className="mb-6 flex justify-center">
           <div className="flex rounded-full border border-line bg-surface p-1 text-sm font-semibold">

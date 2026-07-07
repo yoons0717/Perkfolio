@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import {
   getSession,
   isRecoverySession,
+  markOnboardingSeen,
   onAuthStateChange,
   resetPasswordForEmail,
   signInWithPassword,
@@ -146,6 +147,17 @@ describe('updatePassword', () => {
     await updatePassword('newpw')
 
     expect(supabase.auth.updateUser).toHaveBeenCalledWith({ password: 'newpw' })
+  })
+})
+
+describe('markOnboardingSeen', () => {
+  it('sets the has_seen_onboarding user metadata flag', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(supabase.auth.updateUser).mockResolvedValue({ data: {}, error: null } as any)
+
+    await markOnboardingSeen()
+
+    expect(supabase.auth.updateUser).toHaveBeenCalledWith({ data: { has_seen_onboarding: true } })
   })
 })
 
