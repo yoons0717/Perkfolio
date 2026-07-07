@@ -22,6 +22,8 @@
 
   --color-violet: #8285d6;
   --color-violet-bg: rgba(130, 133, 214, 0.16);
+
+  --color-danger: #f87171;
 }
 
 body {

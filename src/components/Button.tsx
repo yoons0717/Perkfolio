@@ -12,7 +12,7 @@ const variantClass: Record<ButtonVariant, string> = {
   primary: 'rounded-lg bg-blue px-3 py-3 font-display font-bold text-white hover:bg-blue/90',
   secondary: 'rounded-lg border border-line px-3 py-3 hover:bg-white/5',
   ghost: '',
-  danger: 'rounded-lg bg-red-500/10 px-3 py-3 font-display font-bold text-red-400 hover:bg-red-500/20',
+  danger: 'rounded-lg bg-danger/10 px-3 py-3 font-display font-bold text-danger hover:bg-danger/20',
 }
 
 const sizeTextClass: Record<ButtonSize, string> = {

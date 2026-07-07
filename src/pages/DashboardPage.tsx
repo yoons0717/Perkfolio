@@ -70,7 +70,7 @@ export default function DashboardPage() {
   const monthlyTrend = useMemo(() => computeMonthlyTrend(allTimeConfirmed), [allTimeConfirmed])
 
   if (loading) return null
-  if (error) return <p className="text-sm text-red-400">{error}</p>
+  if (error) return <p className="text-sm text-danger">{error}</p>
 
   return (
     <div className="mx-auto max-w-3xl px-4 pt-6 pb-24 lg:max-w-5xl">
@@ -117,7 +117,7 @@ export default function DashboardPage() {
             <StatCard label="총 체험단" value={`${totals.count}건`} />
             <StatCard label="체험가" value={formatWon(totals.retail)} />
             <StatCard label="추가결제액" value={formatWon(totals.extra)} />
-            <StatCard label="순절감액" value={formatWon(totals.net)} valueClassName={totals.net < 0 ? 'text-red-400' : 'text-green'} />
+            <StatCard label="순절감액" value={formatWon(totals.net)} valueClassName={totals.net < 0 ? 'text-danger' : 'text-green'} />
             <StatCard label="평균 절감율" value={`${totals.rate}%`} />
           </div>
 
@@ -201,7 +201,7 @@ export default function DashboardPage() {
                   />
                   <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]}>
                     {platformRanking.map((entry) => (
-                      <Cell key={entry.platform} fill={entry.avgNet < 0 ? '#f87171' : 'var(--color-blue)'} />
+                      <Cell key={entry.platform} fill={entry.avgNet < 0 ? 'var(--color-danger)' : 'var(--color-blue)'} />
                     ))}
                   </Bar>
                 </BarChart>

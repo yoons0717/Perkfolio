@@ -57,7 +57,7 @@ export default function CalendarPage() {
   const grid = useMemo(() => getMonthGrid(cursor.getFullYear(), cursor.getMonth()), [cursor])
 
   if (loading) return null
-  if (error) return <p className="text-sm text-red-400">{error}</p>
+  if (error) return <p className="text-sm text-danger">{error}</p>
 
   const todayStr = toDateString(today)
   const selectedVisits = selectedDate ? (visitsByDate.get(selectedDate) ?? []) : []

@@ -115,7 +115,7 @@ export default function EditPage() {
   }
 
   if (loadError) {
-    return <p className="mx-auto mt-10 max-w-lg px-4 text-sm text-red-400">기록을 불러오지 못했습니다.</p>
+    return <p className="mx-auto mt-10 max-w-lg px-4 text-sm text-danger">기록을 불러오지 못했습니다.</p>
   }
 
   if (!visit) {
@@ -198,7 +198,7 @@ export default function EditPage() {
         </div>
       </div>
 
-      {deleteError && <p className="mt-3 text-sm text-red-400">{deleteError}</p>}
+      {deleteError && <p className="mt-3 text-sm text-danger">{deleteError}</p>}
 
       <div className="mt-6 flex items-center gap-3">
         <Button onClick={() => setMode('edit')} className="flex-1">

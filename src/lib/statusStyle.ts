@@ -29,6 +29,6 @@ export function deadlineDisplay(status: VisitStatus, reviewDeadline: string | nu
 // Single source of truth for "this deadline still needs attention" — used
 // by both TablePage and CalendarPage wherever an unreviewed deadline is
 // shown, so the urgency color only needs to change in one place.
-export const deadlineUrgentTextClass = 'text-red-400'
-export const deadlineUrgentDotClass = 'bg-red-500'
-export const deadlineUrgentBadgeClass = 'bg-red-500/10 text-red-400'
+export const deadlineUrgentTextClass = 'text-danger'
+export const deadlineUrgentDotClass = 'bg-danger'
+export const deadlineUrgentBadgeClass = 'bg-danger/10 text-danger'

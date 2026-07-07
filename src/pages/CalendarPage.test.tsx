@@ -84,7 +84,7 @@ describe('CalendarPage', () => {
     const panel = within(panelHeader.parentElement!)
     const deadlineLabel = panel.getByText('리뷰 마감', { selector: 'p' })
     const dot = deadlineLabel.parentElement!.previousElementSibling as HTMLElement
-    expect(dot.className).toContain('bg-red-500')
+    expect(dot.className).toContain('bg-danger')
   })
 
   it('shows the exact D-day count for a review deadline', async () => {

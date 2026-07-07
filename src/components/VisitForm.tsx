@@ -294,7 +294,7 @@ export default function VisitForm({
         </label>
       </div>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={submitting} className="flex-1">
