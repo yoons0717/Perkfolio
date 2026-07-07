@@ -11,6 +11,6 @@ describe('FloatingAddButton', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('link', { name: '방문 추가' })).toHaveAttribute('href', '/add')
+    expect(screen.getByRole('link', { name: '체험단 추가' })).toHaveAttribute('href', '/add')
   })
 })

@@ -20,7 +20,7 @@ describe('ErrorFallback', () => {
     expect(resetErrorBoundary).toHaveBeenCalledTimes(1)
   })
 
-  it('resets the boundary when navigating back to 방문내역', async () => {
+  it('resets the boundary when navigating back to 체험단 내역', async () => {
     const resetErrorBoundary = vi.fn()
     render(
       <MemoryRouter>
@@ -28,7 +28,7 @@ describe('ErrorFallback', () => {
       </MemoryRouter>,
     )
 
-    await userEvent.click(screen.getByRole('link', { name: '방문내역으로' }))
+    await userEvent.click(screen.getByRole('link', { name: '체험단 내역으로' }))
 
     expect(resetErrorBoundary).toHaveBeenCalledTimes(1)
   })

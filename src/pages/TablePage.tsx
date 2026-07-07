@@ -35,7 +35,7 @@ type Column = {
 
 const columns: Column[] = [
   { key: 'reviewDeadline', label: '마감일' },
-  { key: 'visitDate', label: '방문(예정)일' },
+  { key: 'visitDate', label: '체험(예정)일' },
   { key: 'storeName', label: '업체명' },
   { key: 'retailValue', label: '체험가' },
   { key: 'extraPayment', label: '추가결제액' },
@@ -292,7 +292,7 @@ export default function TablePage() {
             statusFilter === '예정' ? 'border-blue bg-blue-bg' : 'border-line bg-surface'
           }`}
         >
-          <p className="text-xs font-semibold text-muted">방문예정 캠페인</p>
+          <p className="text-xs font-semibold text-muted">방문 예정</p>
           <p className={`mt-1 font-mono text-3xl font-extrabold ${statusFilter === '예정' ? 'text-blue' : 'text-ink'}`}>
             {statusCounts.예정}
           </p>
@@ -304,7 +304,7 @@ export default function TablePage() {
             statusFilter === '리뷰완료' ? 'border-violet bg-violet-bg' : 'border-line bg-surface'
           }`}
         >
-          <p className="text-xs font-semibold text-muted">리뷰한 캠페인</p>
+          <p className="text-xs font-semibold text-muted">리뷰 완료</p>
           <p
             className={`mt-1 font-mono text-3xl font-extrabold ${statusFilter === '리뷰완료' ? 'text-violet' : 'text-ink'}`}
           >
@@ -353,7 +353,7 @@ export default function TablePage() {
 
       {visible.length === 0 ? (
         <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-muted">
-          아직 등록된 방문 기록이 없습니다.
+          아직 등록된 체험단 기록이 없습니다.
         </p>
       ) : (
         <>

@@ -10,7 +10,7 @@ afterEach(() => {
 describe('visitsToCsv', () => {
   it('writes the header row matching the table columns', () => {
     const csv = visitsToCsv([])
-    expect(csv).toBe('방문(예정)일,마감일,플랫폼,업체명,카테고리,체험가,추가결제액,순절감액,상태\r\n')
+    expect(csv).toBe('체험(예정)일,마감일,플랫폼,업체명,카테고리,체험가,추가결제액,순절감액,상태\r\n')
   })
 
   it('writes one data row per visit with raw numeric amounts and computed net savings', () => {
@@ -28,7 +28,7 @@ describe('visitsToCsv', () => {
     const csv = visitsToCsv([visit])
 
     expect(csv).toBe(
-      '방문(예정)일,마감일,플랫폼,업체명,카테고리,체험가,추가결제액,순절감액,상태\r\n' +
+      '체험(예정)일,마감일,플랫폼,업체명,카테고리,체험가,추가결제액,순절감액,상태\r\n' +
         '2026-01-10,2026-01-13,포포몬,카페 온도,카페,48000,5000,43000,리뷰완료\r\n',
     )
   })

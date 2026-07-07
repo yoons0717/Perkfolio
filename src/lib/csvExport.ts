@@ -1,7 +1,7 @@
 import { netSaved } from './visitStats'
 import type { Visit } from '../types/visit'
 
-const headers = ['방문(예정)일', '마감일', '플랫폼', '업체명', '카테고리', '체험가', '추가결제액', '순절감액', '상태']
+const headers = ['체험(예정)일', '마감일', '플랫폼', '업체명', '카테고리', '체험가', '추가결제액', '순절감액', '상태']
 
 function escapeCsvField(value: string | number): string {
   const s = String(value)

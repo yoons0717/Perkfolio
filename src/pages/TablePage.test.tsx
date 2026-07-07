@@ -58,7 +58,7 @@ describe('TablePage loading states', () => {
   it('shows an empty state when there are no visits', async () => {
     vi.mocked(getVisits).mockResolvedValue([])
     renderTablePage()
-    expect(await screen.findByText('아직 등록된 방문 기록이 없습니다.')).toBeInTheDocument()
+    expect(await screen.findByText('아직 등록된 체험단 기록이 없습니다.')).toBeInTheDocument()
   })
 })
 

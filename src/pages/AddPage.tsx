@@ -17,7 +17,7 @@ export default function AddPage() {
     <PageContainer>
       <div className="mb-4 flex items-center gap-3">
         <BackButton />
-        <h1 className="font-display text-2xl font-extrabold text-ink">체험단 방문 입력</h1>
+        <h1 className="font-display text-2xl font-extrabold text-ink">체험단 입력</h1>
       </div>
       <VisitForm onSubmit={handleSubmit} submitLabel="저장" pendingLabel="저장 중..." />
     </PageContainer>

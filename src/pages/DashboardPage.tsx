@@ -112,7 +112,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
-            <StatCard label="총 방문" value={`${totals.count}건`} />
+            <StatCard label="총 체험단" value={`${totals.count}건`} />
             <StatCard label="체험가" value={formatWon(totals.retail)} />
             <StatCard label="추가결제액" value={formatWon(totals.extra)} />
             <StatCard label="순절감액" value={formatWon(totals.net)} valueClassName={totals.net < 0 ? 'text-red-400' : 'text-green'} />

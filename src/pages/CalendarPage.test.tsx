@@ -109,7 +109,7 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('리뷰 완료')).toBeInTheDocument()
 
     await userEvent.click(screen.getByText('15'))
-    expect(await screen.findByText('이 날짜에 등록된 방문이 없습니다.')).toBeInTheDocument()
+    expect(await screen.findByText('이 날짜에 등록된 체험단이 없습니다.')).toBeInTheDocument()
   })
 
   it('keeps a reviewed visit on its visit-date cell when it has no review deadline set', async () => {
@@ -186,7 +186,7 @@ describe('CalendarPage', () => {
     expect(panel.getByText(/카페 온도/)).toBeInTheDocument()
 
     await userEvent.click(screen.getByText('16'))
-    expect(await screen.findByText('이 날짜에 등록된 방문이 없습니다.')).toBeInTheDocument()
+    expect(await screen.findByText('이 날짜에 등록된 체험단이 없습니다.')).toBeInTheDocument()
   })
 
   it('navigates to the detail page when a panel row is clicked', async () => {

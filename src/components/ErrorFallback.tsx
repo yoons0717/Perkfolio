@@ -11,7 +11,7 @@ export default function ErrorFallback({ resetErrorBoundary }: FallbackProps) {
         다시 시도
       </Button>
       <Link to="/table" onClick={resetErrorBoundary} className="text-sm text-blue">
-        방문내역으로
+        체험단 내역으로
       </Link>
     </div>
   )

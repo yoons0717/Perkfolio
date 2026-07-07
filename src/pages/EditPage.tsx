@@ -111,7 +111,7 @@ export default function EditPage() {
 
   async function handleDelete() {
     if (!id) return
-    await confirmAndDelete(id, '이 방문 기록을 삭제할까요?', () => navigate('/table'), setDeleteError)
+    await confirmAndDelete(id, '이 체험단 기록을 삭제할까요?', () => navigate('/table'), setDeleteError)
   }
 
   if (loadError) {
@@ -155,7 +155,7 @@ export default function EditPage() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <ViewField label="방문(예정)일" value={visit.visitDate} />
+            <ViewField label="체험(예정)일" value={visit.visitDate} />
             <ViewField label="플랫폼" value={visit.platform} />
           </div>
 

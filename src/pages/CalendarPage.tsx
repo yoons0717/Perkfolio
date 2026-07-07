@@ -177,7 +177,7 @@ export default function CalendarPage() {
             {selectedDate}
           </div>
           {selectedVisits.length === 0 && selectedDeadlines.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-muted">이 날짜에 등록된 방문이 없습니다.</p>
+            <p className="px-4 py-6 text-center text-sm text-muted">이 날짜에 등록된 체험단이 없습니다.</p>
           ) : (
             <>
               {selectedVisits.map((v) => (

@@ -40,10 +40,10 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
-// "총 방문" 카드의 값("N건")은 상태별 현황 뱃지에도 같은 텍스트가 나올 수 있어
+// "총 체험단" 카드의 값("N건")은 상태별 현황 뱃지에도 같은 텍스트가 나올 수 있어
 // (예: 방문 2건 전부 같은 상태면 "2건"이 두 번), 카드 안으로 스코프를 좁힌다.
 function totalVisitCountText(): string {
-  return screen.getByText('총 방문').nextElementSibling!.textContent!
+  return screen.getByText('총 체험단').nextElementSibling!.textContent!
 }
 
 describe('DashboardPage', () => {
@@ -56,7 +56,7 @@ describe('DashboardPage', () => {
   it('defaults the period filter to 이번 달', async () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
     renderDashboard()
-    await screen.findByText('총 방문')
+    await screen.findByText('총 체험단')
     expect(screen.getByLabelText('기간 필터')).toHaveValue('thisMonth')
   })
 
@@ -68,7 +68,7 @@ describe('DashboardPage', () => {
     ])
     renderDashboard()
 
-    await screen.findByText('총 방문')
+    await screen.findByText('총 체험단')
     expect(totalVisitCountText()).toBe('2건')
     expect(screen.getByText('₩40,000')).toBeInTheDocument()
     expect(screen.getByText('₩10,000')).toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('DashboardPage', () => {
       makeVisit({ id: '1', visitDate: '2020-01-01', status: '리뷰완료' }),
     ])
     renderDashboard()
-    await screen.findByText('총 방문')
+    await screen.findByText('총 체험단')
     expect(totalVisitCountText()).toBe('0건')
 
     await userEvent.selectOptions(screen.getByLabelText('기간 필터'), '전체')
@@ -93,7 +93,7 @@ describe('DashboardPage', () => {
   it('reveals an empty date-range picker when "직접 선택" is chosen, showing no results until a range is picked', async () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({ status: '리뷰완료' })])
     renderDashboard()
-    await screen.findByText('총 방문')
+    await screen.findByText('총 체험단')
 
     await userEvent.selectOptions(screen.getByLabelText('기간 필터'), '직접 선택')
 
@@ -132,7 +132,7 @@ describe('DashboardPage', () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
     renderDashboard()
 
-    await screen.findByText('총 방문')
-    expect(screen.getByRole('link', { name: '방문 추가' })).toHaveAttribute('href', '/add')
+    await screen.findByText('총 체험단')
+    expect(screen.getByRole('link', { name: '체험단 추가' })).toHaveAttribute('href', '/add')
   })
 })
