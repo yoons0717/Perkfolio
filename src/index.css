@@ -91,7 +91,7 @@ body {
   background: var(--color-blue) !important;
   color: white !important;
 }
-.react-datepicker__day--keyboard-selected {
+.react-datepicker__day--keyboard-selected:not(.react-datepicker__day--in-range, .react-datepicker__day--selected) {
   background: var(--color-blue-bg) !important;
   color: var(--color-ink) !important;
 }
