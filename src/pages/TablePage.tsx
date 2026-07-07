@@ -172,7 +172,7 @@ const categoryIcon: Record<Category, string> = {
 
 function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void }) {
   const net = netSaved(visit)
-  const netColor = visit.status === '예정' ? 'text-muted' : net < 0 ? 'text-danger' : 'text-green'
+  const netColor = visit.status === '예정' ? 'text-muted' : net < 0 ? 'text-danger' : 'text-positive'
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
 
   return (
@@ -421,7 +421,7 @@ export default function TablePage() {
                         className={`px-4 py-3 font-mono ${
                           v.status === '예정'
                             ? 'text-muted'
-                            : `font-semibold ${netSaved(v) < 0 ? 'text-danger' : 'text-green'}`
+                            : `font-semibold ${netSaved(v) < 0 ? 'text-danger' : 'text-positive'}`
                         }`}
                       >
                         {v.status === '예정' ? '-' : formatWon(netSaved(v))}

@@ -56,7 +56,7 @@ export default function LoginPage() {
       <Logo />
       <h1 className="mb-6 font-display text-2xl font-extrabold text-ink">로그인</h1>
       {passwordResetSuccess && (
-        <p className="mb-3 text-sm text-green">비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.</p>
+        <p className="mb-3 text-sm text-positive">비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.</p>
       )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <label className="flex flex-col gap-1 text-sm">

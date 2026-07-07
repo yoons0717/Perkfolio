@@ -93,7 +93,7 @@ describe('TablePage columns', () => {
     await screen.findByText('카페 온도')
     const netSavedCell = screen.getByText('₩-5,000')
     expect(netSavedCell).toHaveClass('text-danger')
-    expect(netSavedCell).not.toHaveClass('text-green')
+    expect(netSavedCell).not.toHaveClass('text-positive')
   })
 
   it('shows "-" instead of a computed net savings for 예정 visits, since the amount is not confirmed yet', async () => {
