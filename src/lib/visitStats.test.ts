@@ -213,8 +213,8 @@ describe('computePlatformRanking', () => {
       makeVisit({ platform: '포포몬', retailValue: 5000, extraPayment: 0 }), // avg(10000, 5000) = 7500
     ]
     expect(computePlatformRanking(visits)).toEqual([
-      { platform: '캐시노트', avgNet: 25000 },
-      { platform: '포포몬', avgNet: 7500 },
+      { platform: '캐시노트', avgNet: 25000, count: 1, pct: 100 },
+      { platform: '포포몬', avgNet: 7500, count: 2, pct: 30 },
     ])
   })
 
@@ -230,7 +230,11 @@ describe('computePlatformRanking', () => {
 })
 
 describe('computeMonthlyTrend', () => {
-  it('sums net savings per YYYY-MM and sorts chronologically', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it('sums net savings per YYYY-MM, fixed to January through the current month', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 1, 15)) // 2026-02-15
     const visits = [
       makeVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
       makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
@@ -242,11 +246,31 @@ describe('computeMonthlyTrend', () => {
     ])
   })
 
+  it('fills months with no visits as 0 instead of omitting them', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 2, 10)) // 2026-03-10
+    const visits = [makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 })]
+    expect(computeMonthlyTrend(visits)).toEqual([
+      { month: '2026-01', net: 20000 },
+      { month: '2026-02', net: 0 },
+      { month: '2026-03', net: 0 },
+    ])
+  })
+
   it('skips visits with no visit date instead of crashing', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 0, 20)) // 2026-01-20
     const visits = [
       makeVisit({ visitDate: null, retailValue: 10000, extraPayment: 0 }),
       makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
     ]
     expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 20000 }])
+  })
+
+  it('ignores visits from a different year', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 0, 20)) // 2026-01-20
+    const visits = [makeVisit({ visitDate: '2025-12-15', retailValue: 20000, extraPayment: 0 })]
+    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 0 }])
   })
 })

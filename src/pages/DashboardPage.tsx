@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import FloatingAddButton from '../components/FloatingAddButton'
 import { focusRingClass, inputClass } from '../components/formStyles'
 import InfoTooltip from '../components/InfoTooltip'
@@ -42,8 +42,6 @@ function StatCard({ label, value, valueClassName = 'text-ink' }: { label: string
   )
 }
 
-// Shared axis/tooltip styling for the platform-ranking and monthly-trend
-// charts below, which otherwise only differ in dataKey and tooltip cursor.
 function ChartGrid() {
   return <CartesianGrid stroke="var(--color-line)" vertical={false} />
 }
@@ -208,45 +206,51 @@ export default function DashboardPage() {
             )}
           </Panel>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Panel>
-              <p className="mb-3 font-display text-sm font-bold text-ink">플랫폼별 평균 절감액</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={platformRanking}>
-                  <ChartGrid />
-                  <ChartXAxis dataKey="platform" />
-                  <ChartYAxis />
-                  <ChartTooltip cursor={{ fill: 'var(--color-overlay)' }} />
-                  <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]} isAnimationActive={false}>
-                    {platformRanking.map((entry) => (
-                      <Cell key={entry.platform} fill={entry.avgNet < 0 ? 'var(--color-danger)' : 'var(--color-blue)'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Panel>
+          <Panel className="mb-3">
+            <p className="mb-3 font-display text-sm font-bold text-ink">플랫폼별 평균 절감액</p>
+            <div className="flex flex-col gap-2">
+              {platformRanking.map(({ platform, avgNet, count, pct }) => (
+                <div key={platform} className="flex items-center gap-2 text-sm">
+                  <span className="w-24 shrink-0 truncate text-muted">{platform}</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-line">
+                    <div
+                      className={`h-full rounded-full ${avgNet < 0 ? 'bg-danger' : 'bg-blue'}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span
+                    className={`w-20 shrink-0 text-right font-mono text-xs font-semibold ${avgNet < 0 ? 'text-danger' : 'text-blue'}`}
+                  >
+                    {formatWon(avgNet)}
+                  </span>
+                  <span className={`w-8 shrink-0 text-right font-mono text-xs ${count <= 2 ? 'text-danger' : 'text-muted'}`}>
+                    {count}건
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Panel>
 
-            <Panel>
-              <p className="mb-3 font-display text-sm font-bold text-ink">월별 절감액 트렌드</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={monthlyTrend}>
-                  <ChartGrid />
-                  <ChartXAxis dataKey="month" />
-                  <ChartYAxis />
-                  <ChartTooltip cursor={{ stroke: 'var(--color-line)' }} />
-                  <Line
-                    type="monotone"
-                    dataKey="net"
-                    name="순절감액"
-                    stroke="var(--color-blue)"
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </Panel>
-          </div>
+          <Panel>
+            <p className="mb-3 font-display text-sm font-bold text-ink">월별 절감액 트렌드</p>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={monthlyTrend}>
+                <ChartGrid />
+                <ChartXAxis dataKey="month" />
+                <ChartYAxis />
+                <ChartTooltip cursor={{ stroke: 'var(--color-line)' }} />
+                <Line
+                  type="monotone"
+                  dataKey="net"
+                  name="순절감액"
+                  stroke="var(--color-blue)"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Panel>
         </Section>
       </div>
 

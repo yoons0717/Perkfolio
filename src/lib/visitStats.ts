@@ -86,17 +86,30 @@ export function computePlatformRanking(visits: Visit[]) {
     totals.set(v.platform, (totals.get(v.platform) ?? 0) + netSaved(v))
     counts.set(v.platform, (counts.get(v.platform) ?? 0) + 1)
   }
-  return [...totals.entries()]
-    .map(([platform, total]) => ({ platform, avgNet: Math.round(total / (counts.get(platform) ?? 1)) }))
+  const ranked = [...totals.entries()].map(([platform, total]) => {
+    const count = counts.get(platform) ?? 1
+    return { platform, avgNet: Math.round(total / count), count }
+  })
+  const maxAbs = Math.max(1, ...ranked.map((r) => Math.abs(r.avgNet)))
+  return ranked
+    .map((r) => ({ ...r, pct: (Math.abs(r.avgNet) / maxAbs) * 100 }))
     .sort((a, b) => b.avgNet - a.avgNet)
 }
 
+// 이번 해 1월부터 이번 달까지 고정된 축을 쓴다 — 데이터가 쌓인 달만 표시하면
+// 기록이 길어질수록(예: 12개월+) x축 라벨이 겹치기 때문에, 기간을 항상
+// 연초~이번 달로 제한해 라벨 개수를 예측 가능하게 유지한다.
 export function computeMonthlyTrend(visits: Visit[]) {
+  const now = new Date()
+  const year = now.getFullYear()
   const totals = new Map<string, number>()
   for (const v of visits) {
     if (v.visitDate === null) continue
     const month = v.visitDate.slice(0, 7)
     totals.set(month, (totals.get(month) ?? 0) + netSaved(v))
   }
-  return [...totals.entries()].map(([month, net]) => ({ month, net })).sort((a, b) => (a.month < b.month ? -1 : 1))
+  return Array.from({ length: now.getMonth() + 1 }, (_, i) => {
+    const month = `${year}-${String(i + 1).padStart(2, '0')}`
+    return { month, net: totals.get(month) ?? 0 }
+  })
 }
