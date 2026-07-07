@@ -28,6 +28,26 @@
   --color-overlay: rgba(255, 255, 255, 0.05);
 }
 
+:root[data-theme="light"] {
+  --color-bg: #f4f8f7;
+  --color-surface: #ffffff;
+  --color-line: #dbe6e4;
+  --color-ink: #12211f;
+  --color-muted: #6b7680;
+
+  --color-blue: #16766c;
+  --color-blue-bg: rgba(22, 118, 108, 0.12);
+
+  --color-green: #1d4ed8;
+
+  --color-violet: #5b5fb0;
+  --color-violet-bg: rgba(91, 95, 176, 0.12);
+
+  --color-danger: #dc2626;
+
+  --color-overlay: rgba(0, 0, 0, 0.04);
+}
+
 body {
   font-family: var(--font-sans);
   color: var(--color-ink);
@@ -35,8 +55,6 @@ body {
   color-scheme: dark;
 }
 
-/* :root defaults to dark; a future light palette overrides the tokens
-   above under this same selector once the theme toggle exists. */
 :root[data-theme="light"] body {
   color-scheme: light;
 }

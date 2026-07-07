@@ -192,7 +192,7 @@ export default function DashboardPage() {
                     tickFormatter={(value: number) => value.toLocaleString('ko-KR')}
                   />
                   <Tooltip
-                    cursor={{ fill: 'rgba(255,255,255,0.06)' }}
+                    cursor={{ fill: 'var(--color-overlay)' }}
                     wrapperStyle={{ zIndex: 10 }}
                     contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line)', borderRadius: 8 }}
                     labelStyle={{ color: 'var(--color-ink)' }}
