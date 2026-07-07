@@ -15,7 +15,11 @@ export default function NavBar() {
   const isDashboardActive = location.pathname === '/dashboard'
 
   async function handleLogout() {
-    await signOut()
+    const { error } = await signOut()
+    if (error) {
+      console.error(error)
+      return
+    }
     navigate('/login')
   }
 
