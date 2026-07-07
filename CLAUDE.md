@@ -6,7 +6,8 @@
 - React + TypeScript + Vite
 - Tailwind CSS
 - React Router
-- Supabase (Postgres + Auth) — 데이터/인증 모두 Supabase 사용, localStorage 미사용
+- Supabase (Postgres + Auth) — 방문 기록 등 앱 데이터/인증은 전부 Supabase 사용
+- 테마(라이트/다크) 선택만 예외적으로 localStorage에 저장 — 기기별 UI 취향이라 앱 데이터로 안 보고, React 마운트 전에 동기적으로 읽어야 깜빡임 없이 적용 가능
 - 상태 관리: React state/Context만 사용. Redux, Zustand 등 전역상태 라이브러리 도입 금지
 
 ## 폴더 구조

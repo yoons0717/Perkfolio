@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from './Button'
+import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/auth'
 
@@ -39,6 +40,7 @@ export default function NavBar() {
         <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
           로그아웃
         </Button>
+        <ThemeToggle />
       </div>
     </nav>
   )

@@ -35,6 +35,12 @@ body {
   color-scheme: dark;
 }
 
+/* :root defaults to dark; a future light palette overrides the tokens
+   above under this same selector once the theme toggle exists. */
+:root[data-theme="light"] body {
+  color-scheme: light;
+}
+
 /* react-datepicker dark theme overrides (!important: the library's own
    stylesheet loads after this file in the bundle, so equal-specificity
    rules would otherwise lose to its defaults) */
