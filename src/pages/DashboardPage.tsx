@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import type { ComponentProps } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -40,6 +41,47 @@ function StatCard({ label, value, valueClassName = 'text-ink' }: { label: string
       <p className="text-xs text-muted">{label}</p>
       <p className={`mt-1 font-mono text-xl font-bold ${valueClassName}`}>{value}</p>
     </Panel>
+  )
+}
+
+// Shared axis/tooltip styling for the platform-ranking and monthly-trend
+// charts below, which otherwise only differ in dataKey and tooltip cursor.
+function ChartGrid() {
+  return <CartesianGrid stroke="var(--color-line)" vertical={false} />
+}
+
+function ChartXAxis({ dataKey }: { dataKey: string }) {
+  return (
+    <XAxis
+      dataKey={dataKey}
+      tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
+      axisLine={{ stroke: 'var(--color-line)' }}
+      tickLine={false}
+    />
+  )
+}
+
+function ChartYAxis() {
+  return (
+    <YAxis
+      tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
+      axisLine={false}
+      tickLine={false}
+      tickFormatter={(value: number) => value.toLocaleString('ko-KR')}
+    />
+  )
+}
+
+function ChartTooltip({ cursor }: { cursor: ComponentProps<typeof Tooltip>['cursor'] }) {
+  return (
+    <Tooltip
+      cursor={cursor}
+      wrapperStyle={{ zIndex: 10 }}
+      contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line)', borderRadius: 8 }}
+      labelStyle={{ color: 'var(--color-ink)' }}
+      itemStyle={{ color: 'var(--color-ink)' }}
+      formatter={(value) => formatWon(Number(value))}
+    />
   )
 }
 
@@ -184,22 +226,10 @@ export default function DashboardPage() {
               <p className="mb-3 font-display text-sm font-bold text-ink">플랫폼별 평균 절감액</p>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={platformRanking}>
-                  <CartesianGrid stroke="var(--color-line)" vertical={false} />
-                  <XAxis dataKey="platform" tick={{ fill: 'var(--color-muted)', fontSize: 11 }} axisLine={{ stroke: 'var(--color-line)' }} tickLine={false} />
-                  <YAxis
-                    tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(value: number) => value.toLocaleString('ko-KR')}
-                  />
-                  <Tooltip
-                    cursor={{ fill: 'var(--color-overlay)' }}
-                    wrapperStyle={{ zIndex: 10 }}
-                    contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line)', borderRadius: 8 }}
-                    labelStyle={{ color: 'var(--color-ink)' }}
-                    itemStyle={{ color: 'var(--color-ink)' }}
-                    formatter={(value) => formatWon(Number(value))}
-                  />
+                  <ChartGrid />
+                  <ChartXAxis dataKey="platform" />
+                  <ChartYAxis />
+                  <ChartTooltip cursor={{ fill: 'var(--color-overlay)' }} />
                   <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]}>
                     {platformRanking.map((entry) => (
                       <Cell key={entry.platform} fill={entry.avgNet < 0 ? 'var(--color-danger)' : 'var(--color-blue)'} />
@@ -213,22 +243,10 @@ export default function DashboardPage() {
               <p className="mb-3 font-display text-sm font-bold text-ink">월별 절감액 트렌드</p>
               <ResponsiveContainer width="100%" height={220}>
                 <LineChart data={monthlyTrend}>
-                  <CartesianGrid stroke="var(--color-line)" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fill: 'var(--color-muted)', fontSize: 11 }} axisLine={{ stroke: 'var(--color-line)' }} tickLine={false} />
-                  <YAxis
-                    tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(value: number) => value.toLocaleString('ko-KR')}
-                  />
-                  <Tooltip
-                    cursor={{ stroke: 'var(--color-line)' }}
-                    wrapperStyle={{ zIndex: 10 }}
-                    contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line)', borderRadius: 8 }}
-                    labelStyle={{ color: 'var(--color-ink)' }}
-                    itemStyle={{ color: 'var(--color-ink)' }}
-                    formatter={(value) => formatWon(Number(value))}
-                  />
+                  <ChartGrid />
+                  <ChartXAxis dataKey="month" />
+                  <ChartYAxis />
+                  <ChartTooltip cursor={{ stroke: 'var(--color-line)' }} />
                   <Line type="monotone" dataKey="net" name="순절감액" stroke="var(--color-blue)" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
