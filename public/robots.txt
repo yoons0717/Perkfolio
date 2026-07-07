@@ -5,3 +5,5 @@ Disallow: /calendar
 Disallow: /dashboard
 Disallow: /add
 Disallow: /edit
+
+Sitemap: https://perkfolio.vercel.app/sitemap.xml
