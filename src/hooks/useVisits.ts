@@ -14,5 +14,5 @@ export function useVisits() {
       .finally(() => setLoading(false))
   }, [])
 
-  return { visits, setVisits, loading, error }
+  return { visits, loading, error }
 }

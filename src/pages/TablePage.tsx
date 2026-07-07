@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
+import Button from '../components/Button'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
@@ -101,19 +102,19 @@ function StatusFilterMenu({
 
   return (
     <>
-      <button
+      <Button
         ref={btnRef}
-        type="button"
+        variant="ghost"
         onClick={toggleOpen}
-        className={`flex cursor-pointer items-center gap-1 transition-colors hover:text-ink ${value !== '전체' ? 'text-blue' : ''}`}
+        className={`flex items-center gap-1 hover:text-ink ${value !== '전체' ? 'text-blue' : ''}`}
       >
-        상태
+        <span className="text-[11px]">상태</span>
         <Chevron
           className={`inline-block transition-transform ${open ? 'rotate-180' : ''} ${
             value !== '전체' ? 'text-blue' : 'text-muted/40'
           }`}
         />
-      </button>
+      </Button>
       {open &&
         coords &&
         createPortal(
@@ -123,19 +124,20 @@ function StatusFilterMenu({
             className="fixed z-50 min-w-28 rounded-lg border border-line bg-surface py-1 shadow-lg shadow-black/30"
           >
             {options.map((opt) => (
-              <button
+              <Button
                 key={opt}
-                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => {
                   onChange(opt)
                   setOpen(false)
                 }}
-                className={`block w-full px-3 py-1.5 text-left font-sans text-xs normal-case tracking-normal transition-colors hover:bg-line/40 ${
+                className={`block w-full px-3 py-1.5 text-left font-sans normal-case tracking-normal hover:bg-line/40 ${
                   value === opt ? 'font-semibold text-ink' : 'text-muted'
                 }`}
               >
                 {opt}
-              </button>
+              </Button>
             ))}
           </div>,
           document.body,
@@ -295,10 +297,10 @@ export default function TablePage() {
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-4 flex gap-3">
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => setStatusFilter((f) => (f === '예정' ? '전체' : '예정'))}
-          className={`flex-1 rounded-2xl border p-4 text-left transition-colors ${
+          className={`flex-1 rounded-2xl border p-4 text-left ${
             statusFilter === '예정' ? 'border-blue bg-blue-bg' : 'border-line bg-surface'
           }`}
         >
@@ -306,11 +308,11 @@ export default function TablePage() {
           <p className={`mt-1 font-mono text-3xl font-extrabold ${statusFilter === '예정' ? 'text-blue' : 'text-ink'}`}>
             {statusCounts.예정}
           </p>
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="ghost"
           onClick={() => setStatusFilter((f) => (f === '리뷰완료' ? '전체' : '리뷰완료'))}
-          className={`flex-1 rounded-2xl border p-4 text-left transition-colors ${
+          className={`flex-1 rounded-2xl border p-4 text-left ${
             statusFilter === '리뷰완료' ? 'border-violet bg-violet-bg' : 'border-line bg-surface'
           }`}
         >
@@ -320,7 +322,7 @@ export default function TablePage() {
           >
             {statusCounts.리뷰완료}
           </p>
-        </button>
+        </Button>
       </div>
 
       <div className="mb-4 flex gap-3">

@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import type { ButtonHTMLAttributes } from 'react'
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
@@ -20,18 +21,18 @@ const sizeTextClass: Record<ButtonSize, string> = {
   sm: 'text-xs',
 }
 
-export default function Button({
-  variant = 'primary',
-  size = 'md',
-  type = 'button',
-  className = '',
-  ...props
-}: ButtonProps) {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { variant = 'primary', size = 'md', type = 'button', className = '', ...props },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       type={type}
       className={`cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${variantClass[variant]} ${sizeTextClass[size]} ${className}`}
       {...props}
     />
   )
-}
+})
+
+export default Button

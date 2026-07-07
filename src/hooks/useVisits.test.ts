@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useVisits } from './useVisits'
 import { getVisits } from '../lib/visits'
@@ -32,18 +32,6 @@ describe('useVisits', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('목록을 불러오지 못했습니다.')
-    expect(result.current.visits).toEqual([])
-  })
-
-  it('exposes setVisits so callers can update the list locally', async () => {
-    vi.mocked(getVisits).mockResolvedValue([visit])
-    const { result } = renderHook(() => useVisits())
-    await waitFor(() => expect(result.current.loading).toBe(false))
-
-    act(() => {
-      result.current.setVisits((prev) => prev.filter((v) => v.id !== '1'))
-    })
-
     expect(result.current.visits).toEqual([])
   })
 })

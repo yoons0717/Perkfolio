@@ -10,7 +10,6 @@ import {
   deadlineUrgentBadgeClass,
   deadlineUrgentDotClass,
   deadlineUrgentTextClass,
-  statusBadgeClass,
   statusDotClass,
   statusTextClass,
 } from '../lib/statusStyle'
@@ -118,11 +117,12 @@ export default function CalendarPage() {
           )
 
           return (
-            <button
+            <Button
               key={dateStr}
-              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => setSelectedDate(dateStr)}
-              className={`flex min-h-[3.25rem] flex-col items-stretch rounded-lg border bg-surface p-1 text-left text-xs transition-colors hover:border-blue/60 hover:bg-overlay sm:min-h-[6.5rem] sm:p-1.5 ${
+              className={`flex min-h-[3.25rem] flex-col items-stretch rounded-lg border bg-surface p-1 text-left hover:border-blue/60 hover:bg-overlay sm:min-h-[6.5rem] sm:p-1.5 ${
                 isToday ? 'border-blue' : 'border-line'
               } ${isSelected ? 'bg-blue-bg' : ''} ${inMonth ? '' : 'opacity-30'}`}
             >
@@ -167,7 +167,7 @@ export default function CalendarPage() {
                 })}
                 {extraDeadlines > 0 && <span className="text-[10px] text-muted">+{extraDeadlines}개</span>}
               </div>
-            </button>
+            </Button>
           )
         })}
       </div>
@@ -218,11 +218,13 @@ export default function CalendarPage() {
                         </p>
                       </div>
                     </div>
-                    <span
-                      className={`rounded-full px-3 py-1 font-mono text-xs ${deadline.reviewed ? statusBadgeClass('리뷰완료') : deadlineUrgentBadgeClass}`}
-                    >
-                      {deadline.reviewed ? '리뷰완료' : deadline.text}
-                    </span>
+                    {deadline.reviewed ? (
+                      <StatusBadge status="리뷰완료" />
+                    ) : (
+                      <span className={`rounded-full px-3 py-1 font-mono text-xs ${deadlineUrgentBadgeClass}`}>
+                        {deadline.text}
+                      </span>
+                    )}
                   </div>
                 )
               })}
