@@ -7,9 +7,10 @@ import FloatingAddButton from '../components/FloatingAddButton'
 import { focusRingClass, inputClass } from '../components/formStyles'
 import InfoTooltip from '../components/InfoTooltip'
 import Select from '../components/Select'
+import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
-import { deadlineUrgentDotClass, deadlineUrgentTextClass, statusBadgeClass } from '../lib/statusStyle'
+import { deadlineUrgentDotClass, deadlineUrgentTextClass } from '../lib/statusStyle'
 import {
   computeCategoryBreakdown,
   computeMonthlyTrend,
@@ -122,7 +123,7 @@ export default function DashboardPage() {
           <div className="mb-3 flex flex-wrap gap-3 rounded-xl bg-white/5 p-4">
             {statusCounts.map(({ status, count }) => (
               <div key={status} className="flex items-center gap-2">
-                <span className={`rounded-full px-3 py-1 font-mono text-xs ${statusBadgeClass(status)}`}>{status}</span>
+                <StatusBadge status={status} />
                 <span className="font-mono text-sm text-ink">{count}건</span>
               </div>
             ))}
