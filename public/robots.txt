@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /table
+Disallow: /calendar
+Disallow: /dashboard
+Disallow: /add
+Disallow: /edit
