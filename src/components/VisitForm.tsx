@@ -21,6 +21,15 @@ function parseDateString(value: string): Date {
   return new Date(year, month - 1, day)
 }
 
+function FormField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      {label}
+      {children}
+    </label>
+  )
+}
+
 type FormFields = {
   visitDate: Date | null
   platform: Platform | ''
@@ -126,8 +135,7 @@ export default function VisitForm({
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            체험(예정)일
+          <FormField label="체험(예정)일">
             <DatePicker
               selected={visitDate}
               onChange={(date: Date | null) => updateField('visitDate', date)}
@@ -135,10 +143,9 @@ export default function VisitForm({
               className={`w-full ${compactInputClass}`}
               isClearable
             />
-          </label>
+          </FormField>
 
-          <label className="flex flex-col gap-1 text-sm">
-            플랫폼
+          <FormField label="플랫폼">
             <Select
               aria-label="플랫폼"
               required
@@ -155,11 +162,10 @@ export default function VisitForm({
                 </option>
               ))}
             </Select>
-          </label>
+          </FormField>
         </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          마감일
+        <FormField label="마감일">
           <DatePicker
             selected={reviewDeadline}
             onChange={(date: Date | null) => updateField('reviewDeadline', date)}
@@ -167,11 +173,10 @@ export default function VisitForm({
             className={`w-full ${compactInputClass}`}
             required
           />
-        </label>
+        </FormField>
 
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            업체명
+          <FormField label="업체명">
             <input
               type="text"
               value={storeName}
@@ -179,10 +184,9 @@ export default function VisitForm({
               required
               className={compactInputClass}
             />
-          </label>
+          </FormField>
 
-          <label className="flex flex-col gap-1 text-sm">
-            카테고리
+          <FormField label="카테고리">
             <Select
               aria-label="카테고리"
               required
@@ -199,11 +203,10 @@ export default function VisitForm({
                 </option>
               ))}
             </Select>
-          </label>
+          </FormField>
         </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          가게 정보 URL
+        <FormField label="가게 정보 URL">
           <input
             type="url"
             value={storeInfoUrl}
@@ -211,10 +214,9 @@ export default function VisitForm({
             required
             className={compactInputClass}
           />
-        </label>
+        </FormField>
 
-        <label className="flex flex-col gap-1 text-sm">
-          체험 내역
+        <FormField label="체험 내역">
           <input
             type="text"
             placeholder="예: 파스타 2, 음료 2"
@@ -223,11 +225,10 @@ export default function VisitForm({
             required
             className={compactInputClass}
           />
-        </label>
+        </FormField>
 
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            체험가
+          <FormField label="체험가">
             <input
               type="number"
               min="0"
@@ -236,10 +237,9 @@ export default function VisitForm({
               required
               className={compactInputClass}
             />
-          </label>
+          </FormField>
 
-          <label className="flex flex-col gap-1 text-sm">
-            추가결제액
+          <FormField label="추가결제액">
             <input
               type="number"
               min="0"
@@ -247,11 +247,10 @@ export default function VisitForm({
               onChange={(e) => updateField('extraPayment', e.target.value)}
               className={compactInputClass}
             />
-          </label>
+          </FormField>
         </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          상태
+        <FormField label="상태">
           <Select
             aria-label="상태"
             required
@@ -268,31 +267,29 @@ export default function VisitForm({
               </option>
             ))}
           </Select>
-        </label>
+        </FormField>
       </div>
 
       <div className="flex flex-col gap-3 border-t border-line pt-4">
         <p className={sectionLabelClass}>링크</p>
 
-        <label className="flex flex-col gap-1 text-sm">
-          체험단 URL (선택)
+        <FormField label="체험단 URL (선택)">
           <input
             type="url"
             value={campaignUrl}
             onChange={(e) => updateField('campaignUrl', e.target.value)}
             className={compactInputClass}
           />
-        </label>
+        </FormField>
 
-        <label className="flex flex-col gap-1 text-sm">
-          포스팅 링크 (선택)
+        <FormField label="포스팅 링크 (선택)">
           <input
             type="url"
             value={postUrl}
             onChange={(e) => updateField('postUrl', e.target.value)}
             className={compactInputClass}
           />
-        </label>
+        </FormField>
       </div>
 
       {error && <p className="text-sm text-danger">{error}</p>}
