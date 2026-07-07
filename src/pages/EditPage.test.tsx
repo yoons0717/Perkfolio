@@ -95,22 +95,31 @@ describe('EditPage view mode', () => {
     expect(screen.getByText('예정')).toBeInTheDocument()
   })
 
-  it('shows a link chip for each filled link, and omits the chip for a missing one', async () => {
+  it('shows a link row for each filled link, and omits the row for a missing one', async () => {
     vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrl: null }))
     renderEditPage()
 
     await screen.findByRole('heading', { name: '카페 온도' })
-    expect(screen.getByRole('link', { name: /가게정보/ })).toHaveAttribute('href', 'https://store.example.com')
-    expect(screen.getByRole('link', { name: /체험단/ })).toHaveAttribute('href', 'https://campaign.example.com')
-    expect(screen.queryByRole('link', { name: /포스팅/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'https://store.example.com' })).toHaveAttribute(
+      'href',
+      'https://store.example.com',
+    )
+    expect(screen.getByRole('link', { name: 'https://campaign.example.com' })).toHaveAttribute(
+      'href',
+      'https://campaign.example.com',
+    )
+    expect(screen.queryByText('포스팅 링크')).not.toBeInTheDocument()
   })
 
-  it('shows a chip for 포스팅 링크 once it is filled', async () => {
+  it('shows a row for 포스팅 링크 once it is filled', async () => {
     vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrl: 'https://blog.example.com' }))
     renderEditPage()
 
     await screen.findByRole('heading', { name: '카페 온도' })
-    expect(screen.getByRole('link', { name: /포스팅/ })).toHaveAttribute('href', 'https://blog.example.com')
+    expect(screen.getByRole('link', { name: 'https://blog.example.com' })).toHaveAttribute(
+      'href',
+      'https://blog.example.com',
+    )
   })
 
   it('shows "-" when there is no visit date', async () => {

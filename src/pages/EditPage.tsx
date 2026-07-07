@@ -12,7 +12,7 @@ import { confirmAndDelete } from '../hooks/useVisitActions'
 import { getVisit, updateVisit } from '../lib/visits'
 import type { NewVisit, Visit } from '../types/visit'
 
-const viewBoxClass = 'border-b border-line px-3 py-2 text-ink'
+const viewBoxClass = 'rounded-lg border border-line px-3 py-2'
 
 function LinkIcon() {
   return (
@@ -25,6 +25,7 @@ function LinkIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      className="shrink-0"
     >
       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
       <polyline points="15 3 21 3 21 9" />
@@ -58,23 +59,26 @@ function ViewField({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1 text-sm">
       <span className="text-muted">{label}</span>
-      <div className={`${viewBoxClass} font-medium`}>{value}</div>
+      <div className={`${viewBoxClass} text-ink font-medium`}>{value}</div>
     </div>
   )
 }
 
-function LinkChip({ label, href }: { label: string; href: string | null }) {
+function ViewLinkField({ label, href }: { label: string; href: string | null }) {
   if (!href) return null
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-full bg-blue-bg px-3 py-1.5 text-xs font-semibold text-blue transition-colors hover:bg-blue/20"
-    >
-      <LinkIcon />
-      {label}
-    </a>
+    <div className="flex flex-col gap-1 text-sm">
+      <span className="text-muted">{label}</span>
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={`${viewBoxClass} flex items-center justify-between gap-2 overflow-hidden font-medium text-blue hover:underline`}
+      >
+        <span className="truncate">{href}</span>
+        <LinkIcon />
+      </a>
+    </div>
   )
 }
 
@@ -125,7 +129,7 @@ export default function EditPage() {
   if (mode === 'edit') {
     return (
       <PageContainer>
-        <div className="mb-4 flex items-center gap-3">
+        <div className="mb-6 flex items-center gap-3">
           <BackButton />
           <h1 className="font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
           <span className="rounded-full bg-line px-2 py-0.5 font-mono text-xs text-muted">수정 중</span>
@@ -152,7 +156,7 @@ export default function EditPage() {
 
   return (
     <PageContainer>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-6 flex items-center gap-3">
         <BackButton />
         <h1 className="font-display text-2xl font-extrabold text-ink">{visit.storeName}</h1>
       </div>
@@ -180,6 +184,8 @@ export default function EditPage() {
             <ViewField label="카테고리" value={visit.category} />
           </div>
 
+          <ViewLinkField label="가게 정보 URL" href={visit.storeInfoUrl} />
+
           <ViewField label="체험 내역" value={visit.sponsoredItems} />
 
           <div className="grid grid-cols-2 gap-3">
@@ -193,13 +199,10 @@ export default function EditPage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 pt-3">
+        <div className="flex flex-col gap-3 border-t border-line pt-4">
           <p className={sectionLabelClass}>링크</p>
-          <div className="flex flex-wrap gap-2">
-            <LinkChip label="가게정보" href={visit.storeInfoUrl} />
-            <LinkChip label="체험단" href={visit.campaignUrl} />
-            <LinkChip label="포스팅" href={visit.postUrl} />
-          </div>
+          <ViewLinkField label="체험단 URL" href={visit.campaignUrl} />
+          <ViewLinkField label="포스팅 링크" href={visit.postUrl} />
         </div>
       </div>
 
