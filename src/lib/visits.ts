@@ -41,7 +41,7 @@ export async function getVisits(): Promise<Visit[]> {
   const { data, error } = await supabase
     .from('visits')
     .select('*')
-    .order('visit_date', { ascending: false })
+    .order('visit_date', { ascending: false, nullsFirst: false })
 
   if (error) throw error
   return (data as VisitRow[]).map(toVisit)
