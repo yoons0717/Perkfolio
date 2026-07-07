@@ -58,7 +58,7 @@ type VisitFormProps = {
   onSubmit: (visit: NewVisit) => Promise<void>
   submitLabel: string
   pendingLabel: string
-  footerExtra?: ReactNode
+  footerExtra?: (submitting: boolean) => ReactNode
 }
 
 export default function VisitForm({
@@ -301,7 +301,7 @@ export default function VisitForm({
         <Button type="submit" disabled={submitting} className="flex-1">
           {submitting ? pendingLabel : submitLabel}
         </Button>
-        {footerExtra}
+        {footerExtra?.(submitting)}
       </div>
     </form>
   )

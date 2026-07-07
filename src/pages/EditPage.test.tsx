@@ -201,6 +201,26 @@ describe('EditPage edit mode', () => {
     expect(screen.getByRole('button', { name: '수정' })).toBeInTheDocument()
   })
 
+  it('disables the cancel button while a save is in flight, so it cannot discard-then-reapply a pending edit', async () => {
+    let resolveSave!: (v: Visit) => void
+    const pendingSave = new Promise<Visit>((resolve) => {
+      resolveSave = resolve
+    })
+    const visit = makeVisit({ storeName: '카페 온도', reviewDeadline: '2026-09-01' })
+    vi.mocked(getVisit).mockResolvedValue(visit)
+    vi.mocked(updateVisit).mockReturnValue(pendingSave)
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+
+    await userEvent.click(screen.getByRole('button', { name: '수정' }))
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(screen.getByRole('button', { name: '취소' })).toBeDisabled()
+
+    resolveSave({ ...visit, storeName: '변경된 이름' })
+    await screen.findByRole('heading', { name: '변경된 이름' })
+  })
+
   it('saves via updateVisit and shows the updated value back in view mode', async () => {
     const visit = makeVisit({ storeName: '카페 온도', reviewDeadline: '2026-09-01' })
     vi.mocked(getVisit).mockResolvedValue(visit)

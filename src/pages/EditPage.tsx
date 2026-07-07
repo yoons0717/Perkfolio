@@ -135,11 +135,16 @@ export default function EditPage() {
           onSubmit={handleSubmit}
           submitLabel="저장"
           pendingLabel="저장 중..."
-          footerExtra={
-            <Button variant="secondary" onClick={() => setMode('view')} className="text-muted">
+          footerExtra={(submitting) => (
+            <Button
+              variant="secondary"
+              disabled={submitting}
+              onClick={() => setMode('view')}
+              className="text-muted"
+            >
               취소
             </Button>
-          }
+          )}
         />
       </PageContainer>
     )
