@@ -89,7 +89,7 @@ export default function DashboardPage() {
                   aria-label="기간 필터"
                   value={period}
                   onChange={(e) => setPeriod(e.target.value as Period)}
-                  className={`rounded-lg border border-line bg-white/5 px-3 py-3 text-sm text-ink ${focusRingClass}`}
+                  className={`rounded-lg border border-line bg-overlay px-3 py-3 text-sm text-ink ${focusRingClass}`}
                 >
                   <option value="thisMonth">이번 달</option>
                   <option value="lastMonth">지난달</option>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                   <div
                     key={visit.id}
                     onClick={() => navigate(`/edit/${visit.id}`)}
-                    className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-sm hover:bg-white/5"
+                    className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-sm hover:bg-overlay"
                   >
                     <span className="text-ink">{visit.storeName}</span>
                     <span className={`flex items-center gap-1.5 font-mono text-xs ${deadlineUrgentTextClass}`}>

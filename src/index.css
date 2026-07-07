@@ -24,6 +24,8 @@
   --color-violet-bg: rgba(130, 133, 214, 0.16);
 
   --color-danger: #f87171;
+
+  --color-overlay: rgba(255, 255, 255, 0.05);
 }
 
 body {

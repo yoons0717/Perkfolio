@@ -10,7 +10,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClass: Record<ButtonVariant, string> = {
   primary: 'rounded-lg bg-blue px-3 py-3 font-display font-bold text-white hover:bg-blue/90',
-  secondary: 'rounded-lg border border-line px-3 py-3 hover:bg-white/5',
+  secondary: 'rounded-lg border border-line px-3 py-3 hover:bg-overlay',
   ghost: '',
   danger: 'rounded-lg bg-danger/10 px-3 py-3 font-display font-bold text-danger hover:bg-danger/20',
 }

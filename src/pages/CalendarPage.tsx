@@ -69,7 +69,7 @@ export default function CalendarPage() {
         <Button
           variant="ghost"
           onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-white/5 hover:text-ink"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-overlay hover:text-ink"
         >
           ‹
         </Button>
@@ -79,7 +79,7 @@ export default function CalendarPage() {
         <Button
           variant="ghost"
           onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-white/5 hover:text-ink"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-overlay hover:text-ink"
         >
           ›
         </Button>
@@ -121,7 +121,7 @@ export default function CalendarPage() {
               key={dateStr}
               type="button"
               onClick={() => setSelectedDate(dateStr)}
-              className={`flex min-h-[3.25rem] flex-col items-stretch rounded-lg border bg-surface p-1 text-left text-xs transition-colors hover:border-blue/60 hover:bg-white/5 sm:min-h-[6.5rem] sm:p-1.5 ${
+              className={`flex min-h-[3.25rem] flex-col items-stretch rounded-lg border bg-surface p-1 text-left text-xs transition-colors hover:border-blue/60 hover:bg-overlay sm:min-h-[6.5rem] sm:p-1.5 ${
                 isToday ? 'border-blue' : 'border-line'
               } ${isSelected ? 'bg-blue-bg' : ''} ${inMonth ? '' : 'opacity-30'}`}
             >
@@ -138,7 +138,7 @@ export default function CalendarPage() {
               {/* sm+: full store-name cards */}
               <div className="mt-1.5 hidden flex-col gap-1 sm:flex">
                 {shown.map((v) => (
-                  <div key={v.id} className="flex h-5 items-stretch gap-1 rounded bg-white/5 px-1 py-0.5">
+                  <div key={v.id} className="flex h-5 items-stretch gap-1 rounded bg-overlay px-1 py-0.5">
                     <span className={`w-[3px] rounded-sm ${statusDotClass(v.status)}`} />
                     <span className="truncate self-center text-[10px]">
                       <span className="text-ink">{v.storeName}</span>{' '}
@@ -151,7 +151,7 @@ export default function CalendarPage() {
                 {shownDeadlines.map((v) => {
                   const deadline = deadlineDisplay(v.status, v.reviewDeadline)!
                   return (
-                    <div key={`dl-${v.id}`} className="flex h-5 items-stretch gap-1 rounded bg-white/5 px-1 py-0.5">
+                    <div key={`dl-${v.id}`} className="flex h-5 items-stretch gap-1 rounded bg-overlay px-1 py-0.5">
                       <span
                         className={`w-[3px] rounded-sm ${deadline.reviewed ? statusDotClass('리뷰완료') : deadlineUrgentDotClass}`}
                       />
@@ -184,7 +184,7 @@ export default function CalendarPage() {
                 <div
                   key={v.id}
                   onClick={() => navigate(`/edit/${v.id}`)}
-                  className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
+                  className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-overlay"
                 >
                   <div className="flex items-start gap-2">
                     <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${statusDotClass(v.status)}`} />
@@ -204,7 +204,7 @@ export default function CalendarPage() {
                   <div
                     key={`dl-${v.id}`}
                     onClick={() => navigate(`/edit/${v.id}`)}
-                    className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-white/5"
+                    className="flex cursor-pointer items-center justify-between border-b border-line px-4 py-3 text-sm last:border-b-0 hover:bg-overlay"
                   >
                     <div className="flex items-start gap-2">
                       <span

@@ -5,7 +5,7 @@ export const statusOrder: VisitStatus[] = ['예정', '리뷰완료']
 
 export function statusBadgeClass(status: VisitStatus): string {
   if (status === '리뷰완료') return 'bg-violet-bg text-violet'
-  return 'bg-white/5 text-muted'
+  return 'bg-overlay text-muted'
 }
 
 export function statusDotClass(status: VisitStatus): string {
