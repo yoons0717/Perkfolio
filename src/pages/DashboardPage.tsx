@@ -208,27 +208,31 @@ export default function DashboardPage() {
 
           <Panel className="mb-3">
             <p className="mb-3 font-display text-sm font-bold text-ink">플랫폼별 평균 절감액</p>
-            <div className="flex flex-col gap-2">
-              {platformRanking.map(({ platform, avgNet, count, pct }) => (
-                <div key={platform} className="flex items-center gap-2 text-sm">
-                  <span className="w-24 shrink-0 truncate text-muted">{platform}</span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-line">
-                    <div
-                      className={`h-full rounded-full ${avgNet < 0 ? 'bg-danger' : 'bg-blue'}`}
-                      style={{ width: `${pct}%` }}
-                    />
+            {platformRanking.length === 0 ? (
+              <p className="text-sm text-muted">아직 확정된 체험단 기록이 없습니다.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {platformRanking.map(({ platform, avgNet, count, pct }) => (
+                  <div key={platform} className="flex items-center gap-2 text-sm">
+                    <span className="w-24 shrink-0 truncate text-muted">{platform}</span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-line">
+                      <div
+                        className={`h-full rounded-full ${avgNet < 0 ? 'bg-danger' : 'bg-blue'}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span
+                      className={`w-20 shrink-0 text-right font-mono text-xs font-semibold ${avgNet < 0 ? 'text-danger' : 'text-blue'}`}
+                    >
+                      {formatWon(avgNet)}
+                    </span>
+                    <span className={`w-8 shrink-0 text-right font-mono text-xs ${count <= 2 ? 'text-danger' : 'text-muted'}`}>
+                      {count}건
+                    </span>
                   </div>
-                  <span
-                    className={`w-20 shrink-0 text-right font-mono text-xs font-semibold ${avgNet < 0 ? 'text-danger' : 'text-blue'}`}
-                  >
-                    {formatWon(avgNet)}
-                  </span>
-                  <span className={`w-8 shrink-0 text-right font-mono text-xs ${count <= 2 ? 'text-danger' : 'text-muted'}`}>
-                    {count}건
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </Panel>
 
           <Panel>
