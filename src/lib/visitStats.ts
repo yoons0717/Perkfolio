@@ -94,6 +94,7 @@ export function computePlatformRanking(visits: Visit[]) {
 export function computeMonthlyTrend(visits: Visit[]) {
   const totals = new Map<string, number>()
   for (const v of visits) {
+    if (v.visitDate === null) continue
     const month = v.visitDate.slice(0, 7)
     totals.set(month, (totals.get(month) ?? 0) + netSaved(v))
   }

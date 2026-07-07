@@ -112,6 +112,17 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('이 날짜에 등록된 체험단이 없습니다.')).toBeInTheDocument()
   })
 
+  it('excludes a visit with no visit date from the day grid, but still shows its deadline card', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeBaseVisit({ visitDate: null, reviewDeadline: DAY_16, storeName: '카페 온도', status: '예정' }),
+    ])
+    renderCalendar()
+
+    // only the deadline card renders — no visit-date cell exists to duplicate onto
+    expect(await screen.findAllByText('카페 온도')).toHaveLength(1)
+    expect(screen.getByText(/마감/)).toBeInTheDocument()
+  })
+
   it('keeps a reviewed visit on its visit-date cell when it has no review deadline set', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ visitDate: DAY_15, reviewDeadline: null, status: '리뷰완료' }),

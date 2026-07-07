@@ -33,6 +33,7 @@ export default function CalendarPage() {
   const visitsByDate = useMemo(() => {
     const map = new Map<string, Visit[]>()
     for (const v of visits) {
+      if (v.visitDate === null) continue
       // once reviewed, a visit with a deadline is represented by its
       // deadline-date card instead — showing it here too would duplicate it
       if (v.status === '리뷰완료' && v.reviewDeadline) continue

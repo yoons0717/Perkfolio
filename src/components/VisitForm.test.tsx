@@ -19,6 +19,9 @@ async function fillRequiredFields(opts: { skip?: string[] } = {}) {
   await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
   await userEvent.clear(screen.getByLabelText('체험가'))
   await userEvent.type(screen.getByLabelText('체험가'), '48000')
+  if (!skip.includes('체험(예정)일')) {
+    await userEvent.type(screen.getByLabelText('체험(예정)일'), '2026-07-06{enter}')
+  }
   if (!skip.includes('마감일')) {
     await userEvent.type(screen.getByLabelText('마감일'), '2026-09-01{enter}')
   }
@@ -44,15 +47,14 @@ describe('VisitForm validation', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
-  it('blocks submission when visit date is cleared (native required validation)', async () => {
+  it('submits successfully with the visit date left empty, sending null', async () => {
     const { onSubmit } = renderForm()
-    await fillRequiredFields()
-    const dateInput = screen.getByLabelText('체험(예정)일') as HTMLInputElement
-    await userEvent.clear(dateInput)
+    await fillRequiredFields({ skip: ['체험(예정)일'] })
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
-    expect(dateInput.validity.valueMissing).toBe(true)
-    expect(onSubmit).not.toHaveBeenCalled()
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.visitDate).toBeNull()
   })
 
   it('blocks submission when review deadline is cleared (native required validation)', async () => {
@@ -86,12 +88,13 @@ describe('VisitForm validation', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
-  it('starts with 플랫폼/카테고리/상태 unselected (placeholder), and extra payment defaulting to 0', () => {
+  it('starts with 플랫폼/카테고리/상태 unselected (placeholder), extra payment defaulting to 0, and no visit date prefilled', () => {
     renderForm()
     expect(screen.getByLabelText('플랫폼')).toHaveValue('')
     expect(screen.getByLabelText('카테고리')).toHaveValue('')
     expect(screen.getByLabelText('상태')).toHaveValue('')
     expect(screen.getByLabelText('추가결제액')).toHaveValue(0)
+    expect(screen.getByLabelText('체험(예정)일')).toHaveValue('')
   })
 })
 

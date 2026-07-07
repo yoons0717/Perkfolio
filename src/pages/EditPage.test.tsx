@@ -113,6 +113,13 @@ describe('EditPage view mode', () => {
     expect(screen.getByRole('link', { name: /포스팅/ })).toHaveAttribute('href', 'https://blog.example.com')
   })
 
+  it('shows "-" when there is no visit date', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ visitDate: null }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('체험(예정)일').nextElementSibling).toHaveTextContent('-')
+  })
+
   it('shows "없음" when there is no review deadline', async () => {
     // fix postUrl to a real link so its own "바로가기" doesn't add a second
     // link, keeping the "없음" assertion specific to the deadline field

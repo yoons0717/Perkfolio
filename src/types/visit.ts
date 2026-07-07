@@ -25,7 +25,7 @@ export type VisitStatus = '예정' | '리뷰완료'
 
 export type Visit = {
   id: string
-  visitDate: string
+  visitDate: string | null
   platform: Platform
   storeName: string
   category: Category

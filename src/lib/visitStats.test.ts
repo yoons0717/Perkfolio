@@ -241,4 +241,12 @@ describe('computeMonthlyTrend', () => {
       { month: '2026-02', net: 10000 },
     ])
   })
+
+  it('skips visits with no visit date instead of crashing', () => {
+    const visits = [
+      makeVisit({ visitDate: null, retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
+    ]
+    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 20000 }])
+  })
 })

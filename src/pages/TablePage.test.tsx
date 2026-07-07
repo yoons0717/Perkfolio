@@ -122,6 +122,17 @@ describe('TablePage columns', () => {
     expect(deadlineCell).toHaveTextContent('2099-01-01')
     expect(deadlineCell).not.toHaveTextContent('완료')
   })
+
+  it('shows "-" instead of a date when a visit has no visit date', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', visitDate: null }),
+    ])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    const dateCell = getRowCells('카페 온도')[1]
+    expect(dateCell).toHaveTextContent('-')
+  })
 })
 
 describe('TablePage sorting', () => {
@@ -134,8 +145,9 @@ describe('TablePage sorting', () => {
     renderTablePage()
     await screen.findByText('가게A')
 
-    // default sort: visitDate desc
-    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게B', '가게C', '가게A'])
+    // default sort: 마감일 asc; all three have no deadline (factory default),
+    // so they tie and keep their original (insertion) order
+    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게A', '가게B', '가게C'])
 
     // click 체험가 -> new column defaults to desc
     await userEvent.click(screen.getByText(/체험가/))
@@ -175,7 +187,7 @@ describe('TablePage sorting', () => {
     expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게B', '가게A'])
   })
 
-  it('sorts by 마감일, treating visits without a deadline as coming last (desc)', async () => {
+  it('sorts by 마감일 (the default), treating visits without a deadline as coming last', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', storeName: '가게A', reviewDeadline: null }),
       makeVisit({ id: '2', storeName: '가게B', reviewDeadline: '2026-01-05' }),
@@ -184,8 +196,26 @@ describe('TablePage sorting', () => {
     renderTablePage()
     await screen.findByText('가게A')
 
-    await userEvent.click(screen.getByText(/마감일/))
+    // default sort is 마감일 desc — already selected, no click needed
     expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게B', '가게A'])
+  })
+
+  it('always sorts visits with no visit date to the end, regardless of direction', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', storeName: '가게A', visitDate: null }),
+      makeVisit({ id: '2', storeName: '가게B', visitDate: '2026-01-05' }),
+      makeVisit({ id: '3', storeName: '가게C', visitDate: '2026-01-15' }),
+    ])
+    renderTablePage()
+    await screen.findByText('가게A')
+
+    // switching to a new column (체험(예정)일 isn't the default anymore) defaults to desc
+    await userEvent.click(screen.getByText(/체험\(예정\)일/))
+    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게B', '가게A'])
+
+    // click again to toggle to asc
+    await userEvent.click(screen.getByText(/체험\(예정\)일/))
+    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게B', '가게C', '가게A'])
   })
 })
 
@@ -293,6 +323,18 @@ describe('TablePage mobile card view', () => {
     expect(screen.getByText('-')).toBeInTheDocument()
   })
 
+  it('shows "-" instead of a date on the card when a visit has no visit date', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', platform: '포포몬', visitDate: null }),
+    ])
+    renderTablePage()
+
+    const storeName = await screen.findByText('카페 온도')
+    const card = storeName.closest('.cursor-pointer') as HTMLElement
+    expect(within(card).getByText('포포몬 · -')).toBeInTheDocument()
+  })
+
   it('navigates to the detail page when a card is clicked', async () => {
     vi.mocked(useIsMobile).mockReturnValue(true)
     vi.mocked(getVisits).mockResolvedValue([makeVisit({ id: '42', storeName: '카페 온도' })])
@@ -315,12 +357,16 @@ describe('TablePage infinite scroll', () => {
 
   it('renders only the first 20 visits initially, and more after the sentinel intersects', async () => {
     const visits = Array.from({ length: 25 }, (_, i) =>
-      makeVisit({ id: String(i), storeName: `가게${String(i).padStart(2, '0')}`, visitDate: dateFor(i) }),
+      makeVisit({
+        id: String(i),
+        storeName: `가게${String(i).padStart(2, '0')}`,
+        reviewDeadline: dateFor(i),
+      }),
     )
     vi.mocked(getVisits).mockResolvedValue(visits)
     renderTablePage()
 
-    // default sort is visitDate desc, so the highest i (latest date) renders first
+    // default sort is 마감일 desc, so the highest i (furthest-out deadline) renders first
     await screen.findByText('가게24')
     expect(screen.getAllByRole('row')).toHaveLength(21) // header + first 20
     expect(screen.queryByText('가게04')).not.toBeInTheDocument()

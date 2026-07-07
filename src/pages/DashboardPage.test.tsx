@@ -90,6 +90,19 @@ describe('DashboardPage', () => {
     expect(totalVisitCountText()).toBe('1건')
   })
 
+  it('excludes visits with no visit date from the 이번 달 요약 section, even under 전체', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', visitDate: null, status: '리뷰완료', retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ id: '2', status: '리뷰완료', retailValue: 5000, extraPayment: 0 }),
+    ])
+    renderDashboard()
+    await screen.findByText('총 체험단')
+    expect(totalVisitCountText()).toBe('1건')
+
+    await userEvent.selectOptions(screen.getByLabelText('기간 필터'), '전체')
+    expect(totalVisitCountText()).toBe('1건')
+  })
+
   it('reveals an empty date-range picker when "직접 선택" is chosen, showing no results until a range is picked', async () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({ status: '리뷰완료' })])
     renderDashboard()
@@ -118,6 +131,25 @@ describe('DashboardPage', () => {
 
     await userEvent.click(await screen.findByText('카페 온도'))
 
+    expect(await screen.findByText('상세 화면')).toBeInTheDocument()
+  })
+
+  it('shows an upcoming deadline for a visit with no visit date, since deadlines do not depend on visitDate', async () => {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({
+        id: '42',
+        storeName: '카페 온도',
+        visitDate: null,
+        reviewDeadline: toDateString(tomorrow),
+        status: '예정',
+      }),
+    ])
+    renderDashboard()
+
+    await userEvent.click(await screen.findByText('카페 온도'))
     expect(await screen.findByText('상세 화면')).toBeInTheDocument()
   })
 

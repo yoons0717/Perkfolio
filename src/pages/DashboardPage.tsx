@@ -50,7 +50,7 @@ export default function DashboardPage() {
 
   // "N월 요약" 섹션: 선택한 기간에 종속된 스냅샷 통계.
   const filtered = useMemo(
-    () => visits.filter((v) => isInPeriod(v.visitDate, period, customRange)),
+    () => visits.filter((v) => v.visitDate !== null && isInPeriod(v.visitDate, period, customRange)),
     [visits, period, customRange],
   )
   // 예정 상태는 아직 실제로 일어나지 않았으므로 금액/절감 통계에서는 제외한다.

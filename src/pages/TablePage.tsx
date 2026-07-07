@@ -43,6 +43,7 @@ const columns: Column[] = [
 function sortValue(v: Visit, key: SortKey): string | number {
   if (key === 'netSaved') return netSaved(v)
   if (key === 'reviewDeadline') return v.reviewDeadline ?? ''
+  if (key === 'visitDate') return v.visitDate ?? ''
   return v[key]
 }
 
@@ -185,7 +186,7 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
           <div>
             <p className="font-display text-base font-extrabold text-ink">{visit.storeName}</p>
             <p className="mt-0.5 text-xs text-muted">
-              {visit.platform} · {visit.visitDate}
+              {visit.platform} · {visit.visitDate ?? '-'}
             </p>
           </div>
         </div>
@@ -224,7 +225,7 @@ export default function TablePage() {
   const { visits, loading, error } = useVisits()
   const [statusFilter, setStatusFilter] = useState<'전체' | VisitStatus>('전체')
   const [platformFilter, setPlatformFilter] = useState<'전체' | Platform>('전체')
-  const [sortKey, setSortKey] = useState<SortKey>('visitDate')
+  const [sortKey, setSortKey] = useState<SortKey>('reviewDeadline')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
   const statusCounts = useMemo(
@@ -249,6 +250,21 @@ export default function TablePage() {
         const aPending = a.status === '예정'
         const bPending = b.status === '예정'
         if (aPending || bPending) return aPending && bPending ? 0 : aPending ? 1 : -1
+      }
+
+      // same pinning idea for a visit with no confirmed date yet.
+      if (sortKey === 'visitDate') {
+        const aNoDate = a.visitDate === null
+        const bNoDate = b.visitDate === null
+        if (aNoDate || bNoDate) return aNoDate && bNoDate ? 0 : aNoDate ? 1 : -1
+      }
+
+      // and for a visit with no review deadline set at all (rare, but the
+      // type still allows it) — a missing deadline is never "most urgent".
+      if (sortKey === 'reviewDeadline') {
+        const aNoDeadline = a.reviewDeadline === null
+        const bNoDeadline = b.reviewDeadline === null
+        if (aNoDeadline || bNoDeadline) return aNoDeadline && bNoDeadline ? 0 : aNoDeadline ? 1 : -1
       }
 
       const av = sortValue(a, sortKey)
@@ -390,7 +406,7 @@ export default function TablePage() {
                       <td className="px-4 py-3 font-mono">
                         <DeadlineCell visit={v} />
                       </td>
-                      <td className="px-4 py-3 font-mono text-ink">{v.visitDate}</td>
+                      <td className="px-4 py-3 font-mono text-ink">{v.visitDate ?? '-'}</td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-ink">{v.storeName}</div>
                         <div className="text-xs text-muted">

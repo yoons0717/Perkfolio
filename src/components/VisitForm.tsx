@@ -38,7 +38,7 @@ type FormFields = {
 
 function initialFormFields(initialValues: NewVisit | undefined): FormFields {
   return {
-    visitDate: initialValues ? parseDateString(initialValues.visitDate) : new Date(),
+    visitDate: initialValues?.visitDate ? parseDateString(initialValues.visitDate) : null,
     platform: initialValues?.platform ?? '',
     storeName: initialValues?.storeName ?? '',
     category: initialValues?.category ?? '',
@@ -93,15 +93,16 @@ export default function VisitForm({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    // visitDate/platform/category/status/reviewDeadline are guaranteed
-    // non-empty here: each field is `required` (DatePicker/Select), so the
-    // browser blocks submit before this handler runs if any of them is empty.
+    // platform/category/status/reviewDeadline are guaranteed non-empty here
+    // (each is `required`, so the browser blocks submit before this handler
+    // runs). visitDate is NOT required — it may be null when the actual
+    // visit date isn't confirmed yet.
     setError(null)
     setSubmitting(true)
 
     try {
       await onSubmit({
-        visitDate: toDateString(visitDate as Date),
+        visitDate: visitDate ? toDateString(visitDate) : null,
         platform: platform as Platform,
         storeName,
         category: category as Category,
@@ -132,7 +133,7 @@ export default function VisitForm({
               onChange={(date: Date | null) => updateField('visitDate', date)}
               dateFormat="yyyy-MM-dd"
               className={`w-full ${compactInputClass}`}
-              required
+              isClearable
             />
           </label>
 

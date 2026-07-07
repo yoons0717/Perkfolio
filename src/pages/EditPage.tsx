@@ -155,7 +155,7 @@ export default function EditPage() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <ViewField label="체험(예정)일" value={visit.visitDate} />
+            <ViewField label="체험(예정)일" value={visit.visitDate ?? '-'} />
             <ViewField label="플랫폼" value={visit.platform} />
           </div>
 

@@ -3,7 +3,7 @@ import type { NewVisit, Visit } from '../types/visit'
 
 type VisitRow = {
   id: string
-  visit_date: string
+  visit_date: string | null
   platform: Visit['platform']
   store_name: string
   category: Visit['category']
