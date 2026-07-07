@@ -1,23 +1,20 @@
 import { formatDDay } from './format'
 import type { VisitStatus } from '../types/visit'
 
-export const statusOrder: VisitStatus[] = ['예정', '방문완료', '리뷰완료']
+export const statusOrder: VisitStatus[] = ['예정', '리뷰완료']
 
 export function statusBadgeClass(status: VisitStatus): string {
   if (status === '리뷰완료') return 'bg-violet-bg text-violet'
-  if (status === '방문완료') return 'bg-amber-bg text-amber'
   return 'bg-white/5 text-muted'
 }
 
 export function statusDotClass(status: VisitStatus): string {
   if (status === '리뷰완료') return 'bg-violet'
-  if (status === '방문완료') return 'bg-amber'
   return 'bg-muted'
 }
 
 export function statusTextClass(status: VisitStatus): string {
   if (status === '리뷰완료') return 'text-violet'
-  if (status === '방문완료') return 'text-amber'
   return 'text-muted'
 }
 

@@ -21,7 +21,7 @@ export type Category = '카페' | '음식점' | '술집' | '기타'
 
 export const categories: Category[] = ['카페', '음식점', '술집', '기타']
 
-export type VisitStatus = '예정' | '방문완료' | '리뷰완료'
+export type VisitStatus = '예정' | '리뷰완료'
 
 export type Visit = {
   id: string

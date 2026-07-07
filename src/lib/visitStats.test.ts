@@ -17,10 +17,9 @@ describe('confirmedVisits', () => {
   it('excludes 예정 visits, since they have not actually happened yet', () => {
     const visits = [
       makeVisit({ id: '1', status: '예정' }),
-      makeVisit({ id: '2', status: '방문완료' }),
       makeVisit({ id: '3', status: '리뷰완료' }),
     ]
-    expect(confirmedVisits(visits).map((v) => v.id)).toEqual(['2', '3'])
+    expect(confirmedVisits(visits).map((v) => v.id)).toEqual(['3'])
   })
 })
 
@@ -142,7 +141,6 @@ describe('computeStatusCounts', () => {
     const visits = [makeVisit({ status: '예정' }), makeVisit({ status: '예정' }), makeVisit({ status: '리뷰완료' })]
     expect(computeStatusCounts(visits)).toEqual([
       { status: '예정', count: 2 },
-      { status: '방문완료', count: 0 },
       { status: '리뷰완료', count: 1 },
     ])
   })
@@ -161,7 +159,7 @@ describe('computeUpcomingDeadlines', () => {
   })
 
   it('includes overdue deadlines (negative days remaining)', () => {
-    const visits = [makeVisit({ id: '1', reviewDeadline: '2026-01-05', status: '방문완료' })]
+    const visits = [makeVisit({ id: '1', reviewDeadline: '2026-01-05', status: '예정' })]
     expect(computeUpcomingDeadlines(visits).map((d) => d.visit.id)).toEqual(['1'])
   })
 

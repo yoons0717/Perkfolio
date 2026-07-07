@@ -12,7 +12,6 @@ import AddPage from './pages/AddPage'
 import EditPage from './pages/EditPage'
 import TablePage from './pages/TablePage'
 import CalendarPage from './pages/CalendarPage'
-import ListPage from './pages/ListPage'
 import DashboardPage from './pages/DashboardPage'
 
 function App() {
@@ -51,7 +50,6 @@ function App() {
           >
             <Route path="/table" element={<TablePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/list" element={<ListPage />} />
           </Route>
           <Route
             path="/dashboard"

@@ -124,7 +124,6 @@ describe('CalendarPage', () => {
 
   it.each([
     ['예정', 'bg-muted'],
-    ['방문완료', 'bg-amber'],
     ['리뷰완료', 'bg-violet'],
   ] as const)('shows %s visits with their matching dot color and panel badge', async (status, colorClass) => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({ visitDate: DAY_15, status })])

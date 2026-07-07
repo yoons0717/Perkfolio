@@ -101,7 +101,7 @@ describe('VisitForm submission payload', () => {
     await fillRequiredFields()
     await userEvent.selectOptions(screen.getByLabelText('플랫폼'), '캐시노트')
     await userEvent.selectOptions(screen.getByLabelText('카테고리'), '음식점')
-    await userEvent.selectOptions(screen.getByLabelText('상태'), '방문완료')
+    await userEvent.selectOptions(screen.getByLabelText('상태'), '리뷰완료')
     await userEvent.clear(screen.getByLabelText('추가결제액'))
     await userEvent.type(screen.getByLabelText('추가결제액'), '5000')
 
@@ -120,7 +120,7 @@ describe('VisitForm submission payload', () => {
       campaignUrl: 'https://campaign.example.com',
       postUrl: null,
       reviewDeadline: '2026-09-01',
-      status: '방문완료',
+      status: '리뷰완료',
     })
     expect(submitted.visitDate).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
@@ -222,7 +222,7 @@ describe('VisitForm with initialValues', () => {
       storeInfoUrl: 'https://store.example.com/existing',
       retailValue: 30000,
       extraPayment: 2000,
-      status: '방문완료',
+      status: '리뷰완료',
       postUrl: 'https://blog.example.com/post',
       reviewDeadline: '2026-08-20',
     }
@@ -244,7 +244,7 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('포스팅 링크 (선택)')).toHaveValue('https://blog.example.com/post')
     expect(screen.getByLabelText('플랫폼')).toHaveValue('레뷰')
     expect(screen.getByLabelText('카테고리')).toHaveValue('음식점')
-    expect(screen.getByLabelText('상태')).toHaveValue('방문완료')
+    expect(screen.getByLabelText('상태')).toHaveValue('리뷰완료')
     expect(screen.getByLabelText('방문(예정)일')).toHaveValue('2026-08-15')
     expect(screen.getByLabelText('마감일')).toHaveValue('2026-08-20')
   })

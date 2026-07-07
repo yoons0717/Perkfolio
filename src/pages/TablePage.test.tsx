@@ -72,7 +72,7 @@ describe('TablePage columns', () => {
         category: '카페',
         retailValue: 48000,
         extraPayment: 5000,
-        status: '방문완료',
+        status: '리뷰완료',
       }),
     ])
     renderTablePage()
@@ -80,19 +80,19 @@ describe('TablePage columns', () => {
     await screen.findByText('카페 온도')
     const cells = getRowCells('카페 온도')
     expect(cells.map((c) => c.textContent)).toEqual([
-      '2026-01-10',
       '-',
+      '2026-01-10',
       '카페 온도캐시노트 · 카페',
       '₩48,000',
       '₩5,000',
       '₩43,000',
-      '방문완료',
+      '리뷰완료',
     ])
   })
 
   it('shows the net savings in red when extra payment exceeds retail value (a loss)', async () => {
     vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({ storeName: '카페 온도', retailValue: 10000, extraPayment: 15000, status: '방문완료' }),
+      makeVisit({ storeName: '카페 온도', retailValue: 10000, extraPayment: 15000, status: '리뷰완료' }),
     ])
     renderTablePage()
 
@@ -123,8 +123,8 @@ describe('TablePage columns', () => {
     renderTablePage()
 
     await screen.findByText('가게A')
-    expect(getRowCells('가게A')[1]).toHaveTextContent('-')
-    const deadlineCell = getRowCells('가게B')[1]
+    expect(getRowCells('가게A')[0]).toHaveTextContent('-')
+    const deadlineCell = getRowCells('가게B')[0]
     expect(deadlineCell).toHaveTextContent('2099-01-01')
     expect(deadlineCell).not.toHaveTextContent('완료')
   })
@@ -154,9 +154,9 @@ describe('TablePage sorting', () => {
 
   it('sorts by 순절감액, the computed (retailValue - extraPayment) column', async () => {
     vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({ id: '1', storeName: '가게A', retailValue: 10000, extraPayment: 0, status: '방문완료' }), // net 10000
-      makeVisit({ id: '2', storeName: '가게B', retailValue: 30000, extraPayment: 25000, status: '방문완료' }), // net 5000
-      makeVisit({ id: '3', storeName: '가게C', retailValue: 20000, extraPayment: 5000, status: '방문완료' }), // net 15000
+      makeVisit({ id: '1', storeName: '가게A', retailValue: 10000, extraPayment: 0, status: '리뷰완료' }), // net 10000
+      makeVisit({ id: '2', storeName: '가게B', retailValue: 30000, extraPayment: 25000, status: '리뷰완료' }), // net 5000
+      makeVisit({ id: '3', storeName: '가게C', retailValue: 20000, extraPayment: 5000, status: '리뷰완료' }), // net 15000
     ])
     renderTablePage()
     await screen.findByText('가게A')
@@ -168,7 +168,7 @@ describe('TablePage sorting', () => {
   it('always sorts 예정 visits to the end when sorting by 순절감액, regardless of direction, since their amount is not confirmed', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', storeName: '가게A', status: '예정', retailValue: 999999, extraPayment: 0 }),
-      makeVisit({ id: '2', storeName: '가게B', status: '방문완료', retailValue: 10000, extraPayment: 0 }), // net 10000
+      makeVisit({ id: '2', storeName: '가게B', status: '리뷰완료', retailValue: 10000, extraPayment: 0 }), // net 10000
       makeVisit({ id: '3', storeName: '가게C', status: '리뷰완료', retailValue: 5000, extraPayment: 0 }), // net 5000
     ])
     renderTablePage()
@@ -204,7 +204,8 @@ describe('TablePage filters', () => {
     renderTablePage()
     await screen.findByText('가게A')
 
-    await userEvent.selectOptions(screen.getByLabelText('상태 필터'), '리뷰완료')
+    await userEvent.click(screen.getByRole('button', { name: '상태' }))
+    await userEvent.click(screen.getByRole('button', { name: '리뷰완료' }))
 
     expect(screen.queryByText('가게A')).not.toBeInTheDocument()
     expect(screen.getByText('가게B')).toBeInTheDocument()
@@ -233,7 +234,8 @@ describe('TablePage filters', () => {
     renderTablePage()
     await screen.findByText('가게A')
 
-    await userEvent.selectOptions(screen.getByLabelText('상태 필터'), '예정')
+    await userEvent.click(screen.getByRole('button', { name: '상태' }))
+    await userEvent.click(screen.getByRole('button', { name: '예정' }))
     await userEvent.selectOptions(screen.getByLabelText('플랫폼 필터'), '캐시노트')
 
     // only 가게B matches both 예정 AND 캐시노트
@@ -250,10 +252,12 @@ describe('TablePage filters', () => {
     renderTablePage()
     await screen.findByText('가게A')
 
-    await userEvent.selectOptions(screen.getByLabelText('상태 필터'), '리뷰완료')
+    await userEvent.click(screen.getByRole('button', { name: '상태' }))
+    await userEvent.click(screen.getByRole('button', { name: '리뷰완료' }))
     expect(screen.queryByText('가게A')).not.toBeInTheDocument()
 
-    await userEvent.selectOptions(screen.getByLabelText('상태 필터'), '전체')
+    await userEvent.click(screen.getByRole('button', { name: '상태' }))
+    await userEvent.click(screen.getByRole('button', { name: '전체' }))
     expect(screen.getByText('가게A')).toBeInTheDocument()
     expect(screen.getByText('가게B')).toBeInTheDocument()
   })
@@ -279,7 +283,8 @@ describe('TablePage CSV export', () => {
     renderTablePage()
     await screen.findByText('가게A')
 
-    await userEvent.selectOptions(screen.getByLabelText('상태 필터'), '리뷰완료')
+    await userEvent.click(screen.getByRole('button', { name: '상태' }))
+    await userEvent.click(screen.getByRole('button', { name: '리뷰완료' }))
     await userEvent.click(screen.getByRole('button', { name: 'CSV 내보내기' }))
 
     expect(downloadCsv).toHaveBeenCalledTimes(1)
@@ -300,7 +305,7 @@ describe('TablePage mobile card view', () => {
   it('shows visits as cards instead of a table on mobile', async () => {
     vi.mocked(useIsMobile).mockReturnValue(true)
     vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({ storeName: '카페 온도', retailValue: 48000, extraPayment: 5000, status: '방문완료' }),
+      makeVisit({ storeName: '카페 온도', retailValue: 48000, extraPayment: 5000, status: '리뷰완료' }),
     ])
     renderTablePage()
 

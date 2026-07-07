@@ -22,14 +22,14 @@ describe('visitsToCsv', () => {
       category: '카페',
       retailValue: 48000,
       extraPayment: 5000,
-      status: '방문완료',
+      status: '리뷰완료',
     })
 
     const csv = visitsToCsv([visit])
 
     expect(csv).toBe(
       '방문(예정)일,마감일,플랫폼,업체명,카테고리,체험가,추가결제액,순절감액,상태\r\n' +
-        '2026-01-10,2026-01-13,포포몬,카페 온도,카페,48000,5000,43000,방문완료\r\n',
+        '2026-01-10,2026-01-13,포포몬,카페 온도,카페,48000,5000,43000,리뷰완료\r\n',
     )
   })
 
@@ -42,7 +42,7 @@ describe('visitsToCsv', () => {
   })
 
   it('shows a negative net savings as a plain negative number', () => {
-    const visit = makeVisit({ retailValue: 10000, extraPayment: 15000, status: '방문완료' })
+    const visit = makeVisit({ retailValue: 10000, extraPayment: 15000, status: '리뷰완료' })
 
     const csv = visitsToCsv([visit])
 

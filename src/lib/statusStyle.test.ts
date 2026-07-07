@@ -7,9 +7,8 @@ describe('statusBadgeClass / statusDotClass', () => {
     expect(statusDotClass(status)).toMatch(/^bg-\S+$/)
   })
 
-  it('uses violet for 리뷰완료, amber for 방문완료, a neutral tone for 예정', () => {
+  it('uses violet for 리뷰완료, a neutral tone for 예정', () => {
     expect(statusBadgeClass('리뷰완료')).toContain('violet')
-    expect(statusBadgeClass('방문완료')).toContain('amber')
     expect(statusBadgeClass('예정')).toContain('muted')
   })
 })
@@ -33,8 +32,8 @@ describe('deadlineDisplay', () => {
     expect(deadlineDisplay('리뷰완료', '2099-01-01')).toEqual({ text: '리뷰완료', reviewed: true })
   })
 
-  it('returns reviewed:false with a D-day countdown for 예정 / 방문완료', () => {
+  it('returns reviewed:false with a D-day countdown for 예정', () => {
     expect(deadlineDisplay('예정', '2026-01-13')).toEqual({ text: 'D-3', reviewed: false })
-    expect(deadlineDisplay('방문완료', '2026-01-10')).toEqual({ text: 'D-DAY', reviewed: false })
+    expect(deadlineDisplay('예정', '2026-01-10')).toEqual({ text: 'D-DAY', reviewed: false })
   })
 })

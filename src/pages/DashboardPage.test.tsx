@@ -22,7 +22,7 @@ function thisMonthDate(day = 15): string {
 // Dashboard totals exclude 예정 visits (see confirmedVisits), so tests here
 // default to a confirmed status unlike the shared factory's plain 예정.
 function makeVisit(overrides: Partial<Visit> = {}): Visit {
-  return makeBaseVisit({ visitDate: thisMonthDate(), status: '방문완료', ...overrides })
+  return makeBaseVisit({ visitDate: thisMonthDate(), status: '리뷰완료', ...overrides })
 }
 
 function renderDashboard() {
@@ -62,7 +62,7 @@ describe('DashboardPage', () => {
 
   it('shows totals and savings rate computed only from confirmed (non-예정) visits', async () => {
     vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({ id: '1', status: '방문완료', retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ id: '1', status: '리뷰완료', retailValue: 10000, extraPayment: 0 }),
       makeVisit({ id: '2', status: '리뷰완료', retailValue: 30000, extraPayment: 10000 }),
       makeVisit({ id: '3', status: '예정', retailValue: 999999, extraPayment: 0 }),
     ])
@@ -79,7 +79,7 @@ describe('DashboardPage', () => {
 
   it('excludes out-of-period visits by default, then includes them once switched to 전체', async () => {
     vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({ id: '1', visitDate: '2020-01-01', status: '방문완료' }),
+      makeVisit({ id: '1', visitDate: '2020-01-01', status: '리뷰완료' }),
     ])
     renderDashboard()
     await screen.findByText('총 방문')
@@ -91,7 +91,7 @@ describe('DashboardPage', () => {
   })
 
   it('reveals an empty date-range picker when "직접 선택" is chosen, showing no results until a range is picked', async () => {
-    vi.mocked(getVisits).mockResolvedValue([makeVisit({ status: '방문완료' })])
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ status: '리뷰완료' })])
     renderDashboard()
     await screen.findByText('총 방문')
 
