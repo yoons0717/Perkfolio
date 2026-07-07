@@ -6,6 +6,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContaine
 import FloatingAddButton from '../components/FloatingAddButton'
 import { focusRingClass, inputClass } from '../components/formStyles'
 import InfoTooltip from '../components/InfoTooltip'
+import Panel from '../components/Panel'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
@@ -34,10 +35,10 @@ const periodLabel: Record<Period, string> = {
 
 function StatCard({ label, value, valueClassName = 'text-ink' }: { label: string; value: string; valueClassName?: string }) {
   return (
-    <div className="rounded-xl bg-white/5 p-4">
+    <Panel>
       <p className="text-xs text-muted">{label}</p>
       <p className={`mt-1 font-mono text-xl font-bold ${valueClassName}`}>{value}</p>
-    </div>
+    </Panel>
   )
 }
 
@@ -120,16 +121,16 @@ export default function DashboardPage() {
             <StatCard label="평균 절감율" value={`${totals.rate}%`} />
           </div>
 
-          <div className="mb-3 flex flex-wrap gap-3 rounded-xl bg-white/5 p-4">
+          <Panel className="mb-3 flex flex-wrap gap-3">
             {statusCounts.map(({ status, count }) => (
               <div key={status} className="flex items-center gap-2">
                 <StatusBadge status={status} />
                 <span className="font-mono text-sm text-ink">{count}건</span>
               </div>
             ))}
-          </div>
+          </Panel>
 
-          <div className="rounded-xl bg-white/5 p-4">
+          <Panel>
             <p className="mb-3 font-display text-sm font-bold text-ink">카테고리별 분포</p>
             <div className="flex flex-col gap-2">
               {categoryBreakdown.map(({ category, count, pct }) => (
@@ -142,7 +143,7 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </Panel>
         </section>
 
         <section className="rounded-2xl border border-line bg-surface p-5 shadow-lg shadow-black/30">
@@ -151,7 +152,7 @@ export default function DashboardPage() {
             <InfoTooltip text="기간 필터와 무관하게 항상 전체 기록 기준" />
           </div>
 
-          <div className="mb-3 rounded-xl bg-white/5 p-4">
+          <Panel className="mb-3">
             <div className="mb-3 flex items-baseline gap-2">
               <p className="font-display text-sm font-bold text-ink">마감 임박 (D-3 이내)</p>
               <p className="text-xs text-muted">예정 포함</p>
@@ -175,10 +176,10 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
-          </div>
+          </Panel>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl bg-white/5 p-4">
+            <Panel>
               <p className="mb-3 font-display text-sm font-bold text-ink">플랫폼별 평균 절감액</p>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={platformRanking}>
@@ -205,9 +206,9 @@ export default function DashboardPage() {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            </Panel>
 
-            <div className="rounded-xl bg-white/5 p-4">
+            <Panel>
               <p className="mb-3 font-display text-sm font-bold text-ink">월별 절감액 트렌드</p>
               <ResponsiveContainer width="100%" height={220}>
                 <LineChart data={monthlyTrend}>
@@ -230,7 +231,7 @@ export default function DashboardPage() {
                   <Line type="monotone" dataKey="net" name="순절감액" stroke="var(--color-blue)" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
+            </Panel>
           </div>
         </section>
       </div>
