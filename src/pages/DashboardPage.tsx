@@ -230,7 +230,7 @@ export default function DashboardPage() {
                   <ChartXAxis dataKey="platform" />
                   <ChartYAxis />
                   <ChartTooltip cursor={{ fill: 'var(--color-overlay)' }} />
-                  <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="avgNet" name="평균 절감액" radius={[4, 4, 0, 0]} isAnimationActive={false}>
                     {platformRanking.map((entry) => (
                       <Cell key={entry.platform} fill={entry.avgNet < 0 ? 'var(--color-danger)' : 'var(--color-blue)'} />
                     ))}
@@ -247,7 +247,15 @@ export default function DashboardPage() {
                   <ChartXAxis dataKey="month" />
                   <ChartYAxis />
                   <ChartTooltip cursor={{ stroke: 'var(--color-line)' }} />
-                  <Line type="monotone" dataKey="net" name="순절감액" stroke="var(--color-blue)" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line
+                    type="monotone"
+                    dataKey="net"
+                    name="순절감액"
+                    stroke="var(--color-blue)"
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                    isAnimationActive={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </Panel>
