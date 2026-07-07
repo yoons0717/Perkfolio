@@ -10,7 +10,6 @@ import InfoTooltip from '../components/InfoTooltip'
 import Panel from '../components/Panel'
 import Section from '../components/Section'
 import Select from '../components/Select'
-import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
 import { deadlineUrgentDotClass, deadlineUrgentTextClass } from '../lib/statusStyle'
@@ -18,7 +17,6 @@ import {
   computeCategoryBreakdown,
   computeMonthlyTrend,
   computePlatformRanking,
-  computeStatusCounts,
   computeTotals,
   computeUpcomingDeadlines,
   confirmedVisits,
@@ -97,11 +95,9 @@ export default function DashboardPage() {
     [visits, period, customRange],
   )
   // 예정 상태는 아직 실제로 일어나지 않았으므로 금액/절감 통계에서는 제외한다.
-  // (상태별 현황은 예정 항목도 그대로 보여줘야 하므로 filtered를 그대로 씀)
   const confirmed = useMemo(() => confirmedVisits(filtered), [filtered])
 
   const totals = useMemo(() => computeTotals(confirmed), [confirmed])
-  const statusCounts = useMemo(() => computeStatusCounts(filtered), [filtered])
   const categoryBreakdown = useMemo(() => computeCategoryBreakdown(confirmed), [confirmed])
 
   // "전체 기록 기준" 섹션: 마감 임박/플랫폼 비교/월별 트렌드는 그 성격상 기간
@@ -163,15 +159,6 @@ export default function DashboardPage() {
             <StatCard label="순절감액" value={formatWon(totals.net)} valueClassName={totals.net < 0 ? 'text-danger' : 'text-positive'} />
             <StatCard label="평균 절감율" value={`${totals.rate}%`} />
           </div>
-
-          <Panel className="mb-3 flex flex-wrap gap-3">
-            {statusCounts.map(({ status, count }) => (
-              <div key={status} className="flex items-center gap-2">
-                <StatusBadge status={status} />
-                <span className="font-mono text-sm text-ink">{count}건</span>
-              </div>
-            ))}
-          </Panel>
 
           <Panel>
             <p className="mb-3 font-display text-sm font-bold text-ink">카테고리별 분포</p>

@@ -40,8 +40,6 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
-// "총 체험단" 카드의 값("N건")은 상태별 현황 뱃지에도 같은 텍스트가 나올 수 있어
-// (예: 방문 2건 전부 같은 상태면 "2건"이 두 번), 카드 안으로 스코프를 좁힌다.
 function totalVisitCountText(): string {
   return screen.getByText('총 체험단').nextElementSibling!.textContent!
 }
