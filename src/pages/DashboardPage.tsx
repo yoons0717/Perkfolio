@@ -7,6 +7,7 @@ import FloatingAddButton from '../components/FloatingAddButton'
 import { focusRingClass, inputClass } from '../components/formStyles'
 import InfoTooltip from '../components/InfoTooltip'
 import Panel from '../components/Panel'
+import Section from '../components/Section'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
@@ -77,7 +78,7 @@ export default function DashboardPage() {
       <h1 className="mb-5 font-display text-2xl font-extrabold text-ink">대시보드</h1>
 
       <div className="flex flex-col gap-6">
-        <section className="rounded-2xl border border-line bg-surface p-5 shadow-lg shadow-black/30">
+        <Section>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-1.5">
               <p className="font-display text-base font-extrabold text-ink">{periodLabel[period]} 요약</p>
@@ -144,9 +145,9 @@ export default function DashboardPage() {
               ))}
             </div>
           </Panel>
-        </section>
+        </Section>
 
-        <section className="rounded-2xl border border-line bg-surface p-5 shadow-lg shadow-black/30">
+        <Section>
           <div className="mb-4 flex items-center gap-1.5">
             <p className="font-display text-base font-extrabold text-ink">전체 통계</p>
             <InfoTooltip text="기간 필터와 무관하게 항상 전체 기록 기준" />
@@ -233,7 +234,7 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             </Panel>
           </div>
-        </section>
+        </Section>
       </div>
 
       <FloatingAddButton />
