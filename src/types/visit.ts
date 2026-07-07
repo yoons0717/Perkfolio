@@ -6,6 +6,7 @@ export type Platform =
   | '디너의여왕'
   | '리뷰노트'
   | '레뷰'
+  | '슈퍼멤버스'
 
 export const platforms: Platform[] = [
   '포포몬',
@@ -15,6 +16,7 @@ export const platforms: Platform[] = [
   '디너의여왕',
   '리뷰노트',
   '레뷰',
+  '슈퍼멤버스',
 ]
 
 export type Category = '카페' | '음식점' | '술집' | '기타'
