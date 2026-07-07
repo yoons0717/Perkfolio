@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import BackButton from '../components/BackButton'
 import Button from '../components/Button'
 import PageContainer from '../components/PageContainer'
+import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
@@ -119,11 +120,11 @@ export default function EditPage() {
   }
 
   if (loadError) {
-    return <p className="mx-auto mt-10 max-w-lg px-4 text-sm text-danger">기록을 불러오지 못했습니다.</p>
+    return <p className="text-sm text-danger">기록을 불러오지 못했습니다.</p>
   }
 
   if (!visit) {
-    return null
+    return <Spinner />
   }
 
   if (mode === 'edit') {

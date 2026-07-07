@@ -10,6 +10,7 @@ import InfoTooltip from '../components/InfoTooltip'
 import Panel from '../components/Panel'
 import Section from '../components/Section'
 import Select from '../components/Select'
+import Spinner from '../components/Spinner'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
 import { deadlineUrgentDotClass, deadlineUrgentTextClass } from '../lib/statusStyle'
@@ -106,7 +107,7 @@ export default function DashboardPage() {
   const platformRanking = useMemo(() => computePlatformRanking(allTimeConfirmed), [allTimeConfirmed])
   const monthlyTrend = useMemo(() => computeMonthlyTrend(allTimeConfirmed), [allTimeConfirmed])
 
-  if (loading) return null
+  if (loading) return <Spinner />
   if (error) return <p className="text-sm text-danger">{error}</p>
 
   return (

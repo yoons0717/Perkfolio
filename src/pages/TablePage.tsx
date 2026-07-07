@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import Select from '../components/Select'
+import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { useIsMobile } from '../hooks/useIsMobile'
@@ -291,7 +292,7 @@ export default function TablePage() {
     }
   }
 
-  if (loading) return null
+  if (loading) return <Spinner />
   if (error) return <p className="text-sm text-danger">{error}</p>
 
   return (

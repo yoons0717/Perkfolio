@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
 import { getMonthGrid } from '../lib/calendarGrid'
@@ -56,7 +57,7 @@ export default function CalendarPage() {
 
   const grid = useMemo(() => getMonthGrid(cursor.getFullYear(), cursor.getMonth()), [cursor])
 
-  if (loading) return null
+  if (loading) return <Spinner />
   if (error) return <p className="text-sm text-danger">{error}</p>
 
   const todayStr = toDateString(today)
