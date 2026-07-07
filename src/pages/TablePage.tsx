@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
-import Button from '../components/Button'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useVisits } from '../hooks/useVisits'
-import { downloadCsv, visitsToCsv } from '../lib/csvExport'
-import { formatWon, toDateString } from '../lib/format'
+import { formatWon } from '../lib/format'
 import {
   deadlineDisplay,
   deadlineUrgentBadgeClass,
@@ -275,10 +273,6 @@ export default function TablePage() {
     }
   }
 
-  function handleExportCsv() {
-    downloadCsv(`perktrack_visits_${toDateString(new Date())}.csv`, visitsToCsv(visible))
-  }
-
   if (loading) return null
   if (error) return <p className="text-sm text-red-400">{error}</p>
 
@@ -346,9 +340,6 @@ export default function TablePage() {
             ))}
           </Select>
         </div>
-        <Button variant="secondary" onClick={handleExportCsv} disabled={visible.length === 0} className="ml-auto">
-          CSV 내보내기
-        </Button>
       </div>
 
       {visible.length === 0 ? (
