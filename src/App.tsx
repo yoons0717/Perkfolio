@@ -15,6 +15,7 @@ import EditPage from './pages/EditPage'
 import TablePage from './pages/TablePage'
 import CalendarPage from './pages/CalendarPage'
 import DashboardPage from './pages/DashboardPage'
+import AdminFeedbackPage from './pages/AdminFeedbackPage'
 
 function App() {
   return (
@@ -58,6 +59,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/feedback"
+            element={
+              <ProtectedRoute>
+                <AdminFeedbackPage />
               </ProtectedRoute>
             }
           />

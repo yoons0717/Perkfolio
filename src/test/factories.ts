@@ -1,4 +1,5 @@
 import type { Visit } from '../types/visit'
+import type { Feedback } from '../types/feedback'
 
 export function makeVisit(overrides: Partial<Visit> = {}): Visit {
   return {
@@ -15,6 +16,16 @@ export function makeVisit(overrides: Partial<Visit> = {}): Visit {
     status: '예정',
     postUrl: null,
     reviewDeadline: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    ...overrides,
+  }
+}
+
+export function makeFeedback(overrides: Partial<Feedback> = {}): Feedback {
+  return {
+    id: '1',
+    type: '버그',
+    content: '버튼이 안 눌려요',
     createdAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
   }
