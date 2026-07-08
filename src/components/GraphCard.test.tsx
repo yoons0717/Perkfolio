@@ -41,6 +41,19 @@ describe('GraphCard', () => {
     expect(screen.getByText('2건')).toBeInTheDocument()
   })
 
+  it('shows a dash instead of ₩0 for a zero-count entry', () => {
+    render(
+      <GraphCard
+        graph={makeGraph({ axis: 'category', scope: 'all' })}
+        data={[{ label: '기타', avgNet: 0, count: 0 }]}
+        onDelete={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('-')).toBeInTheDocument()
+    expect(screen.queryByText('₩0')).not.toBeInTheDocument()
+  })
+
   it('does not show a scope subtitle for the month axis', () => {
     render(
       <GraphCard

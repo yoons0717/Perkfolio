@@ -114,7 +114,7 @@ export default function GraphCard({
               <span
                 className={`w-20 shrink-0 text-right font-mono text-xs font-semibold ${avgNet < 0 ? 'text-danger' : 'text-blue'}`}
               >
-                {formatWon(avgNet)}
+                {count === 0 ? '-' : formatWon(avgNet)}
               </span>
               <span className="w-8 shrink-0 text-right font-mono text-xs text-muted">{count}건</span>
             </div>
