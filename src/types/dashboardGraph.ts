@@ -2,7 +2,7 @@ export type DashboardGraph = {
   id: string
   axis: 'category' | 'platform' | 'month'
   chartType: 'bar' | 'line'
-  scope: 'all' | 'period'
+  scope: 'all' | 'thisMonth' | 'lastMonth' | 'thisYear' | 'lastYear'
   createdAt: string
 }
 

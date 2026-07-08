@@ -62,7 +62,7 @@ describe('getDashboardGraphs', () => {
           id: '1',
           axis: 'platform',
           chart_type: 'bar',
-          scope: 'period',
+          scope: 'thisMonth',
           created_at: '2026-01-02T00:00:00.000Z',
         },
       ],
@@ -78,7 +78,7 @@ describe('getDashboardGraphs', () => {
     expect(select).toHaveBeenCalledWith('*')
     expect(order).toHaveBeenCalledWith('created_at', { ascending: false })
     expect(result).toEqual([
-      { id: '1', axis: 'platform', chartType: 'bar', scope: 'period', createdAt: '2026-01-02T00:00:00.000Z' },
+      { id: '1', axis: 'platform', chartType: 'bar', scope: 'thisMonth', createdAt: '2026-01-02T00:00:00.000Z' },
     ])
   })
 

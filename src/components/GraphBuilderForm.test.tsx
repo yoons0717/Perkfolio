@@ -17,6 +17,14 @@ describe('GraphBuilderForm', () => {
     expect(screen.getByLabelText('기간')).toBeInTheDocument()
   })
 
+  it('offers all fixed period options for the scope select', () => {
+    render(<GraphBuilderForm onSave={vi.fn()} />)
+
+    const scopeSelect = screen.getByLabelText('기간')
+    const optionLabels = Array.from(scopeSelect.querySelectorAll('option')).map((o) => o.textContent)
+    expect(optionLabels).toEqual(['전체', '이번 달', '지난달', '올해', '작년'])
+  })
+
   it('switching axis to month reveals chart type select and fixes scope to 전체 고정', async () => {
     render(<GraphBuilderForm onSave={vi.fn()} />)
 
@@ -46,7 +54,7 @@ describe('GraphBuilderForm', () => {
     await userEvent.selectOptions(screen.getByLabelText('기간'), '이번 달')
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
-    expect(onSave).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'period' })
+    expect(onSave).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'thisMonth' })
   })
 
   it('saves month axis with the selected chartType and scope forced to all', async () => {

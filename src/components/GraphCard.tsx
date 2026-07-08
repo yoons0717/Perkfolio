@@ -15,7 +15,10 @@ const axisLabel: Record<DashboardGraph['axis'], string> = {
 
 const scopeLabel: Record<DashboardGraph['scope'], string> = {
   all: '전체',
-  period: '이번 달',
+  thisMonth: '이번 달',
+  lastMonth: '지난달',
+  thisYear: '올해',
+  lastYear: '작년',
 }
 
 function ChartGrid() {

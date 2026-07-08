@@ -136,7 +136,7 @@ describe('DashboardPage', () => {
       // Outside the default 이번 달 period, but confirmed: only counted when scope='all'.
       makeVisit({ id: '2', category: '카페', visitDate: '2020-01-01', retailValue: 50000, extraPayment: 0 }),
     ])
-    const savedGraph = makeDashboardGraph({ id: 'g1', axis: 'category', chartType: 'bar', scope: 'period' })
+    const savedGraph = makeDashboardGraph({ id: 'g1', axis: 'category', chartType: 'bar', scope: 'thisMonth' })
     vi.mocked(addDashboardGraph).mockResolvedValue(savedGraph)
 
     renderDashboard()
@@ -146,10 +146,26 @@ describe('DashboardPage', () => {
     await userEvent.selectOptions(screen.getByLabelText('기간'), '이번 달')
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
-    expect(addDashboardGraph).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'period' })
+    expect(addDashboardGraph).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'thisMonth' })
     const title = await screen.findByText('카테고리별 평균 절감액')
     const card = within(title.closest('.rounded-xl')!)
-    // scope='period' excludes visit '2' (outside 이번 달), so 카페's avg is 10000, not blended with 50000.
+    // scope='thisMonth' excludes visit '2' (outside 이번 달), so 카페's avg is 10000, not blended with 50000.
+    expect(card.getByText('₩10,000')).toBeInTheDocument()
+  })
+
+  it('supports a fixed period other than 이번 달 as a graph scope (e.g. 작년)', async () => {
+    const graph = makeDashboardGraph({ id: 'g1', axis: 'category', chartType: 'bar', scope: 'lastYear' })
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', category: '카페', visitDate: '2025-06-01', retailValue: 10000, extraPayment: 0 }),
+      // Not last year, so excluded from a scope='lastYear' graph even though it's confirmed.
+      makeVisit({ id: '2', category: '카페', retailValue: 90000, extraPayment: 0 }),
+    ])
+    vi.mocked(getDashboardGraphs).mockResolvedValue([graph])
+
+    renderDashboard()
+    const title = await screen.findByText('카테고리별 평균 절감액')
+
+    const card = within(title.closest('.rounded-xl')!)
     expect(card.getByText('₩10,000')).toBeInTheDocument()
   })
 

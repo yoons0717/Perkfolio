@@ -54,14 +54,14 @@ describe('useDashboardGraphs', () => {
     await result.current.addGraph({
       axis: 'platform',
       chartType: 'line',
-      scope: 'period',
+      scope: 'thisMonth',
     })
 
     await waitFor(() => expect(result.current.graphs).toEqual([graph2, graph1]))
     expect(addDashboardGraph).toHaveBeenCalledWith({
       axis: 'platform',
       chartType: 'line',
-      scope: 'period',
+      scope: 'thisMonth',
     })
     expect(getDashboardGraphs).toHaveBeenCalledTimes(1)
   })
