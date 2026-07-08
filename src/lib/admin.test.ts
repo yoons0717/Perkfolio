@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { isAdmin } from './admin'
+import { ADMIN_EMAIL, isAdmin } from './admin'
 
 describe('isAdmin', () => {
   it('returns true for the admin email', () => {
-    expect(isAdmin('yoons0717@gmail.com')).toBe(true)
+    expect(isAdmin(ADMIN_EMAIL)).toBe(true)
   })
 
   it('returns false for a non-admin email', () => {

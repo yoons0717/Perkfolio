@@ -27,8 +27,9 @@
 - 데이터 접근(Supabase 호출)은 반드시 `src/lib` 모듈을 통해서만 수행 — 컴포넌트에서 Supabase client 직접 호출 금지
 
 ## 환경 변수
-- `.env.local`에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 저장
+- `.env.local`에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_ADMIN_EMAIL`(관리자 판별용, `src/lib/admin.ts`) 저장
 - `.env.local`은 git에 커밋하지 않음 (`.gitignore` 처리)
+- `VITE_` 접두사 env var는 빌드된 클라이언트 번들에 그대로 노출됨 — git 이력에는 안 남지만 배포된 JS를 열어보면 값이 보임. 진짜 비밀값이 아니라 "레포에 평문으로 박아두고 싶지 않은 값" 용도로만 사용
 
 ## 명령어
 - `npm install` — 의존성 설치
