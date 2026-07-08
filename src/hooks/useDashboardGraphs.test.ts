@@ -42,15 +42,14 @@ describe('useDashboardGraphs', () => {
     expect(result.current.graphs).toEqual([])
   })
 
-  it('adds a graph to local state after successful add', async () => {
+  it('adds a graph to local state after successful add without re-fetching', async () => {
     vi.mocked(getDashboardGraphs).mockResolvedValue([graph1])
     const { result } = renderHook(() => useDashboardGraphs())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.graphs).toEqual([graph1])
 
-    vi.mocked(addDashboardGraph).mockResolvedValue(undefined)
-    vi.mocked(getDashboardGraphs).mockResolvedValue([graph1, graph2])
+    vi.mocked(addDashboardGraph).mockResolvedValue(graph2)
 
     await result.current.addGraph({
       axis: 'platform',
@@ -58,12 +57,13 @@ describe('useDashboardGraphs', () => {
       scope: 'period',
     })
 
-    await waitFor(() => expect(result.current.graphs).toEqual([graph1, graph2]))
+    await waitFor(() => expect(result.current.graphs).toEqual([graph2, graph1]))
     expect(addDashboardGraph).toHaveBeenCalledWith({
       axis: 'platform',
       chartType: 'line',
       scope: 'period',
     })
+    expect(getDashboardGraphs).toHaveBeenCalledTimes(1)
   })
 
   it('removes a graph from local state after successful delete', async () => {

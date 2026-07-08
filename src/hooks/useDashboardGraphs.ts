@@ -15,15 +15,12 @@ export function useDashboardGraphs() {
   }, [])
 
   const addGraph = async (newGraph: NewDashboardGraph) => {
-    await addDashboardGraph(newGraph)
-    // Fetch updated list and update state
-    const updated = await getDashboardGraphs()
-    setGraphs(updated)
+    const created = await addDashboardGraph(newGraph)
+    setGraphs((prev) => [created, ...prev])
   }
 
   const removeGraph = async (id: string) => {
     await deleteDashboardGraph(id)
-    // Update state by filtering out the deleted graph
     setGraphs((prev) => prev.filter((g) => g.id !== id))
   }
 

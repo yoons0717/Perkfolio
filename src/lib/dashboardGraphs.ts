@@ -29,14 +29,19 @@ export async function getDashboardGraphs(): Promise<DashboardGraph[]> {
   return (data as DashboardGraphRow[]).map(toDashboardGraph)
 }
 
-export async function addDashboardGraph(graph: NewDashboardGraph): Promise<void> {
-  const { error } = await supabase.from('dashboard_graphs').insert({
-    axis: graph.axis,
-    chart_type: graph.chartType,
-    scope: graph.scope,
-  })
+export async function addDashboardGraph(graph: NewDashboardGraph): Promise<DashboardGraph> {
+  const { data, error } = await supabase
+    .from('dashboard_graphs')
+    .insert({
+      axis: graph.axis,
+      chart_type: graph.chartType,
+      scope: graph.scope,
+    })
+    .select()
+    .single()
 
   if (error) throw error
+  return toDashboardGraph(data as DashboardGraphRow)
 }
 
 export async function deleteDashboardGraph(id: string): Promise<void> {

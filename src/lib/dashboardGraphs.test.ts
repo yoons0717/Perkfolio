@@ -13,20 +13,40 @@ afterEach(() => {
 })
 
 describe('addDashboardGraph', () => {
-  it('inserts the axis, chartType, and scope into the dashboard_graphs table', async () => {
-    const insert = vi.fn().mockResolvedValue({ error: null })
+  it('inserts the axis, chartType, and scope and returns the mapped row', async () => {
+    const single = vi.fn().mockResolvedValue({
+      data: {
+        id: '1',
+        axis: 'category',
+        chart_type: 'bar',
+        scope: 'all',
+        created_at: '2026-01-02T00:00:00.000Z',
+      },
+      error: null,
+    })
+    const select = vi.fn().mockReturnValue({ single })
+    const insert = vi.fn().mockReturnValue({ select })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(supabase.from).mockReturnValue({ insert } as any)
 
-    await addDashboardGraph({ axis: 'category', chartType: 'bar', scope: 'all' })
+    const result = await addDashboardGraph({ axis: 'category', chartType: 'bar', scope: 'all' })
 
     expect(supabase.from).toHaveBeenCalledWith('dashboard_graphs')
     expect(insert).toHaveBeenCalledWith({ axis: 'category', chart_type: 'bar', scope: 'all' })
+    expect(result).toEqual({
+      id: '1',
+      axis: 'category',
+      chartType: 'bar',
+      scope: 'all',
+      createdAt: '2026-01-02T00:00:00.000Z',
+    })
   })
 
   it('throws when supabase returns an error', async () => {
     const error = new Error('network error')
-    const insert = vi.fn().mockResolvedValue({ error })
+    const single = vi.fn().mockResolvedValue({ data: null, error })
+    const select = vi.fn().mockReturnValue({ single })
+    const insert = vi.fn().mockReturnValue({ select })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(supabase.from).mockReturnValue({ insert } as any)
 
