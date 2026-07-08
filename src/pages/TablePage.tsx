@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Button from '../components/Button'
 import Select from '../components/Select'
 import Spinner from '../components/Spinner'
@@ -47,6 +47,16 @@ function sortValue(v: Visit, key: SortKey): string | number {
   if (key === 'reviewDeadline') return v.reviewDeadline ?? ''
   if (key === 'visitDate') return v.visitDate ?? ''
   return v[key]
+}
+
+// Filters live in the URL (not useState) so they survive navigating to
+// /edit/:id and back, instead of resetting on remount.
+function parseStatusFilter(value: string | null): '전체' | VisitStatus {
+  return value && (statusOrder as string[]).includes(value) ? (value as VisitStatus) : '전체'
+}
+
+function parsePlatformFilter(value: string | null): '전체' | Platform {
+  return value && (platforms as string[]).includes(value) ? (value as Platform) : '전체'
 }
 
 function Chevron({ className }: { className?: string }) {
@@ -226,10 +236,29 @@ export default function TablePage() {
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const { visits, loading, error } = useVisits()
-  const [statusFilter, setStatusFilter] = useState<'전체' | VisitStatus>('전체')
-  const [platformFilter, setPlatformFilter] = useState<'전체' | Platform>('전체')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const statusFilter = parseStatusFilter(searchParams.get('status'))
+  const platformFilter = parsePlatformFilter(searchParams.get('platform'))
   const [sortKey, setSortKey] = useState<SortKey>('reviewDeadline')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+
+  function setStatusFilter(value: '전체' | VisitStatus) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (value === '전체') next.delete('status')
+      else next.set('status', value)
+      return next
+    })
+  }
+
+  function setPlatformFilter(value: '전체' | Platform) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (value === '전체') next.delete('platform')
+      else next.set('platform', value)
+      return next
+    })
+  }
 
   const statusCounts = useMemo(
     () => ({
@@ -300,7 +329,7 @@ export default function TablePage() {
       <div className="mb-4 flex gap-3">
         <Button
           variant="ghost"
-          onClick={() => setStatusFilter((f) => (f === '예정' ? '전체' : '예정'))}
+          onClick={() => setStatusFilter(statusFilter === '예정' ? '전체' : '예정')}
           className={`flex-1 rounded-2xl border p-4 text-left ${
             statusFilter === '예정' ? 'border-blue bg-blue-bg' : 'border-line bg-surface'
           }`}
@@ -312,7 +341,7 @@ export default function TablePage() {
         </Button>
         <Button
           variant="ghost"
-          onClick={() => setStatusFilter((f) => (f === '리뷰완료' ? '전체' : '리뷰완료'))}
+          onClick={() => setStatusFilter(statusFilter === '리뷰완료' ? '전체' : '리뷰완료')}
           className={`flex-1 rounded-2xl border p-4 text-left ${
             statusFilter === '리뷰완료' ? 'border-violet bg-violet-bg' : 'border-line bg-surface'
           }`}
