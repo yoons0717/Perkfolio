@@ -20,6 +20,9 @@ Deno.serve(async (req) => {
     headers: { Authorization: `Bearer ${tokenData.access_token}` },
   })
   const profileData = await profileRes.json()
+  if (!profileRes.ok || profileData.resultcode !== '00') {
+    return new Response(JSON.stringify({ error: '로그인에 실패했습니다. 다시 시도해주세요.' }), { status: 502 })
+  }
   const email = profileData.response?.email
   if (!email) {
     return new Response(
@@ -30,7 +33,10 @@ Deno.serve(async (req) => {
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
 
-  const { data: existing } = await admin.auth.admin.listUsers()
+  const { data: existing, error: listError } = await admin.auth.admin.listUsers()
+  if (listError) {
+    return new Response(JSON.stringify({ error: '로그인에 실패했습니다. 다시 시도해주세요.' }), { status: 500 })
+  }
   const existingUser = existing.users.find((u) => u.email === email)
   if (existingUser && !existingUser.email_confirmed_at) {
     return new Response(
