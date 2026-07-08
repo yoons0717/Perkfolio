@@ -1,16 +1,27 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DashboardPage from './DashboardPage'
+import { addDashboardGraph, deleteDashboardGraph, getDashboardGraphs } from '../lib/dashboardGraphs'
 import { toDateString } from '../lib/format'
 import { getVisits } from '../lib/visits'
-import { makeVisit as makeBaseVisit } from '../test/factories'
+import { makeDashboardGraph, makeVisit as makeBaseVisit } from '../test/factories'
 import type { Visit } from '../types/visit'
 
 vi.mock('../lib/visits', () => ({
   getVisits: vi.fn(),
 }))
+
+vi.mock('../lib/dashboardGraphs', () => ({
+  getDashboardGraphs: vi.fn(),
+  addDashboardGraph: vi.fn(),
+  deleteDashboardGraph: vi.fn(),
+}))
+
+beforeEach(() => {
+  vi.mocked(getDashboardGraphs).mockResolvedValue([])
+})
 
 // Day 15 is never part of the leading/trailing padding from adjacent
 // months, so it's always "이번 달" relative to whenever tests run.
@@ -117,5 +128,60 @@ describe('DashboardPage', () => {
 
     await screen.findByText('총 체험단')
     expect(screen.getByRole('link', { name: '체험단 추가' })).toHaveAttribute('href', '/add')
+  })
+
+  it('adds a graph via the builder form and renders a GraphCard computed with the selected scope', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', category: '카페', retailValue: 10000, extraPayment: 0 }),
+      // Outside the default 이번 달 period, but confirmed: only counted when scope='all'.
+      makeVisit({ id: '2', category: '카페', visitDate: '2020-01-01', retailValue: 50000, extraPayment: 0 }),
+    ])
+    const savedGraph = makeDashboardGraph({ id: 'g1', axis: 'category', chartType: 'bar', scope: 'period' })
+    vi.mocked(addDashboardGraph).mockResolvedValue(savedGraph)
+
+    renderDashboard()
+    await screen.findByText('총 체험단')
+
+    await userEvent.click(screen.getByRole('button', { name: '+ 그래프 추가' }))
+    await userEvent.selectOptions(screen.getByLabelText('기간'), '이번 달')
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(addDashboardGraph).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'period' })
+    const title = await screen.findByText('카테고리별 평균 절감액')
+    const card = within(title.closest('.rounded-xl')!)
+    // scope='period' excludes visit '2' (outside 이번 달), so 카페's avg is 10000, not blended with 50000.
+    expect(card.getByText('₩10,000')).toBeInTheDocument()
+  })
+
+  it('removes a graph card after deleting it', async () => {
+    const graph = makeDashboardGraph({ id: 'g1', axis: 'platform', chartType: 'bar', scope: 'all' })
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
+    vi.mocked(getDashboardGraphs).mockResolvedValue([graph])
+    vi.mocked(deleteDashboardGraph).mockResolvedValue(undefined)
+
+    renderDashboard()
+    await screen.findByText('플랫폼별 평균 절감액')
+
+    await userEvent.click(screen.getByRole('button', { name: '삭제' }))
+
+    expect(deleteDashboardGraph).toHaveBeenCalledWith('g1')
+    await waitFor(() => expect(screen.queryByText('플랫폼별 평균 절감액')).not.toBeInTheDocument())
+  })
+
+  it('forces scope to 전체 when axis=월 is chosen, end to end', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
+    const savedGraph = makeDashboardGraph({ id: 'g1', axis: 'month', chartType: 'line', scope: 'all' })
+    vi.mocked(addDashboardGraph).mockResolvedValue(savedGraph)
+
+    renderDashboard()
+    await screen.findByText('총 체험단')
+
+    await userEvent.click(screen.getByRole('button', { name: '+ 그래프 추가' }))
+    await userEvent.selectOptions(screen.getByLabelText('축'), '월')
+    await userEvent.selectOptions(screen.getByLabelText('차트 종류'), '라인')
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(addDashboardGraph).toHaveBeenCalledWith({ axis: 'month', chartType: 'line', scope: 'all' })
+    expect(await screen.findByText('월별 평균 절감액')).toBeInTheDocument()
   })
 })

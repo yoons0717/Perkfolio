@@ -1,16 +1,20 @@
 import { useMemo, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import Button from '../components/Button'
 import FloatingAddButton from '../components/FloatingAddButton'
 import { focusRingClass, inputClass } from '../components/formStyles'
+import GraphBuilderForm from '../components/GraphBuilderForm'
+import GraphCard from '../components/GraphCard'
 import InfoTooltip from '../components/InfoTooltip'
 import Panel from '../components/Panel'
 import Section from '../components/Section'
 import Select from '../components/Select'
 import Spinner from '../components/Spinner'
+import { useDashboardGraphs } from '../hooks/useDashboardGraphs'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
-import { computeCategoryBreakdown, computeTotals, confirmedVisits, isInPeriod } from '../lib/visitStats'
+import { computeCategoryBreakdown, computeGraphData, computeTotals, confirmedVisits, isInPeriod } from '../lib/visitStats'
 import type { CustomRange, Period } from '../lib/visitStats'
 
 const periodLabel: Record<Period, string> = {
@@ -33,8 +37,10 @@ function StatCard({ label, value, valueClassName = 'text-ink' }: { label: string
 
 export default function DashboardPage() {
   const { visits, loading, error } = useVisits()
+  const { graphs, loading: graphsLoading, error: graphsError, addGraph, removeGraph } = useDashboardGraphs()
   const [period, setPeriod] = useState<Period>('thisMonth')
   const [customRange, setCustomRange] = useState<CustomRange>([null, null])
+  const [showGraphBuilder, setShowGraphBuilder] = useState(false)
 
   // "N월 요약" 섹션: 선택한 기간에 종속된 스냅샷 통계.
   const filtered = useMemo(
@@ -46,6 +52,9 @@ export default function DashboardPage() {
 
   const totals = useMemo(() => computeTotals(confirmed), [confirmed])
   const categoryBreakdown = useMemo(() => computeCategoryBreakdown(confirmed), [confirmed])
+
+  // 커스텀 그래프의 scope==='all'은 기간 필터와 무관하게 항상 전체 데이터를 봐야 한다.
+  const allTimeConfirmed = useMemo(() => confirmedVisits(visits), [visits])
 
   if (loading) return <Spinner />
   if (error) return <p className="text-sm text-danger">{error}</p>
@@ -118,6 +127,41 @@ export default function DashboardPage() {
               ))}
             </div>
           </Panel>
+        </Section>
+
+        <Section>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="font-display text-base font-extrabold text-ink">커스텀 그래프</p>
+            <Button variant="secondary" size="sm" onClick={() => setShowGraphBuilder((prev) => !prev)}>
+              {showGraphBuilder ? '닫기' : '+ 그래프 추가'}
+            </Button>
+          </div>
+
+          {showGraphBuilder && (
+            <Panel className="mb-3">
+              <GraphBuilderForm
+                onSave={(g) => {
+                  addGraph(g)
+                  setShowGraphBuilder(false)
+                }}
+              />
+            </Panel>
+          )}
+
+          {graphsError && <p className="text-sm text-danger">{graphsError}</p>}
+
+          {!graphsLoading && !graphsError && graphs.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {graphs.map((graph) => (
+                <GraphCard
+                  key={graph.id}
+                  graph={graph}
+                  data={computeGraphData(graph.scope === 'period' ? confirmed : allTimeConfirmed, graph.axis)}
+                  onDelete={() => removeGraph(graph.id)}
+                />
+              ))}
+            </div>
+          )}
         </Section>
       </div>
 
