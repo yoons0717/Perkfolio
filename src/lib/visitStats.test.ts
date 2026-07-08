@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   computeCategoryBreakdown,
+  computeGraphData,
   computeMonthlyTrend,
   computePlatformRanking,
   computeStatusCounts,
@@ -276,5 +277,53 @@ describe('computeMonthlyTrend', () => {
     vi.setSystemTime(new Date(2026, 0, 20)) // 2026-01-20
     const visits = [makeVisit({ visitDate: '2025-12-15', retailValue: 20000, extraPayment: 0 })]
     expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 0 }])
+  })
+})
+
+describe('computeGraphData', () => {
+  it('groups by category (fixed category order, including zero-count categories) and averages net savings', () => {
+    const visits = [
+      makeVisit({ category: '카페', retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ category: '카페', retailValue: 20000, extraPayment: 5000 }), // avg(10000, 15000) = 12500
+      makeVisit({ category: '술집', retailValue: 30000, extraPayment: 0 }),
+    ]
+    expect(computeGraphData(visits, 'category')).toEqual([
+      { label: '카페', avgNet: 12500, count: 2 },
+      { label: '음식점', avgNet: 0, count: 0 },
+      { label: '술집', avgNet: 30000, count: 1 },
+      { label: '기타', avgNet: 0, count: 0 },
+    ])
+  })
+
+  it('groups by platform (only platforms present in the data, sorted alphabetically) and averages net savings', () => {
+    const visits = [
+      makeVisit({ platform: '포포몬', retailValue: 10000, extraPayment: 0 }), // 10000
+      makeVisit({ platform: '캐시노트', retailValue: 30000, extraPayment: 5000 }), // 25000
+      makeVisit({ platform: '포포몬', retailValue: 5000, extraPayment: 0 }), // avg(10000, 5000) = 7500
+    ]
+    expect(computeGraphData(visits, 'platform')).toEqual([
+      { label: '캐시노트', avgNet: 25000, count: 1 },
+      { label: '포포몬', avgNet: 7500, count: 2 },
+    ])
+  })
+
+  it('groups by visitDate YYYY-MM, sorted chronologically, and skips visits with no visit date', () => {
+    const visits = [
+      makeVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
+      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500
+      makeVisit({ visitDate: null, retailValue: 99999, extraPayment: 0 }),
+    ]
+    expect(computeGraphData(visits, 'month')).toEqual([
+      { label: '2026-01', avgNet: 12500, count: 2 },
+      { label: '2026-02', avgNet: 10000, count: 1 },
+    ])
+  })
+
+  it('does not divide by zero when there are no visits, for any axis', () => {
+    const emptyCategoryResult = computeGraphData([], 'category')
+    expect(emptyCategoryResult.every((r) => r.count === 0 && r.avgNet === 0)).toBe(true)
+    expect(computeGraphData([], 'platform')).toEqual([])
+    expect(computeGraphData([], 'month')).toEqual([])
   })
 })

@@ -119,3 +119,30 @@ export function computeMonthlyTrend(visits: Visit[]) {
     return { month, net: totals.get(month) ?? 0 }
   })
 }
+
+// computeCategoryBreakdown/computePlatformRanking의 평균 절감액 계산 로직을
+// 축(category/platform/month)에 무관하게 일반화한 버전. 커스텀 그래프 위젯에서 사용한다.
+export function computeGraphData(
+  visits: Visit[],
+  axis: 'category' | 'platform' | 'month',
+): { label: string; avgNet: number; count: number }[] {
+  const totals = new Map<string, number>()
+  const counts = new Map<string, number>()
+
+  for (const v of visits) {
+    if (axis === 'month' && v.visitDate === null) continue
+    const key = axis === 'category' ? v.category : axis === 'platform' ? v.platform : v.visitDate!.slice(0, 7)
+    totals.set(key, (totals.get(key) ?? 0) + netSaved(v))
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+
+  // category는 고정된 축(categories 순서)을 쓰고, platform/month는 정해진 전체 집합이 없으므로
+  // 등장한 값만 알파벳/오름차순 정렬해 보여준다.
+  const labels: string[] = axis === 'category' ? categories : [...totals.keys()].sort()
+
+  return labels.map((label) => {
+    const count = counts.get(label) ?? 0
+    const total = totals.get(label) ?? 0
+    return { label, avgNet: count === 0 ? 0 : Math.round(total / count), count }
+  })
+}
