@@ -168,6 +168,36 @@ describe('DashboardPage', () => {
     await waitFor(() => expect(screen.queryByText('플랫폼별 평균 절감액')).not.toBeInTheDocument())
   })
 
+  it('keeps the builder form open and shows an error when adding a graph fails', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
+    vi.mocked(addDashboardGraph).mockRejectedValue(new Error('insert failed'))
+
+    renderDashboard()
+    await screen.findByText('총 체험단')
+
+    await userEvent.click(screen.getByRole('button', { name: '+ 그래프 추가' }))
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(await screen.findByText('그래프를 추가하지 못했습니다.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '저장' })).toBeInTheDocument()
+    expect(screen.queryByText('카테고리별 평균 절감액')).not.toBeInTheDocument()
+  })
+
+  it('keeps the graph card and shows an error when deleting a graph fails', async () => {
+    const graph = makeDashboardGraph({ id: 'g1', axis: 'platform', chartType: 'bar', scope: 'all' })
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
+    vi.mocked(getDashboardGraphs).mockResolvedValue([graph])
+    vi.mocked(deleteDashboardGraph).mockRejectedValue(new Error('delete failed'))
+
+    renderDashboard()
+    await screen.findByText('플랫폼별 평균 절감액')
+
+    await userEvent.click(screen.getByRole('button', { name: '삭제' }))
+
+    expect(await screen.findByText('그래프를 삭제하지 못했습니다.')).toBeInTheDocument()
+    expect(screen.getByText('플랫폼별 평균 절감액')).toBeInTheDocument()
+  })
+
   it('forces scope to 전체 when axis=월 is chosen, end to end', async () => {
     vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
     const savedGraph = makeDashboardGraph({ id: 'g1', axis: 'month', chartType: 'line', scope: 'all' })

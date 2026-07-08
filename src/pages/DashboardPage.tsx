@@ -41,6 +41,7 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<Period>('thisMonth')
   const [customRange, setCustomRange] = useState<CustomRange>([null, null])
   const [showGraphBuilder, setShowGraphBuilder] = useState(false)
+  const [graphActionError, setGraphActionError] = useState<string | null>(null)
 
   // "N월 요약" 섹션: 선택한 기간에 종속된 스냅샷 통계.
   const filtered = useMemo(
@@ -140,15 +141,21 @@ export default function DashboardPage() {
           {showGraphBuilder && (
             <Panel className="mb-3">
               <GraphBuilderForm
-                onSave={(g) => {
-                  addGraph(g)
-                  setShowGraphBuilder(false)
+                onSave={async (g) => {
+                  try {
+                    await addGraph(g)
+                    setGraphActionError(null)
+                    setShowGraphBuilder(false)
+                  } catch {
+                    setGraphActionError('그래프를 추가하지 못했습니다.')
+                  }
                 }}
               />
             </Panel>
           )}
 
           {graphsError && <p className="text-sm text-danger">{graphsError}</p>}
+          {graphActionError && <p className="text-sm text-danger">{graphActionError}</p>}
 
           {!graphsLoading && !graphsError && graphs.length > 0 && (
             <div className="flex flex-col gap-3">
@@ -157,7 +164,14 @@ export default function DashboardPage() {
                   key={graph.id}
                   graph={graph}
                   data={computeGraphData(graph.scope === 'period' ? confirmed : allTimeConfirmed, graph.axis)}
-                  onDelete={() => removeGraph(graph.id)}
+                  onDelete={async () => {
+                    try {
+                      await removeGraph(graph.id)
+                      setGraphActionError(null)
+                    } catch {
+                      setGraphActionError('그래프를 삭제하지 못했습니다.')
+                    }
+                  }}
                 />
               ))}
             </div>
