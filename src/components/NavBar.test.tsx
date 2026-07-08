@@ -14,6 +14,10 @@ vi.mock('../lib/auth', () => ({
   signOut: vi.fn(),
 }))
 
+vi.mock('../lib/feedback', () => ({
+  addFeedback: vi.fn(),
+}))
+
 afterEach(() => {
   vi.clearAllMocks()
 })
@@ -99,5 +103,14 @@ describe('NavBar', () => {
     renderNavBar()
 
     expect(screen.queryByRole('link', { name: '관리자' })).not.toBeInTheDocument()
+  })
+
+  it('opens the feedback modal when 문의하기 is clicked', async () => {
+    vi.mocked(useAuth).mockReturnValue({ session: { user: { id: '1' } }, loading: false } as never)
+    renderNavBar()
+
+    await userEvent.click(screen.getByRole('button', { name: '문의하기' }))
+
+    expect(screen.getByRole('heading', { name: '문의하기' })).toBeInTheDocument()
   })
 })

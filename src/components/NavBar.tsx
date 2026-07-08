@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from './Button'
+import FeedbackModal from './FeedbackModal'
 import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/auth'
@@ -27,6 +28,7 @@ export default function NavBar() {
   const navigate = useNavigate()
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
 
   useEffect(() => {
     setIsMenuOpen(false)
@@ -76,6 +78,9 @@ export default function NavBar() {
               관리자
             </Link>
           )}
+          <Button variant="ghost" onClick={() => setIsFeedbackOpen(true)} className="font-normal text-muted hover:text-ink">
+            문의하기
+          </Button>
           <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
             로그아웃
           </Button>
@@ -115,6 +120,13 @@ export default function NavBar() {
               관리자
             </Link>
           )}
+          <Button
+            variant="ghost"
+            onClick={() => setIsFeedbackOpen(true)}
+            className="rounded-lg px-2 py-2 text-left font-normal text-muted hover:text-ink"
+          >
+            문의하기
+          </Button>
           <div className="flex items-center justify-between px-2 py-1">
             <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
               로그아웃
@@ -123,6 +135,7 @@ export default function NavBar() {
           </div>
         </div>
       )}
+      {isFeedbackOpen && <FeedbackModal onClose={() => setIsFeedbackOpen(false)} />}
     </nav>
   )
 }
