@@ -4,8 +4,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import Logo from '../components/Logo'
 import PasswordInput from '../components/PasswordInput'
+import PasswordRequirementsChecklist from '../components/PasswordRequirementsChecklist'
 import { authInputClass } from '../components/formStyles'
 import { signOut, updatePassword } from '../lib/auth'
+import { isPasswordStrong } from '../lib/passwordStrength'
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate()
@@ -20,6 +22,11 @@ export default function ResetPasswordPage() {
 
     if (password !== passwordConfirm) {
       setError('비밀번호가 일치하지 않습니다.')
+      return
+    }
+
+    if (!isPasswordStrong(password)) {
+      setError('비밀번호는 8자 이상이며 대문자, 소문자, 특수문자를 포함해야 합니다.')
       return
     }
 
@@ -65,6 +72,7 @@ export default function ResetPasswordPage() {
             required
             className={authInputClass}
           />
+          <PasswordRequirementsChecklist password={password} />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           새 비밀번호 확인
@@ -78,7 +86,11 @@ export default function ResetPasswordPage() {
           />
         </label>
         {error && <p className="text-sm text-danger">{error}</p>}
-        <Button type="submit" disabled={submitting} className="mt-1">
+        <Button
+          type="submit"
+          disabled={submitting || !isPasswordStrong(password) || password !== passwordConfirm}
+          className="mt-1"
+        >
           {submitting ? '변경 중...' : '비밀번호 변경'}
         </Button>
       </form>
