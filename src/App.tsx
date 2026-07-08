@@ -19,61 +19,63 @@ import AdminFeedbackPage from './pages/AdminFeedbackPage'
 
 function App() {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <NavBar />
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route
-            path="/add"
-            element={
-              <ProtectedRoute>
-                <AddPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/edit/:id"
-            element={
-              <ProtectedRoute>
-                <EditPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            element={
-              <ProtectedRoute>
-                <RecordsLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/table" element={<TablePage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-          </Route>
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/feedback"
-            element={
-              <ProtectedRoute>
-                <AdminFeedbackPage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+        <div className="flex-1">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route
+              path="/add"
+              element={
+                <ProtectedRoute>
+                  <AddPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              element={
+                <ProtectedRoute>
+                  <RecordsLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/table" element={<TablePage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
+            </Route>
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/feedback"
+              element={
+                <ProtectedRoute>
+                  <AdminFeedbackPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </div>
       </ErrorBoundary>
       <Footer />
-    </>
+    </div>
   )
 }
 
