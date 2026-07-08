@@ -42,4 +42,11 @@ describe('NaverCallbackPage', () => {
     renderAt('?code=abc&state=st1')
     await waitFor(() => expect(completeNaverSignIn).toHaveBeenCalledWith('a@b.com', 'tok'))
   })
+
+  it('shows the specific error message when exchangeNaverCode rejects', async () => {
+    sessionStorage.setItem('naver_oauth_state', 'st1')
+    vi.mocked(exchangeNaverCode).mockRejectedValue(new Error('먼저 이메일 인증을 완료해주세요.'))
+    renderAt('?code=abc&state=st1')
+    expect(await screen.findByText('먼저 이메일 인증을 완료해주세요.')).toBeInTheDocument()
+  })
 })

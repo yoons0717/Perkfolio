@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
+import { FunctionsHttpError } from '@supabase/supabase-js'
 import { buildNaverAuthorizeUrl, exchangeNaverCode, completeNaverSignIn } from './naverAuth'
 import { supabase } from './supabaseClient'
 
@@ -39,6 +40,17 @@ describe('exchangeNaverCode', () => {
       error: new Error('boom'),
     } as never)
     await expect(exchangeNaverCode('c', 's')).rejects.toThrow('boom')
+  })
+
+  it('surfaces the Edge Function response message on a FunctionsHttpError', async () => {
+    const context = {
+      json: () => Promise.resolve({ error: '먼저 이메일 인증을 완료해주세요.' }),
+    } as Response
+    vi.mocked(supabase.functions.invoke).mockResolvedValue({
+      data: null,
+      error: new FunctionsHttpError(context),
+    } as never)
+    await expect(exchangeNaverCode('c', 's')).rejects.toThrow('먼저 이메일 인증을 완료해주세요.')
   })
 })
 

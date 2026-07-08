@@ -1,3 +1,4 @@
+import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from './supabaseClient'
 
 const NAVER_AUTHORIZE_URL = 'https://nid.naver.com/oauth2.0/authorize'
@@ -19,7 +20,13 @@ export async function exchangeNaverCode(
   const { data, error } = await supabase.functions.invoke('naver-auth', {
     body: { code, state },
   })
-  if (error) throw error
+  if (error) {
+    if (error instanceof FunctionsHttpError) {
+      const body = await error.context.json().catch(() => null)
+      throw new Error(body?.error ?? '로그인에 실패했습니다. 다시 시도해주세요.')
+    }
+    throw error
+  }
   return data
 }
 
