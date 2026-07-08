@@ -188,20 +188,24 @@ describe('computeUpcomingDeadlines', () => {
 })
 
 describe('computeCategoryBreakdown', () => {
-  it('counts visits per category, including zero-count categories', () => {
-    const visits = [makeVisit({ category: '카페' }), makeVisit({ category: '카페' }), makeVisit({ category: '술집' })]
+  it('counts visits per category and averages net savings, including zero-count categories', () => {
+    const visits = [
+      makeVisit({ category: '카페', retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ category: '카페', retailValue: 20000, extraPayment: 5000 }), // avg(10000, 15000) = 12500
+      makeVisit({ category: '술집', retailValue: 30000, extraPayment: 0 }),
+    ]
     const result = computeCategoryBreakdown(visits)
     expect(result).toEqual([
-      { category: '카페', count: 2, pct: 100 },
-      { category: '음식점', count: 0, pct: 0 },
-      { category: '술집', count: 1, pct: 50 },
-      { category: '기타', count: 0, pct: 0 },
+      { category: '카페', count: 2, pct: 100, avgNet: 12500 },
+      { category: '음식점', count: 0, pct: 0, avgNet: 0 },
+      { category: '술집', count: 1, pct: 50, avgNet: 30000 },
+      { category: '기타', count: 0, pct: 0, avgNet: 0 },
     ])
   })
 
   it('does not divide by zero when there are no visits', () => {
     const result = computeCategoryBreakdown([])
-    expect(result.every((r) => r.count === 0 && r.pct === 0)).toBe(true)
+    expect(result.every((r) => r.count === 0 && r.pct === 0 && r.avgNet === 0)).toBe(true)
   })
 })
 

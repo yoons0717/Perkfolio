@@ -71,11 +71,17 @@ export function computeUpcomingDeadlines(visits: Visit[], withinDays = 3) {
 
 export function computeCategoryBreakdown(visits: Visit[]) {
   const counts = new Map<Category, number>(categories.map((c) => [c, 0]))
-  for (const v of visits) counts.set(v.category, (counts.get(v.category) ?? 0) + 1)
+  const totals = new Map<Category, number>(categories.map((c) => [c, 0]))
+  for (const v of visits) {
+    counts.set(v.category, (counts.get(v.category) ?? 0) + 1)
+    totals.set(v.category, (totals.get(v.category) ?? 0) + netSaved(v))
+  }
   const max = Math.max(1, ...counts.values())
   return categories.map((category) => {
     const count = counts.get(category) ?? 0
-    return { category, count, pct: (count / max) * 100 }
+    const total = totals.get(category) ?? 0
+    const avgNet = count === 0 ? 0 : Math.round(total / count)
+    return { category, count, pct: (count / max) * 100, avgNet }
   })
 }
 

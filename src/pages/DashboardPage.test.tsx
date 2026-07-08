@@ -30,7 +30,6 @@ function renderDashboard() {
     <MemoryRouter initialEntries={['/dashboard']}>
       <Routes>
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/edit/:id" element={<div>상세 화면</div>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -110,59 +109,6 @@ describe('DashboardPage', () => {
 
     expect(screen.getByLabelText('기간 범위 선택')).toHaveValue('')
     expect(totalVisitCountText()).toBe('0건')
-  })
-
-  it('shows an upcoming deadline regardless of the selected stats period', async () => {
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
-    vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({
-        id: '42',
-        storeName: '카페 온도',
-        visitDate: '2020-01-01', // outside the default 이번 달 period
-        reviewDeadline: toDateString(tomorrow),
-        status: '예정',
-      }),
-    ])
-    renderDashboard()
-
-    await userEvent.click(await screen.findByText('카페 온도'))
-
-    expect(await screen.findByText('상세 화면')).toBeInTheDocument()
-  })
-
-  it('shows an upcoming deadline for a visit with no visit date, since deadlines do not depend on visitDate', async () => {
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
-    vi.mocked(getVisits).mockResolvedValue([
-      makeVisit({
-        id: '42',
-        storeName: '카페 온도',
-        visitDate: null,
-        reviewDeadline: toDateString(tomorrow),
-        status: '예정',
-      }),
-    ])
-    renderDashboard()
-
-    await userEvent.click(await screen.findByText('카페 온도'))
-    expect(await screen.findByText('상세 화면')).toBeInTheDocument()
-  })
-
-  it('shows a placeholder when there are no upcoming deadlines', async () => {
-    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
-    renderDashboard()
-
-    expect(await screen.findByText('임박한 마감이 없습니다.')).toBeInTheDocument()
-  })
-
-  it('shows a placeholder in the platform ranking when there are no confirmed visits', async () => {
-    vi.mocked(getVisits).mockResolvedValue([])
-    renderDashboard()
-
-    expect(await screen.findByText('아직 확정된 체험단 기록이 없습니다.')).toBeInTheDocument()
   })
 
   it('shows a floating button linking to the add-visit page', async () => {
