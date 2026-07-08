@@ -227,7 +227,7 @@ export default function DashboardPage() {
                     >
                       {formatWon(avgNet)}
                     </span>
-                    <span className={`w-8 shrink-0 text-right font-mono text-xs ${count <= 2 ? 'text-danger' : 'text-muted'}`}>
+                    <span className="w-8 shrink-0 text-right font-mono text-xs text-muted">
                       {count}건
                     </span>
                   </div>
