@@ -4,6 +4,7 @@ import Button from './Button'
 import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/auth'
+import { isAdmin } from '../lib/admin'
 
 function MenuIcon() {
   return (
@@ -33,6 +34,7 @@ export default function NavBar() {
 
   if (!session || isPasswordRecovery) return null
 
+  const showAdminLink = isAdmin(session.user.email)
   const isRecordsActive = location.pathname === '/table' || location.pathname === '/calendar'
   const isDashboardActive = location.pathname === '/dashboard'
 
@@ -64,6 +66,16 @@ export default function NavBar() {
           >
             대시보드
           </Link>
+          {showAdminLink && (
+            <Link
+              to="/admin/feedback"
+              className={`transition-colors ${
+                location.pathname === '/admin/feedback' ? 'text-ink' : 'text-muted hover:text-ink'
+              }`}
+            >
+              관리자
+            </Link>
+          )}
           <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
             로그아웃
           </Button>
@@ -93,6 +105,16 @@ export default function NavBar() {
           >
             대시보드
           </Link>
+          {showAdminLink && (
+            <Link
+              to="/admin/feedback"
+              className={`rounded-lg px-2 py-2 transition-colors ${
+                location.pathname === '/admin/feedback' ? 'text-ink' : 'text-muted hover:text-ink'
+              }`}
+            >
+              관리자
+            </Link>
+          )}
           <div className="flex items-center justify-between px-2 py-1">
             <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
               로그아웃

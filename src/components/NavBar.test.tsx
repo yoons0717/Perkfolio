@@ -78,4 +78,26 @@ describe('NavBar', () => {
 
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('shows an admin link when the session email is the admin account', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      session: { user: { id: '1', email: 'yoons0717@gmail.com' } },
+      loading: false,
+      isPasswordRecovery: false,
+    } as never)
+    renderNavBar()
+
+    expect(screen.getByRole('link', { name: '관리자' })).toHaveAttribute('href', '/admin/feedback')
+  })
+
+  it('does not show an admin link for a non-admin session', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      session: { user: { id: '1', email: 'other@example.com' } },
+      loading: false,
+      isPasswordRecovery: false,
+    } as never)
+    renderNavBar()
+
+    expect(screen.queryByRole('link', { name: '관리자' })).not.toBeInTheDocument()
+  })
 })
