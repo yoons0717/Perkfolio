@@ -9,7 +9,12 @@ export default function NaverLoginButton() {
   }
 
   return (
-    <Button type="button" onClick={handleClick} className="bg-[#03C75A] text-white">
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={handleClick}
+      className="rounded-lg bg-[#03C75A] px-3 py-3 text-sm font-bold text-white hover:bg-[#03C75A]/90"
+    >
       네이버로 시작하기
     </Button>
   )
