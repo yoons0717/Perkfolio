@@ -12,6 +12,7 @@ import {
   netSaved,
 } from './visitStats'
 import { makeVisit } from '../test/factories'
+import { categories } from '../types/visit'
 import type { Platform } from '../types/visit'
 
 describe('confirmedVisits', () => {
@@ -321,8 +322,10 @@ describe('computeGraphData', () => {
   })
 
   it('does not divide by zero when there are no visits, for any axis', () => {
-    const emptyCategoryResult = computeGraphData([], 'category')
-    expect(emptyCategoryResult.every((r) => r.count === 0 && r.avgNet === 0)).toBe(true)
+    // category always returns all fixed categories (including zero-count ones), while platform/month return only present labels
+    expect(computeGraphData([], 'category')).toEqual(
+      categories.map((label) => ({ label, avgNet: 0, count: 0 }))
+    )
     expect(computeGraphData([], 'platform')).toEqual([])
     expect(computeGraphData([], 'month')).toEqual([])
   })

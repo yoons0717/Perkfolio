@@ -122,6 +122,7 @@ export function computeMonthlyTrend(visits: Visit[]) {
 
 // computeCategoryBreakdown/computePlatformRanking의 평균 절감액 계산 로직을
 // 축(category/platform/month)에 무관하게 일반화한 버전. 커스텀 그래프 위젯에서 사용한다.
+// Note: category 축은 고정된 전체 카테고리를 반환하고(zero-count 포함), platform/month는 등장한 값만 반환한다.
 export function computeGraphData(
   visits: Visit[],
   axis: 'category' | 'platform' | 'month',
