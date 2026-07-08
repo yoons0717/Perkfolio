@@ -1,5 +1,6 @@
 import type { Visit } from '../types/visit'
 import type { Feedback } from '../types/feedback'
+import type { DashboardGraph } from '../types/dashboardGraph'
 
 export function makeVisit(overrides: Partial<Visit> = {}): Visit {
   return {
@@ -26,6 +27,17 @@ export function makeFeedback(overrides: Partial<Feedback> = {}): Feedback {
     id: '1',
     type: '버그',
     content: '버튼이 안 눌려요',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    ...overrides,
+  }
+}
+
+export function makeDashboardGraph(overrides: Partial<DashboardGraph> = {}): DashboardGraph {
+  return {
+    id: '1',
+    axis: 'category',
+    chartType: 'bar',
+    scope: 'all',
     createdAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
   }
