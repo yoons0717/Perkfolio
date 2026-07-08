@@ -7,9 +7,9 @@ type VisitRow = {
   platform: Visit['platform']
   store_name: string
   category: Visit['category']
-  sponsored_items: string
+  sponsored_items: string | null
   campaign_url: string | null
-  store_info_url: string
+  store_info_url: string | null
   retail_value: number
   extra_payment: number
   status: Visit['status']

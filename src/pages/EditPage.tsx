@@ -187,7 +187,7 @@ export default function EditPage() {
 
           <ViewLinkField label="가게 정보 URL" href={visit.storeInfoUrl} />
 
-          <ViewField label="체험 내역" value={visit.sponsoredItems} />
+          <ViewField label="체험 내역" value={visit.sponsoredItems ?? '-'} />
 
           <div className="grid grid-cols-2 gap-3">
             <ViewField label="체험가" value={formatWon(visit.retailValue)} />

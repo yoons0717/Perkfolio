@@ -21,6 +21,11 @@ function parseDateString(value: string): Date {
   return new Date(year, month - 1, day)
 }
 
+function trimToNull(value: string): string | null {
+  const trimmed = value.trim()
+  return trimmed === '' ? null : trimmed
+}
+
 function FormField({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="flex flex-col gap-1 text-sm">
@@ -115,13 +120,13 @@ export default function VisitForm({
         platform: platform as Platform,
         storeName,
         category: category as Category,
-        sponsoredItems,
-        campaignUrl: campaignUrl.trim() === '' ? null : campaignUrl.trim(),
-        storeInfoUrl,
+        sponsoredItems: trimToNull(sponsoredItems),
+        campaignUrl: trimToNull(campaignUrl),
+        storeInfoUrl: trimToNull(storeInfoUrl),
         retailValue: Number(retailValue),
         extraPayment: Number(extraPayment),
         status: status as VisitStatus,
-        postUrl: postUrl.trim() === '' ? null : postUrl.trim(),
+        postUrl: trimToNull(postUrl),
         reviewDeadline: toDateString(reviewDeadline as Date),
       })
     } catch {
@@ -206,23 +211,21 @@ export default function VisitForm({
           </FormField>
         </div>
 
-        <FormField label="가게 정보 URL">
+        <FormField label="가게 정보 URL (선택)">
           <input
             type="url"
             value={storeInfoUrl}
             onChange={(e) => updateField('storeInfoUrl', e.target.value)}
-            required
             className={compactInputClass}
           />
         </FormField>
 
-        <FormField label="체험 내역">
+        <FormField label="체험 내역 (선택)">
           <input
             type="text"
             placeholder="예: 파스타 2, 음료 2"
             value={sponsoredItems}
             onChange={(e) => updateField('sponsoredItems', e.target.value)}
-            required
             className={compactInputClass}
           />
         </FormField>

@@ -31,9 +31,9 @@ export type Visit = {
   platform: Platform
   storeName: string
   category: Category
-  sponsoredItems: string
+  sponsoredItems: string | null
   campaignUrl: string | null
-  storeInfoUrl: string
+  storeInfoUrl: string | null
   retailValue: number
   extraPayment: number
   status: VisitStatus

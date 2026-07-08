@@ -15,8 +15,12 @@ async function fillRequiredFields(opts: { skip?: string[] } = {}) {
   if (!skip.includes('카테고리')) await userEvent.selectOptions(screen.getByLabelText('카테고리'), '카페')
   if (!skip.includes('상태')) await userEvent.selectOptions(screen.getByLabelText('상태'), '예정')
   await userEvent.type(screen.getByLabelText('업체명'), '카페 온도')
-  await userEvent.type(screen.getByLabelText('가게 정보 URL'), 'https://store.example.com')
-  await userEvent.type(screen.getByLabelText('체험 내역'), '파스타 2, 음료 2')
+  if (!skip.includes('가게 정보 URL')) {
+    await userEvent.type(screen.getByLabelText('가게 정보 URL (선택)'), 'https://store.example.com')
+  }
+  if (!skip.includes('체험 내역')) {
+    await userEvent.type(screen.getByLabelText('체험 내역 (선택)'), '파스타 2, 음료 2')
+  }
   await userEvent.clear(screen.getByLabelText('체험가'))
   await userEvent.type(screen.getByLabelText('체험가'), '48000')
   if (!skip.includes('체험(예정)일')) {
@@ -30,7 +34,7 @@ async function fillRequiredFields(opts: { skip?: string[] } = {}) {
   }
 }
 
-const requiredFieldLabels = ['업체명', '가게 정보 URL', '체험 내역', '체험가']
+const requiredFieldLabels = ['업체명', '체험가']
 
 describe('VisitForm validation', () => {
   it('does not submit when required fields are empty', async () => {
@@ -182,6 +186,48 @@ describe('VisitForm submission payload', () => {
     expect(submitted.campaignUrl).toBeNull()
   })
 
+  it('submits an empty 가게 정보 URL as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields({ skip: ['가게 정보 URL'] })
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.storeInfoUrl).toBeNull()
+  })
+
+  it('submits a whitespace-only 가게 정보 URL as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields({ skip: ['가게 정보 URL'] })
+    await userEvent.type(screen.getByLabelText('가게 정보 URL (선택)'), '   ')
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.storeInfoUrl).toBeNull()
+  })
+
+  it('submits an empty 체험 내역 as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields({ skip: ['체험 내역'] })
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.sponsoredItems).toBeNull()
+  })
+
+  it('submits a whitespace-only 체험 내역 as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields({ skip: ['체험 내역'] })
+    await userEvent.type(screen.getByLabelText('체험 내역 (선택)'), '   ')
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.sponsoredItems).toBeNull()
+  })
+
   it('shows an error message when onSubmit rejects', async () => {
     const onSubmit = vi.fn().mockRejectedValue(new Error('network error'))
     renderForm(onSubmit)
@@ -239,8 +285,8 @@ describe('VisitForm with initialValues', () => {
     )
 
     expect(screen.getByLabelText('업체명')).toHaveValue('기존 업체')
-    expect(screen.getByLabelText('가게 정보 URL')).toHaveValue('https://store.example.com/existing')
-    expect(screen.getByLabelText('체험 내역')).toHaveValue('세트메뉴')
+    expect(screen.getByLabelText('가게 정보 URL (선택)')).toHaveValue('https://store.example.com/existing')
+    expect(screen.getByLabelText('체험 내역 (선택)')).toHaveValue('세트메뉴')
     expect(screen.getByLabelText('체험가')).toHaveValue(30000)
     expect(screen.getByLabelText('추가결제액')).toHaveValue(2000)
     expect(screen.getByLabelText('체험단 URL (선택)')).toHaveValue('https://campaign.example.com/existing')
