@@ -10,9 +10,20 @@ vi.mock('../lib/feedback', () => ({
 
 afterEach(() => {
   vi.clearAllMocks()
+  document.body.style.overflow = ''
 })
 
 describe('FeedbackModal', () => {
+  it('locks and restores body scroll while mounted', () => {
+    const { unmount } = render(<FeedbackModal onClose={vi.fn()} />)
+
+    expect(document.body.style.overflow).toBe('hidden')
+
+    unmount()
+
+    expect(document.body.style.overflow).toBe('')
+  })
+
   it('submits the selected type and entered content', async () => {
     vi.mocked(addFeedback).mockResolvedValue(undefined)
     render(<FeedbackModal onClose={vi.fn()} />)
