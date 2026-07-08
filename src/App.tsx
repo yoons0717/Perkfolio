@@ -16,6 +16,7 @@ import TablePage from './pages/TablePage'
 import CalendarPage from './pages/CalendarPage'
 import DashboardPage from './pages/DashboardPage'
 import AdminFeedbackPage from './pages/AdminFeedbackPage'
+import NaverCallbackPage from './pages/NaverCallbackPage'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/auth/naver/callback" element={<NaverCallbackPage />} />
             <Route
               path="/add"
               element={
