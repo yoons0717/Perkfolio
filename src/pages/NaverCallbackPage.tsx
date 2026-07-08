@@ -1,12 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { exchangeNaverCode, completeNaverSignIn } from '../lib/naverAuth'
 
 export default function NaverCallbackPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const ranRef = useRef(false)
 
   useEffect(() => {
+    if (ranRef.current) return
+    ranRef.current = true
+
     async function run() {
       const params = new URLSearchParams(window.location.search)
       const code = params.get('code')
