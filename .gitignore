@@ -15,6 +15,7 @@ dist-ssr
 supabase/.temp
 .claude/scheduled_tasks.lock
 .husky/_
+.superpowers/
 
 # Editor directories and files
 .vscode/*
