@@ -4,8 +4,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import Logo from '../components/Logo'
 import PasswordInput from '../components/PasswordInput'
+import PasswordRequirementsChecklist from '../components/PasswordRequirementsChecklist'
 import { authInputClass } from '../components/formStyles'
 import { signUpWithPassword } from '../lib/auth'
+import { isPasswordStrong } from '../lib/passwordStrength'
 
 export default function SignupPage() {
   const navigate = useNavigate()
@@ -22,6 +24,11 @@ export default function SignupPage() {
 
     if (password !== passwordConfirm) {
       setError('비밀번호가 일치하지 않습니다.')
+      return
+    }
+
+    if (!isPasswordStrong(password)) {
+      setError('비밀번호는 8자 이상이며 대문자, 소문자, 특수문자를 포함해야 합니다.')
       return
     }
 
@@ -82,6 +89,7 @@ export default function SignupPage() {
               required
               className={authInputClass}
             />
+            <PasswordRequirementsChecklist password={password} />
           </label>
           <label className="flex flex-col gap-1 text-sm">
             비밀번호 확인

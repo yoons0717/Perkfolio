@@ -37,9 +37,9 @@ describe('ResetPasswordPage', () => {
     vi.mocked(signOut).mockResolvedValue({ error: null } as never)
     renderResetPasswordPage()
 
-    await fillAndSubmit('newpassword123', 'newpassword123')
+    await fillAndSubmit('NewPassword123!', 'NewPassword123!')
 
-    expect(updatePassword).toHaveBeenCalledWith('newpassword123')
+    expect(updatePassword).toHaveBeenCalledWith('NewPassword123!')
     expect(signOut).toHaveBeenCalled()
     expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
@@ -47,9 +47,20 @@ describe('ResetPasswordPage', () => {
   it('shows an error without calling updatePassword when the passwords do not match', async () => {
     renderResetPasswordPage()
 
-    await fillAndSubmit('newpassword123', 'somethingelse')
+    await fillAndSubmit('NewPassword123!', 'somethingelse')
 
     expect(await screen.findByText('비밀번호가 일치하지 않습니다.')).toBeInTheDocument()
+    expect(updatePassword).not.toHaveBeenCalled()
+  })
+
+  it('shows an error without calling updatePassword when the password is too weak', async () => {
+    renderResetPasswordPage()
+
+    await fillAndSubmit('password1', 'password1')
+
+    expect(
+      await screen.findByText('비밀번호는 8자 이상이며 대문자, 소문자, 특수문자를 포함해야 합니다.'),
+    ).toBeInTheDocument()
     expect(updatePassword).not.toHaveBeenCalled()
   })
 
@@ -60,7 +71,7 @@ describe('ResetPasswordPage', () => {
     } as never)
     renderResetPasswordPage()
 
-    await fillAndSubmit('newpassword123', 'newpassword123')
+    await fillAndSubmit('NewPassword123!', 'NewPassword123!')
 
     expect(await screen.findByText('비밀번호 변경에 실패했습니다.')).toBeInTheDocument()
     expect(screen.queryByText('로그인 화면')).not.toBeInTheDocument()
@@ -70,7 +81,7 @@ describe('ResetPasswordPage', () => {
     vi.mocked(updatePassword).mockRejectedValue(new Error('network error'))
     renderResetPasswordPage()
 
-    await fillAndSubmit('newpassword123', 'newpassword123')
+    await fillAndSubmit('NewPassword123!', 'NewPassword123!')
 
     expect(await screen.findByRole('button', { name: '비밀번호 변경' })).not.toBeDisabled()
   })
@@ -80,7 +91,7 @@ describe('ResetPasswordPage', () => {
     vi.mocked(signOut).mockRejectedValue(new Error('network error'))
     renderResetPasswordPage()
 
-    await fillAndSubmit('newpassword123', 'newpassword123')
+    await fillAndSubmit('NewPassword123!', 'NewPassword123!')
 
     expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
