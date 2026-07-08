@@ -83,9 +83,9 @@ describe('NavBar', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('shows an admin link when the session email is the admin account', () => {
+  it('shows an admin link when the session has the admin role', () => {
     vi.mocked(useAuth).mockReturnValue({
-      session: { user: { id: '1', email: 'yoons0717@gmail.com' } },
+      session: { user: { id: '1', app_metadata: { role: 'admin' } } },
       loading: false,
       isPasswordRecovery: false,
     } as never)
@@ -96,7 +96,7 @@ describe('NavBar', () => {
 
   it('does not show an admin link for a non-admin session', () => {
     vi.mocked(useAuth).mockReturnValue({
-      session: { user: { id: '1', email: 'other@example.com' } },
+      session: { user: { id: '1', app_metadata: {} } },
       loading: false,
       isPasswordRecovery: false,
     } as never)

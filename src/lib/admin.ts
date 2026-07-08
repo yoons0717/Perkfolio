@@ -1,5 +1,5 @@
-export const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL
+import type { UserAppMetadata } from '@supabase/supabase-js'
 
-export function isAdmin(email: string | null | undefined): boolean {
-  return email === ADMIN_EMAIL
+export function isAdmin(appMetadata: UserAppMetadata | null | undefined): boolean {
+  return appMetadata?.role === 'admin'
 }

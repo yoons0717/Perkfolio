@@ -1,20 +1,24 @@
 import { describe, expect, it } from 'vitest'
-import { ADMIN_EMAIL, isAdmin } from './admin'
+import { isAdmin } from './admin'
 
 describe('isAdmin', () => {
-  it('returns true for the admin email', () => {
-    expect(isAdmin(ADMIN_EMAIL)).toBe(true)
+  it('returns true when app_metadata has the admin role', () => {
+    expect(isAdmin({ role: 'admin' })).toBe(true)
   })
 
-  it('returns false for a non-admin email', () => {
-    expect(isAdmin('other@example.com')).toBe(false)
+  it('returns false for a non-admin role', () => {
+    expect(isAdmin({ role: 'user' })).toBe(false)
   })
 
-  it('returns false when email is undefined', () => {
+  it('returns false when app_metadata has no role', () => {
+    expect(isAdmin({})).toBe(false)
+  })
+
+  it('returns false when app_metadata is undefined', () => {
     expect(isAdmin(undefined)).toBe(false)
   })
 
-  it('returns false when email is null', () => {
+  it('returns false when app_metadata is null', () => {
     expect(isAdmin(null)).toBe(false)
   })
 })

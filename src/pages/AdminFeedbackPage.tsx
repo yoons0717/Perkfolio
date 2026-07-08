@@ -18,7 +18,7 @@ export default function AdminFeedbackPage() {
   const [feedbackList, setFeedbackList] = useState<Feedback[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const admin = isAdmin(session?.user.email)
+  const admin = isAdmin(session?.user.app_metadata)
 
   useEffect(() => {
     if (!admin) {

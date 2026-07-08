@@ -36,7 +36,7 @@ export default function NavBar() {
 
   if (!session || isPasswordRecovery) return null
 
-  const showAdminLink = isAdmin(session.user.email)
+  const showAdminLink = isAdmin(session.user.app_metadata)
   const isRecordsActive = location.pathname === '/table' || location.pathname === '/calendar'
   const isDashboardActive = location.pathname === '/dashboard'
 

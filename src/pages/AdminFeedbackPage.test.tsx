@@ -32,7 +32,7 @@ function renderPage() {
 describe('AdminFeedbackPage', () => {
   it('redirects to /table when the session is not the admin account', async () => {
     vi.mocked(useAuth).mockReturnValue({
-      session: { user: { email: 'other@example.com' } },
+      session: { user: { app_metadata: {} } },
       loading: false,
       isPasswordRecovery: false,
     } as never)
@@ -44,7 +44,7 @@ describe('AdminFeedbackPage', () => {
 
   it('renders the feedback list for the admin account', async () => {
     vi.mocked(useAuth).mockReturnValue({
-      session: { user: { email: 'yoons0717@gmail.com' } },
+      session: { user: { app_metadata: { role: 'admin' } } },
       loading: false,
       isPasswordRecovery: false,
     } as never)
@@ -62,7 +62,7 @@ describe('AdminFeedbackPage', () => {
 
   it('shows a placeholder when there is no feedback yet', async () => {
     vi.mocked(useAuth).mockReturnValue({
-      session: { user: { email: 'yoons0717@gmail.com' } },
+      session: { user: { app_metadata: { role: 'admin' } } },
       loading: false,
       isPasswordRecovery: false,
     } as never)
@@ -74,7 +74,7 @@ describe('AdminFeedbackPage', () => {
 
   it('shows an error message when the list fails to load', async () => {
     vi.mocked(useAuth).mockReturnValue({
-      session: { user: { email: 'yoons0717@gmail.com' } },
+      session: { user: { app_metadata: { role: 'admin' } } },
       loading: false,
       isPasswordRecovery: false,
     } as never)
