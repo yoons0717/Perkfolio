@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import Logo from '../components/Logo'
 import PasswordInput from '../components/PasswordInput'
 import PasswordRequirementsChecklist from '../components/PasswordRequirementsChecklist'
+import NaverLoginButton from '../components/NaverLoginButton'
 import { authInputClass } from '../components/formStyles'
 import { signUpWithPassword } from '../lib/auth'
 import { isPasswordStrong } from '../lib/passwordStrength'
@@ -110,6 +111,8 @@ export default function SignupPage() {
           >
             {submitting ? '가입 중...' : '회원가입'}
           </Button>
+          <div className="my-3 text-center text-xs text-muted">또는</div>
+          <NaverLoginButton />
         </form>
       )}
       <p className="mt-4 text-sm text-muted">
