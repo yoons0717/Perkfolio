@@ -86,7 +86,11 @@ export default function ResetPasswordPage() {
           />
         </label>
         {error && <p className="text-sm text-danger">{error}</p>}
-        <Button type="submit" disabled={submitting} className="mt-1">
+        <Button
+          type="submit"
+          disabled={submitting || !isPasswordStrong(password) || password !== passwordConfirm}
+          className="mt-1"
+        >
           {submitting ? '변경 중...' : '비밀번호 변경'}
         </Button>
       </form>

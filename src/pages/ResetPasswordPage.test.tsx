@@ -44,23 +44,23 @@ describe('ResetPasswordPage', () => {
     expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
 
-  it('shows an error without calling updatePassword when the passwords do not match', async () => {
+  it('disables the submit button when the passwords do not match', async () => {
     renderResetPasswordPage()
 
-    await fillAndSubmit('NewPassword123!', 'somethingelse')
+    await userEvent.type(screen.getByPlaceholderText('새 비밀번호'), 'NewPassword123!')
+    await userEvent.type(screen.getByPlaceholderText('새 비밀번호 확인'), 'somethingelse')
 
-    expect(await screen.findByText('비밀번호가 일치하지 않습니다.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '비밀번호 변경' })).toBeDisabled()
     expect(updatePassword).not.toHaveBeenCalled()
   })
 
-  it('shows an error without calling updatePassword when the password is too weak', async () => {
+  it('disables the submit button when the password is too weak', async () => {
     renderResetPasswordPage()
 
-    await fillAndSubmit('password1', 'password1')
+    await userEvent.type(screen.getByPlaceholderText('새 비밀번호'), 'password1')
+    await userEvent.type(screen.getByPlaceholderText('새 비밀번호 확인'), 'password1')
 
-    expect(
-      await screen.findByText('비밀번호는 8자 이상이며 대문자, 소문자, 특수문자를 포함해야 합니다.'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '비밀번호 변경' })).toBeDisabled()
     expect(updatePassword).not.toHaveBeenCalled()
   })
 

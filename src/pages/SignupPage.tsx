@@ -103,7 +103,11 @@ export default function SignupPage() {
             />
           </label>
           {error && <p className="text-sm text-danger">{error}</p>}
-          <Button type="submit" disabled={submitting} className="mt-1">
+          <Button
+            type="submit"
+            disabled={submitting || !isPasswordStrong(password) || password !== passwordConfirm}
+            className="mt-1"
+          >
             {submitting ? '가입 중...' : '회원가입'}
           </Button>
         </form>

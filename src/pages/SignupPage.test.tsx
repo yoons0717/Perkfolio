@@ -68,23 +68,25 @@ describe('SignupPage', () => {
     expect(await screen.findByText('표 화면')).toBeInTheDocument()
   })
 
-  it('shows an error without calling signUpWithPassword when the passwords do not match', async () => {
+  it('disables the submit button when the passwords do not match', async () => {
     renderSignupPage()
 
-    await fillAndSubmit('user@example.com', 'Password123!', 'password456')
+    await userEvent.type(screen.getByPlaceholderText('이메일'), 'user@example.com')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호'), 'Password123!')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호 확인'), 'password456')
 
-    expect(await screen.findByText('비밀번호가 일치하지 않습니다.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '회원가입' })).toBeDisabled()
     expect(signUpWithPassword).not.toHaveBeenCalled()
   })
 
-  it('shows an error without calling signUpWithPassword when the password is too weak', async () => {
+  it('disables the submit button when the password is too weak', async () => {
     renderSignupPage()
 
-    await fillAndSubmit('user@example.com', 'password1', 'password1')
+    await userEvent.type(screen.getByPlaceholderText('이메일'), 'user@example.com')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호'), 'password1')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호 확인'), 'password1')
 
-    expect(
-      await screen.findByText('비밀번호는 8자 이상이며 대문자, 소문자, 특수문자를 포함해야 합니다.'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '회원가입' })).toBeDisabled()
     expect(signUpWithPassword).not.toHaveBeenCalled()
   })
 
