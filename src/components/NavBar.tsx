@@ -1,13 +1,35 @@
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from './Button'
 import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/auth'
 
+function MenuIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  )
+}
+
+function CloseIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  )
+}
+
 export default function NavBar() {
   const { session, isPasswordRecovery } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  useEffect(() => {
+    setIsMenuOpen(false)
+  }, [location.pathname])
 
   if (!session || isPasswordRecovery) return null
 
@@ -24,28 +46,61 @@ export default function NavBar() {
   }
 
   return (
-    <nav className="flex items-center justify-between border-b border-line bg-surface px-6 py-3">
-      <Link to="/table" className="font-display text-lg font-extrabold text-ink">
-        Perk<span className="text-blue">Track</span>
-      </Link>
-      <div className="flex items-center gap-5 font-display text-sm font-semibold">
-        <Link
-          to="/table"
-          className={`transition-colors ${isRecordsActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
-        >
-          체험단 내역
+    <nav className="relative border-b border-line bg-surface px-4 py-3 sm:px-6">
+      <div className="flex items-center justify-between">
+        <Link to="/table" className="font-display text-lg font-extrabold text-ink">
+          Perk<span className="text-blue">Track</span>
         </Link>
-        <Link
-          to="/dashboard"
-          className={`transition-colors ${isDashboardActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+        <div className="hidden items-center gap-5 font-display text-sm font-semibold sm:flex">
+          <Link
+            to="/table"
+            className={`transition-colors ${isRecordsActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+          >
+            체험단 내역
+          </Link>
+          <Link
+            to="/dashboard"
+            className={`transition-colors ${isDashboardActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+          >
+            대시보드
+          </Link>
+          <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
+            로그아웃
+          </Button>
+          <ThemeToggle />
+        </div>
+        <Button
+          variant="ghost"
+          onClick={() => setIsMenuOpen((open) => !open)}
+          aria-label={isMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+          className="flex h-9 w-9 items-center justify-center rounded-lg p-0 text-muted hover:bg-overlay hover:text-ink sm:hidden"
         >
-          대시보드
-        </Link>
-        <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
-          로그아웃
+          {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
         </Button>
-        <ThemeToggle />
       </div>
+
+      {isMenuOpen && (
+        <div className="absolute inset-x-0 top-full z-10 flex flex-col gap-1 border-b border-line bg-surface px-4 py-3 font-display text-sm font-semibold sm:hidden">
+          <Link
+            to="/table"
+            className={`rounded-lg px-2 py-2 transition-colors ${isRecordsActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+          >
+            체험단 내역
+          </Link>
+          <Link
+            to="/dashboard"
+            className={`rounded-lg px-2 py-2 transition-colors ${isDashboardActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+          >
+            대시보드
+          </Link>
+          <div className="flex items-center justify-between px-2 py-1">
+            <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
+              로그아웃
+            </Button>
+            <ThemeToggle />
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
