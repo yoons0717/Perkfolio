@@ -192,14 +192,15 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
       className="flex cursor-pointer flex-col gap-4 rounded-2xl border border-line bg-surface p-5 shadow-sm shadow-black/10 transition-colors hover:border-blue/50"
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-line text-base">
             {categoryIcon[visit.category]}
           </span>
-          <div>
+          <div className="min-w-0">
             <p className="font-display text-base font-extrabold text-ink">{visit.storeName}</p>
-            <p className="mt-0.5 text-xs text-muted">
+            <p className="mt-0.5 truncate text-xs text-muted">
               {visit.platform} · {visit.visitDate ?? '-'}
+              {visit.reservationNote && ` · ${visit.reservationNote}`}
             </p>
           </div>
         </div>
@@ -441,8 +442,9 @@ export default function TablePage() {
                       <td className="px-4 py-3 font-mono text-ink">{v.visitDate ?? '-'}</td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-ink">{v.storeName}</div>
-                        <div className="text-xs text-muted">
+                        <div className="max-w-[220px] truncate text-xs text-muted">
                           {v.platform} · {v.category}
+                          {v.reservationNote && ` · ${v.reservationNote}`}
                         </div>
                       </td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>

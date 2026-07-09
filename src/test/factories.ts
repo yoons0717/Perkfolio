@@ -10,6 +10,7 @@ export function makeVisit(overrides: Partial<Visit> = {}): Visit {
     storeName: '카페 온도',
     category: '카페',
     sponsoredItems: '음료 2',
+    reservationNote: null,
     campaignUrl: 'https://campaign.example.com',
     storeInfoUrl: 'https://store.example.com',
     retailValue: 10000,
