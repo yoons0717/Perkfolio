@@ -133,6 +133,16 @@ describe('TablePage columns', () => {
     const dateCell = getRowCells('카페 온도')[1]
     expect(dateCell).toHaveTextContent('-')
   })
+
+  it('appends the reservation note to the platform/category line when present', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', platform: '캐시노트', category: '카페', reservationNote: '예약 필수, 저녁 7시' }),
+    ])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    expect(screen.getByText('캐시노트 · 카페 · 예약 필수, 저녁 7시')).toBeInTheDocument()
+  })
 })
 
 describe('TablePage sorting', () => {
@@ -343,6 +353,17 @@ describe('TablePage mobile card view', () => {
     await userEvent.click(await screen.findByText('카페 온도'))
 
     expect(await screen.findByText('상세 화면')).toBeInTheDocument()
+  })
+
+  it('appends the reservation note to the platform/date line when present', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', platform: '포포몬', visitDate: '2026-01-10', reservationNote: '예약 필수, 저녁 7시' }),
+    ])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    expect(screen.getByText('포포몬 · 2026-01-10 · 예약 필수, 저녁 7시')).toBeInTheDocument()
   })
 })
 

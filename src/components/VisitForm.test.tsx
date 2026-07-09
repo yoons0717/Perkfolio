@@ -228,6 +228,38 @@ describe('VisitForm submission payload', () => {
     expect(submitted.sponsoredItems).toBeNull()
   })
 
+  it('submits a filled 예약 정보 as-is', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields()
+    await userEvent.type(screen.getByLabelText('예약 정보 (선택)'), '예약 필수, 저녁 7시')
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.reservationNote).toBe('예약 필수, 저녁 7시')
+  })
+
+  it('submits an empty 예약 정보 as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields()
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.reservationNote).toBeNull()
+  })
+
+  it('submits a whitespace-only 예약 정보 as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields()
+    await userEvent.type(screen.getByLabelText('예약 정보 (선택)'), '   ')
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.reservationNote).toBeNull()
+  })
+
   it('shows an error message when onSubmit rejects', async () => {
     const onSubmit = vi.fn().mockRejectedValue(new Error('network error'))
     renderForm(onSubmit)
@@ -267,6 +299,7 @@ describe('VisitForm with initialValues', () => {
       storeName: '기존 업체',
       category: '음식점',
       sponsoredItems: '세트메뉴',
+      reservationNote: '예약 필수, 저녁 7시',
       campaignUrl: 'https://campaign.example.com/existing',
       storeInfoUrl: 'https://store.example.com/existing',
       retailValue: 30000,
@@ -287,6 +320,7 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('업체명')).toHaveValue('기존 업체')
     expect(screen.getByLabelText('가게 정보 URL (선택)')).toHaveValue('https://store.example.com/existing')
     expect(screen.getByLabelText('체험 내역 (선택)')).toHaveValue('세트메뉴')
+    expect(screen.getByLabelText('예약 정보 (선택)')).toHaveValue('예약 필수, 저녁 7시')
     expect(screen.getByLabelText('체험가')).toHaveValue(30000)
     expect(screen.getByLabelText('추가결제액')).toHaveValue(2000)
     expect(screen.getByLabelText('체험단 URL (선택)')).toHaveValue('https://campaign.example.com/existing')

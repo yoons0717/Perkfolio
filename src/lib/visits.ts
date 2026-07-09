@@ -8,6 +8,7 @@ type VisitRow = {
   store_name: string
   category: Visit['category']
   sponsored_items: string | null
+  reservation_note: string | null
   campaign_url: string | null
   store_info_url: string | null
   retail_value: number
@@ -26,6 +27,7 @@ function toVisit(row: VisitRow): Visit {
     storeName: row.store_name,
     category: row.category,
     sponsoredItems: row.sponsored_items,
+    reservationNote: row.reservation_note,
     campaignUrl: row.campaign_url,
     storeInfoUrl: row.store_info_url,
     retailValue: row.retail_value,
@@ -62,6 +64,7 @@ export async function addVisit(visit: NewVisit): Promise<Visit> {
       store_name: visit.storeName,
       category: visit.category,
       sponsored_items: visit.sponsoredItems,
+      reservation_note: visit.reservationNote,
       campaign_url: visit.campaignUrl,
       store_info_url: visit.storeInfoUrl,
       retail_value: visit.retailValue,
@@ -86,6 +89,7 @@ export async function updateVisit(id: string, visit: NewVisit): Promise<Visit> {
       store_name: visit.storeName,
       category: visit.category,
       sponsored_items: visit.sponsoredItems,
+      reservation_note: visit.reservationNote,
       campaign_url: visit.campaignUrl,
       store_info_url: visit.storeInfoUrl,
       retail_value: visit.retailValue,

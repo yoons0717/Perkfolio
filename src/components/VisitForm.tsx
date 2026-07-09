@@ -41,6 +41,7 @@ type FormFields = {
   storeName: string
   category: Category | ''
   sponsoredItems: string
+  reservationNote: string
   campaignUrl: string
   storeInfoUrl: string
   retailValue: string
@@ -57,6 +58,7 @@ function initialFormFields(initialValues: NewVisit | undefined): FormFields {
     storeName: initialValues?.storeName ?? '',
     category: initialValues?.category ?? '',
     sponsoredItems: initialValues?.sponsoredItems ?? '',
+    reservationNote: initialValues?.reservationNote ?? '',
     campaignUrl: initialValues?.campaignUrl ?? '',
     storeInfoUrl: initialValues?.storeInfoUrl ?? '',
     retailValue: String(initialValues?.retailValue ?? ''),
@@ -96,6 +98,7 @@ export default function VisitForm({
     storeName,
     category,
     sponsoredItems,
+    reservationNote,
     campaignUrl,
     storeInfoUrl,
     retailValue,
@@ -121,6 +124,7 @@ export default function VisitForm({
         storeName,
         category: category as Category,
         sponsoredItems: trimToNull(sponsoredItems),
+        reservationNote: trimToNull(reservationNote),
         campaignUrl: trimToNull(campaignUrl),
         storeInfoUrl: trimToNull(storeInfoUrl),
         retailValue: Number(retailValue),
@@ -226,6 +230,16 @@ export default function VisitForm({
             placeholder="예: 파스타 2, 음료 2"
             value={sponsoredItems}
             onChange={(e) => updateField('sponsoredItems', e.target.value)}
+            className={compactInputClass}
+          />
+        </FormField>
+
+        <FormField label="예약 정보 (선택)">
+          <input
+            type="text"
+            placeholder="예: 예약 필수, 저녁 7시"
+            value={reservationNote}
+            onChange={(e) => updateField('reservationNote', e.target.value)}
             className={compactInputClass}
           />
         </FormField>

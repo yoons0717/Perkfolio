@@ -129,6 +129,20 @@ describe('EditPage view mode', () => {
     expect(screen.getByText('체험(예정)일').nextElementSibling).toHaveTextContent('-')
   })
 
+  it('shows the reservation note when present', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ reservationNote: '예약 필수, 저녁 7시' }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('예약 필수, 저녁 7시')).toBeInTheDocument()
+  })
+
+  it('shows "-" for the reservation note when it is null', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ reservationNote: null }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('예약 정보').nextElementSibling).toHaveTextContent('-')
+  })
+
   it('shows "없음" when there is no review deadline', async () => {
     // fix postUrl to a real link so its own "바로가기" doesn't add a second
     // link, keeping the "없음" assertion specific to the deadline field
