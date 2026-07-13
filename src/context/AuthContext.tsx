@@ -26,12 +26,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [recoveryEventSeen, setRecoveryEventSeen] = useState(false)
 
   useEffect(() => {
+    // onAuthStateChange always fires its own initial event too, and is the
+    // source of truth when it does — this flag stops a slower getSession()
+    // call from overwriting a session it already delivered.
+    let authEventSeen = false
+
     getSession().then((s) => {
+      if (authEventSeen) return
       setSession(s)
       setLoading(false)
     })
 
     return onAuthStateChange((event, s) => {
+      authEventSeen = true
       if (event === 'PASSWORD_RECOVERY') setRecoveryEventSeen(true)
       else if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') setRecoveryEventSeen(false)
       setSession(s)

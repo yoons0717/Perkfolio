@@ -3,8 +3,14 @@ import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from './supabaseClient'
 
 export async function getSession(): Promise<Session | null> {
-  const { data } = await supabase.auth.getSession()
-  return data.session
+  try {
+    const { data, error } = await supabase.auth.getSession()
+    if (error) console.error('getSession error:', error)
+    return data.session
+  } catch (err) {
+    console.error('getSession failed:', err)
+    return null
+  }
 }
 
 export function onAuthStateChange(
