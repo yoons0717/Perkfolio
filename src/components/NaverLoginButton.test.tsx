@@ -12,7 +12,7 @@ afterEach(() => vi.clearAllMocks())
 describe('NaverLoginButton', () => {
   it('stores a state and redirects on click', () => {
     delete (window as unknown as { location: unknown }).location
-    window.location = { href: '' } as Location
+    ;(window as unknown as { location: { href: string } }).location = { href: '' }
     render(<NaverLoginButton />)
     fireEvent.click(screen.getByRole('button', { name: '네이버로 시작하기' }))
     const storedState = sessionStorage.getItem('naver_oauth_state')
