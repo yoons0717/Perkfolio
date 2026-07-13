@@ -69,7 +69,7 @@ describe('MyPage', () => {
     expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
 
-  it('does not navigate to /login when signOut fails after deletion', async () => {
+  it('still navigates to /login when signOut fails after deletion, since the account is already gone', async () => {
     vi.mocked(signOut).mockResolvedValue({ error: new Error('network error') } as never)
     vi.spyOn(console, 'error').mockImplementation(() => {})
     renderPage()
@@ -78,7 +78,19 @@ describe('MyPage', () => {
     await userEvent.click(screen.getByText('모달 확인'))
 
     expect(signOut).toHaveBeenCalled()
-    expect(screen.queryByText('로그인 화면')).not.toBeInTheDocument()
+    expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
+  })
+
+  it('still navigates to /login when signOut throws after deletion, since the account is already gone', async () => {
+    vi.mocked(signOut).mockRejectedValue(new Error('network error'))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    renderPage()
+
+    await userEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }))
+    await userEvent.click(screen.getByText('모달 확인'))
+
+    expect(signOut).toHaveBeenCalled()
+    expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
 
   it('renders the blog link card', () => {

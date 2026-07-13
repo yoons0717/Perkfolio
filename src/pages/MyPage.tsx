@@ -12,10 +12,14 @@ export default function MyPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   async function handleDeleted() {
-    const { error } = await signOut()
-    if (error) {
-      console.error(error)
-      return
+    // account is already gone at this point, so a signOut failure — whether
+    // returned as { error } or thrown outright — shouldn't strand the user
+    // on the delete modal; still navigate away, just log it for diagnostics
+    try {
+      const { error } = await signOut()
+      if (error) console.error(error)
+    } catch (err) {
+      console.error(err)
     }
     navigate('/login')
   }
