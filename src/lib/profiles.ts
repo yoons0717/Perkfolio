@@ -4,8 +4,6 @@ import type { NewProfile, Profile } from '../types/profile'
 type ProfileRow = {
   user_id: string
   blog_url: string
-  blog_name: string | null
-  blog_description: string | null
   updated_at: string
 }
 
@@ -13,8 +11,6 @@ function toProfile(row: ProfileRow): Profile {
   return {
     userId: row.user_id,
     blogUrl: row.blog_url,
-    blogName: row.blog_name,
-    blogDescription: row.blog_description,
     updatedAt: row.updated_at,
   }
 }
@@ -37,8 +33,6 @@ export async function upsertProfile(userId: string, profile: NewProfile): Promis
       {
         user_id: userId,
         blog_url: profile.blogUrl,
-        blog_name: profile.blogName,
-        blog_description: profile.blogDescription,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id' },

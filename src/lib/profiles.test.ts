@@ -18,8 +18,6 @@ describe('getProfile', () => {
       data: {
         user_id: 'user-1',
         blog_url: 'https://blog.naver.com/yeonis',
-        blog_name: '여니의 체험단 일기',
-        blog_description: '맛집 후기 블로그',
         updated_at: '2026-01-02T00:00:00.000Z',
       },
       error: null,
@@ -37,8 +35,6 @@ describe('getProfile', () => {
     expect(result).toEqual({
       userId: 'user-1',
       blogUrl: 'https://blog.naver.com/yeonis',
-      blogName: '여니의 체험단 일기',
-      blogDescription: '맛집 후기 블로그',
       updatedAt: '2026-01-02T00:00:00.000Z',
     })
   })
@@ -73,8 +69,6 @@ describe('upsertProfile', () => {
       data: {
         user_id: 'user-1',
         blog_url: 'https://blog.naver.com/yeonis',
-        blog_name: null,
-        blog_description: null,
         updated_at: '2026-01-02T00:00:00.000Z',
       },
       error: null,
@@ -86,8 +80,6 @@ describe('upsertProfile', () => {
 
     const result = await upsertProfile('user-1', {
       blogUrl: 'https://blog.naver.com/yeonis',
-      blogName: null,
-      blogDescription: null,
     })
 
     expect(supabase.from).toHaveBeenCalledWith('profiles')
@@ -95,8 +87,6 @@ describe('upsertProfile', () => {
       expect.objectContaining({
         user_id: 'user-1',
         blog_url: 'https://blog.naver.com/yeonis',
-        blog_name: null,
-        blog_description: null,
       }),
       { onConflict: 'user_id' },
     )
@@ -114,8 +104,6 @@ describe('upsertProfile', () => {
     await expect(
       upsertProfile('user-1', {
         blogUrl: 'https://blog.naver.com/yeonis',
-        blogName: null,
-        blogDescription: null,
       }),
     ).rejects.toBe(error)
   })

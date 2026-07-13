@@ -28,8 +28,6 @@ vi.mock('./UnlinkBlogModal', () => ({
 const profile: Profile = {
   userId: 'user-1',
   blogUrl: 'https://blog.naver.com/yeonis',
-  blogName: '여니의 체험단 일기',
-  blogDescription: '맛집 후기 블로그',
   updatedAt: '2026-01-02T00:00:00.000Z',
 }
 
@@ -47,16 +45,16 @@ function mockSession() {
 }
 
 describe('BlogLinkCard', () => {
-  it('shows the empty state and switches to the form on 블로그 연동하기 click', async () => {
+  it('shows the empty state and switches to the form on 블로그 등록하기 click', async () => {
     mockSession()
     vi.mocked(getProfile).mockResolvedValue(null)
     render(<BlogLinkCard />)
 
     expect(
-      await screen.findByText('아직 연동된 블로그가 없어요. 블로그 주소를 등록하면 마이페이지에 노출돼요.'),
+      await screen.findByText('아직 등록된 블로그가 없어요. 블로그 주소를 등록하면 마이페이지에 노출돼요.'),
     ).toBeInTheDocument()
 
-    await userEvent.click(screen.getByRole('button', { name: '블로그 연동하기' }))
+    await userEvent.click(screen.getByRole('button', { name: '블로그 등록하기' }))
 
     expect(screen.getByPlaceholderText('https://blog.naver.com/yourid')).toBeInTheDocument()
   })
@@ -67,26 +65,28 @@ describe('BlogLinkCard', () => {
     vi.mocked(upsertProfile).mockResolvedValue(profile)
     render(<BlogLinkCard />)
 
-    await userEvent.click(await screen.findByRole('button', { name: '블로그 연동하기' }))
+    await userEvent.click(await screen.findByRole('button', { name: '블로그 등록하기' }))
     await userEvent.type(screen.getByPlaceholderText('https://blog.naver.com/yourid'), profile.blogUrl)
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
     expect(upsertProfile).toHaveBeenCalledWith('user-1', {
       blogUrl: profile.blogUrl,
-      blogName: null,
-      blogDescription: null,
     })
-    expect(await screen.findByText(profile.blogName as string)).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: profile.blogUrl })).toHaveAttribute(
+      'href',
+      profile.blogUrl,
+    )
   })
 
-  it('shows the linked blog name, description and a working link in view mode', async () => {
+  it('shows a working link to the blog URL in view mode', async () => {
     mockSession()
     vi.mocked(getProfile).mockResolvedValue(profile)
     render(<BlogLinkCard />)
 
-    expect(await screen.findByText(profile.blogName as string)).toBeInTheDocument()
-    expect(screen.getByText(profile.blogDescription as string)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '바로가기' })).toHaveAttribute('href', profile.blogUrl)
+    expect(await screen.findByRole('link', { name: profile.blogUrl })).toHaveAttribute(
+      'href',
+      profile.blogUrl,
+    )
   })
 
   it('opens the unlink modal and resets to the empty state when unlinked', async () => {
@@ -94,11 +94,11 @@ describe('BlogLinkCard', () => {
     vi.mocked(getProfile).mockResolvedValue(profile)
     render(<BlogLinkCard />)
 
-    await userEvent.click(await screen.findByRole('button', { name: '연동 해제' }))
+    await userEvent.click(await screen.findByRole('button', { name: '삭제' }))
     await userEvent.click(screen.getByText('모달 확인'))
 
     expect(
-      await screen.findByText('아직 연동된 블로그가 없어요. 블로그 주소를 등록하면 마이페이지에 노출돼요.'),
+      await screen.findByText('아직 등록된 블로그가 없어요. 블로그 주소를 등록하면 마이페이지에 노출돼요.'),
     ).toBeInTheDocument()
   })
 
@@ -117,7 +117,7 @@ describe('BlogLinkCard', () => {
     vi.mocked(getProfile).mockResolvedValue(null)
     render(<BlogLinkCard />)
 
-    await userEvent.click(await screen.findByRole('button', { name: '블로그 연동하기' }))
+    await userEvent.click(await screen.findByRole('button', { name: '블로그 등록하기' }))
     await userEvent.type(
       screen.getByPlaceholderText('https://blog.naver.com/yourid'),
       'javascript:alert(1)',
@@ -136,7 +136,7 @@ describe('BlogLinkCard', () => {
     vi.mocked(upsertProfile).mockRejectedValue(new Error('저장에 실패했습니다. 다시 시도해주세요.'))
     render(<BlogLinkCard />)
 
-    await userEvent.click(await screen.findByRole('button', { name: '블로그 연동하기' }))
+    await userEvent.click(await screen.findByRole('button', { name: '블로그 등록하기' }))
     await userEvent.type(
       screen.getByPlaceholderText('https://blog.naver.com/yourid'),
       'https://blog.naver.com/yeonis',

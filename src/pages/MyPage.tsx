@@ -33,7 +33,7 @@ export default function MyPage() {
           <p className="mb-4 text-sm text-muted">
             계정을 삭제하면 모든 체험단 데이터가 함께 삭제되며 복구할 수 없습니다.
           </p>
-          <Button variant="danger" onClick={() => setIsDeleteModalOpen(true)}>
+          <Button variant="danger" onClick={() => setIsDeleteModalOpen(true)} className="w-full">
             회원 탈퇴
           </Button>
         </div>

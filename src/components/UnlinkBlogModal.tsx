@@ -30,7 +30,7 @@ export default function UnlinkBlogModal({
       await deleteProfile(userId)
       onUnlinked()
     } catch (err) {
-      setError(err instanceof Error ? err.message : '연동 해제에 실패했습니다. 다시 시도해주세요.')
+      setError(err instanceof Error ? err.message : '삭제에 실패했습니다. 다시 시도해주세요.')
       setSubmitting(false)
     }
   }
@@ -38,9 +38,9 @@ export default function UnlinkBlogModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="w-full max-w-sm rounded-xl border border-line bg-surface p-6">
-        <h2 className="mb-4 font-display text-xl font-extrabold text-ink">블로그 연동 해제</h2>
+        <h2 className="mb-4 font-display text-xl font-extrabold text-ink">블로그 삭제</h2>
         <p className="mb-6 text-sm text-ink">
-          연동을 해제하면 등록된 블로그 정보가 삭제돼요. 언제든 다시 연동할 수 있어요.
+          삭제하면 등록된 블로그 주소가 사라져요. 언제든 다시 등록할 수 있어요.
         </p>
         {error && <p className="mb-4 text-sm text-danger">{error}</p>}
         <div className="flex gap-3">
@@ -48,7 +48,7 @@ export default function UnlinkBlogModal({
             취소
           </Button>
           <Button type="button" variant="danger" disabled={submitting} onClick={handleConfirm} className="flex-1">
-            {submitting ? '해제 중...' : '해제하기'}
+            {submitting ? '삭제 중...' : '삭제하기'}
           </Button>
         </div>
       </div>

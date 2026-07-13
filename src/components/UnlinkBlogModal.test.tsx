@@ -39,20 +39,20 @@ describe('UnlinkBlogModal', () => {
     const onUnlinked = vi.fn()
     render(<UnlinkBlogModal userId="user-1" onClose={vi.fn()} onUnlinked={onUnlinked} />)
 
-    await userEvent.click(screen.getByRole('button', { name: '해제하기' }))
+    await userEvent.click(screen.getByRole('button', { name: '삭제하기' }))
 
     expect(deleteProfile).toHaveBeenCalledWith('user-1')
     expect(onUnlinked).toHaveBeenCalled()
   })
 
   it('shows an error message and stays open when unlinking fails', async () => {
-    vi.mocked(deleteProfile).mockRejectedValue(new Error('연동 해제에 실패했습니다. 다시 시도해주세요.'))
+    vi.mocked(deleteProfile).mockRejectedValue(new Error('삭제에 실패했습니다. 다시 시도해주세요.'))
     const onUnlinked = vi.fn()
     render(<UnlinkBlogModal userId="user-1" onClose={vi.fn()} onUnlinked={onUnlinked} />)
 
-    await userEvent.click(screen.getByRole('button', { name: '해제하기' }))
+    await userEvent.click(screen.getByRole('button', { name: '삭제하기' }))
 
-    expect(await screen.findByText('연동 해제에 실패했습니다. 다시 시도해주세요.')).toBeInTheDocument()
+    expect(await screen.findByText('삭제에 실패했습니다. 다시 시도해주세요.')).toBeInTheDocument()
     expect(onUnlinked).not.toHaveBeenCalled()
   })
 })
