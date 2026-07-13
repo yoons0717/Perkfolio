@@ -112,6 +112,15 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('이 날짜에 등록된 체험단이 없습니다.')).toBeInTheDocument()
   })
 
+  it('shows a pending visit only once when its visit date and review deadline are the same day', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_15, status: '예정' }),
+    ])
+    renderCalendar()
+
+    expect(await screen.findAllByText('카페 온도')).toHaveLength(1)
+  })
+
   it('excludes a visit with no visit date from the day grid, but still shows its deadline card', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeBaseVisit({ visitDate: null, reviewDeadline: DAY_16, storeName: '카페 온도', status: '예정' }),

@@ -34,9 +34,10 @@ export default function CalendarPage() {
     const map = new Map<string, Visit[]>()
     for (const v of visits) {
       if (v.visitDate === null) continue
-      // once reviewed, a visit with a deadline is represented by its
-      // deadline-date card instead — showing it here too would duplicate it
-      if (v.status === '리뷰완료' && v.reviewDeadline) continue
+      // a visit with a deadline is represented by its deadline-date card
+      // instead — showing it here too would duplicate it, whether because
+      // it's already reviewed or because the deadline falls on the visit date
+      if (v.reviewDeadline && (v.status === '리뷰완료' || v.reviewDeadline === v.visitDate)) continue
       const list = map.get(v.visitDate) ?? []
       list.push(v)
       map.set(v.visitDate, list)
