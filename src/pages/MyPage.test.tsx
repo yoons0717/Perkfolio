@@ -18,6 +18,10 @@ vi.mock('../components/DeleteAccountModal', () => ({
   ),
 }))
 
+vi.mock('../components/BlogLinkCard', () => ({
+  default: () => <div>블로그 연동 카드</div>,
+}))
+
 afterEach(() => {
   vi.clearAllMocks()
 })
@@ -75,5 +79,11 @@ describe('MyPage', () => {
 
     expect(signOut).toHaveBeenCalled()
     expect(screen.queryByText('로그인 화면')).not.toBeInTheDocument()
+  })
+
+  it('renders the blog link card', () => {
+    renderPage()
+
+    expect(screen.getByText('블로그 연동 카드')).toBeInTheDocument()
   })
 })
