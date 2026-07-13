@@ -24,14 +24,14 @@ describe('buildNaverAuthorizeUrl', () => {
 describe('exchangeNaverCode', () => {
   it('invokes the naver-auth function and returns data', async () => {
     vi.mocked(supabase.functions.invoke).mockResolvedValue({
-      data: { email: 'a@b.com', token: 'tok' },
+      data: { email: 'a@b.com', token: 'tok', type: 'signup' },
       error: null,
     } as never)
     const result = await exchangeNaverCode('code1', 'state1')
     expect(supabase.functions.invoke).toHaveBeenCalledWith('naver-auth', {
       body: { code: 'code1', state: 'state1' },
     })
-    expect(result).toEqual({ email: 'a@b.com', token: 'tok' })
+    expect(result).toEqual({ email: 'a@b.com', token: 'tok', type: 'signup' })
   })
 
   it('throws when the function returns an error', async () => {
@@ -55,12 +55,11 @@ describe('exchangeNaverCode', () => {
 })
 
 describe('completeNaverSignIn', () => {
-  it('calls verifyOtp with magiclink type', () => {
-    completeNaverSignIn('a@b.com', 'tok')
+  it('calls verifyOtp with the token hash and the given type', () => {
+    completeNaverSignIn('tok', 'signup')
     expect(supabase.auth.verifyOtp).toHaveBeenCalledWith({
-      email: 'a@b.com',
-      token: 'tok',
-      type: 'magiclink',
+      token_hash: 'tok',
+      type: 'signup',
     })
   })
 })

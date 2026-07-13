@@ -29,8 +29,8 @@ export default function NaverCallbackPage() {
       }
 
       try {
-        const { email, token } = await exchangeNaverCode(code, state)
-        const { error: otpError } = await completeNaverSignIn(email, token)
+        const { token, type } = await exchangeNaverCode(code, state)
+        const { error: otpError } = await completeNaverSignIn(token, type)
         if (otpError) {
           setError('로그인에 실패했습니다. 다시 시도해주세요.')
           return

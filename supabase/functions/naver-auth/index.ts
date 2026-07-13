@@ -75,7 +75,11 @@ Deno.serve(async (req) => {
   }
 
   return new Response(
-    JSON.stringify({ email, token: linkData.properties.hashed_token }),
+    JSON.stringify({
+      email,
+      token: linkData.properties.hashed_token,
+      type: linkData.properties.verification_type,
+    }),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
   )
 })

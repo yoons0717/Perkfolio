@@ -37,10 +37,10 @@ describe('NaverCallbackPage', () => {
 
   it('completes sign-in and shows success path on match', async () => {
     sessionStorage.setItem('naver_oauth_state', 'st1')
-    vi.mocked(exchangeNaverCode).mockResolvedValue({ email: 'a@b.com', token: 'tok' })
+    vi.mocked(exchangeNaverCode).mockResolvedValue({ email: 'a@b.com', token: 'tok', type: 'signup' })
     vi.mocked(completeNaverSignIn).mockResolvedValue({ error: null } as never)
     renderAt('?code=abc&state=st1')
-    await waitFor(() => expect(completeNaverSignIn).toHaveBeenCalledWith('a@b.com', 'tok'))
+    await waitFor(() => expect(completeNaverSignIn).toHaveBeenCalledWith('tok', 'signup'))
   })
 
   it('shows the specific error message when exchangeNaverCode rejects', async () => {

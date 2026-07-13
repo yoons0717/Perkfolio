@@ -1,4 +1,5 @@
 import { FunctionsHttpError } from '@supabase/supabase-js'
+import type { EmailOtpType } from '@supabase/supabase-js'
 import { supabase } from './supabaseClient'
 
 const NAVER_AUTHORIZE_URL = 'https://nid.naver.com/oauth2.0/authorize'
@@ -16,7 +17,7 @@ export function buildNaverAuthorizeUrl(state: string): string {
 export async function exchangeNaverCode(
   code: string,
   state: string,
-): Promise<{ email: string; token: string }> {
+): Promise<{ email: string; token: string; type: EmailOtpType }> {
   const { data, error } = await supabase.functions.invoke('naver-auth', {
     body: { code, state },
   })
@@ -30,6 +31,6 @@ export async function exchangeNaverCode(
   return data
 }
 
-export function completeNaverSignIn(email: string, token: string) {
-  return supabase.auth.verifyOtp({ email, token, type: 'magiclink' })
+export function completeNaverSignIn(token: string, type: EmailOtpType) {
+  return supabase.auth.verifyOtp({ token_hash: token, type })
 }
