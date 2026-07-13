@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { exchangeNaverCode, completeNaverSignIn } from '../lib/naverAuth'
 
 export default function NaverCallbackPage() {
@@ -48,7 +48,7 @@ export default function NaverCallbackPage() {
     return (
       <div className="mx-auto mt-24 w-full max-w-sm px-4 text-center">
         <p className="mb-3 text-sm text-danger">{error}</p>
-        <a href="/login" className="text-blue text-sm">로그인 페이지로 돌아가기</a>
+        <Link to="/login" className="text-blue text-sm">로그인 페이지로 돌아가기</Link>
       </div>
     )
   }
