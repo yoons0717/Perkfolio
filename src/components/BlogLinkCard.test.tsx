@@ -101,4 +101,49 @@ describe('BlogLinkCard', () => {
       await screen.findByText('아직 연동된 블로그가 없어요. 블로그 주소를 등록하면 마이페이지에 노출돼요.'),
     ).toBeInTheDocument()
   })
+
+  it('shows an error state when the initial profile load fails', async () => {
+    mockSession()
+    vi.mocked(getProfile).mockRejectedValue(new Error('network error'))
+    render(<BlogLinkCard />)
+
+    expect(
+      await screen.findByText('블로그 정보를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.'),
+    ).toBeInTheDocument()
+  })
+
+  it('rejects an invalid URL scheme without calling upsertProfile', async () => {
+    mockSession()
+    vi.mocked(getProfile).mockResolvedValue(null)
+    render(<BlogLinkCard />)
+
+    await userEvent.click(await screen.findByRole('button', { name: '블로그 연동하기' }))
+    await userEvent.type(
+      screen.getByPlaceholderText('https://blog.naver.com/yourid'),
+      'javascript:alert(1)',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(
+      await screen.findByText('http:// 또는 https://로 시작하는 주소를 입력해주세요.'),
+    ).toBeInTheDocument()
+    expect(upsertProfile).not.toHaveBeenCalled()
+  })
+
+  it('shows an error and stays in edit mode when saving fails', async () => {
+    mockSession()
+    vi.mocked(getProfile).mockResolvedValue(null)
+    vi.mocked(upsertProfile).mockRejectedValue(new Error('저장에 실패했습니다. 다시 시도해주세요.'))
+    render(<BlogLinkCard />)
+
+    await userEvent.click(await screen.findByRole('button', { name: '블로그 연동하기' }))
+    await userEvent.type(
+      screen.getByPlaceholderText('https://blog.naver.com/yourid'),
+      'https://blog.naver.com/yeonis',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(await screen.findByText('저장에 실패했습니다. 다시 시도해주세요.')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('https://blog.naver.com/yourid')).toBeInTheDocument()
+  })
 })

@@ -13,6 +13,15 @@ function trimToNull(value: string): string | null {
   return trimmed === '' ? null : trimmed
 }
 
+function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 type FormFields = {
   blogUrl: string
   blogName: string
@@ -35,16 +44,23 @@ export default function BlogLinkCard() {
   const [fields, setFields] = useState<FormFields>(() => initialFormFields(null))
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [loadError, setLoadError] = useState(false)
   const userId = session?.user.id
 
   useEffect(() => {
     if (!userId) return
     let cancelled = false
-    getProfile(userId).then((p) => {
-      if (cancelled) return
-      setProfile(p)
-      setFields(initialFormFields(p))
-    })
+    setLoadError(false)
+    getProfile(userId)
+      .then((p) => {
+        if (cancelled) return
+        setProfile(p)
+        setFields(initialFormFields(p))
+      })
+      .catch(() => {
+        if (cancelled) return
+        setLoadError(true)
+      })
     return () => {
       cancelled = true
     }
@@ -65,11 +81,18 @@ export default function BlogLinkCard() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+
+    const blogUrl = fields.blogUrl.trim()
+    if (!isHttpUrl(blogUrl)) {
+      setError('http:// 또는 https://로 시작하는 주소를 입력해주세요.')
+      return
+    }
+
     setSubmitting(true)
 
     try {
       const saved = await upsertProfile(userId as string, {
-        blogUrl: fields.blogUrl.trim(),
+        blogUrl,
         blogName: trimToNull(fields.blogName),
         blogDescription: trimToNull(fields.blogDescription),
       })
@@ -80,6 +103,17 @@ export default function BlogLinkCard() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (loadError) {
+    return (
+      <div className="rounded-xl border border-line bg-surface p-4">
+        <h2 className="mb-2 font-display text-sm font-bold text-ink">블로그 연동</h2>
+        <p className="text-sm text-danger">
+          블로그 정보를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.
+        </p>
+      </div>
+    )
   }
 
   if (profile === undefined) {
