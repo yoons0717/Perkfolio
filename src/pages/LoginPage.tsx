@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import Logo from '../components/Logo'
 import PasswordInput from '../components/PasswordInput'
+import NaverLoginButton from '../components/NaverLoginButton'
 import { authInputClass } from '../components/formStyles'
 import { signInWithPassword } from '../lib/auth'
 
@@ -86,6 +87,8 @@ export default function LoginPage() {
         <Button type="submit" disabled={submitting} className="mt-1">
           {submitting ? '로그인 중...' : '로그인'}
         </Button>
+        <div className="my-3 text-center text-xs text-muted">또는</div>
+        <NaverLoginButton />
       </form>
       <div className="mt-4 flex justify-between text-sm text-muted">
         <Link to="/signup" className="text-blue">

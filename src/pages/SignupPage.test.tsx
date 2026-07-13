@@ -9,6 +9,10 @@ vi.mock('../lib/auth', () => ({
   signUpWithPassword: vi.fn(),
 }))
 
+vi.mock('../components/NaverLoginButton', () => ({
+  default: () => <div data-testid="naver-login-button">Naver Login</div>,
+}))
+
 afterEach(() => {
   vi.clearAllMocks()
 })
