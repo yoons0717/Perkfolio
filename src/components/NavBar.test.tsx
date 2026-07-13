@@ -105,6 +105,13 @@ describe('NavBar', () => {
     expect(screen.queryByRole('link', { name: '관리자' })).not.toBeInTheDocument()
   })
 
+  it('links 마이페이지 to /mypage', () => {
+    vi.mocked(useAuth).mockReturnValue({ session: { user: { id: '1' } }, loading: false } as never)
+    renderNavBar()
+
+    expect(screen.getByRole('link', { name: '마이페이지' })).toHaveAttribute('href', '/mypage')
+  })
+
   it('opens the feedback modal when 문의하기 is clicked', async () => {
     vi.mocked(useAuth).mockReturnValue({ session: { user: { id: '1' } }, loading: false } as never)
     renderNavBar()
