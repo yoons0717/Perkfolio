@@ -12,7 +12,7 @@ export default function MyPage() {
 
   async function handleDeleted() {
     await signOut()
-    navigate('/')
+    navigate('/login')
   }
 
   return (

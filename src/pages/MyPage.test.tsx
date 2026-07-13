@@ -27,7 +27,7 @@ function renderPage() {
     <MemoryRouter initialEntries={['/mypage']}>
       <Routes>
         <Route path="/mypage" element={<MyPage />} />
-        <Route path="/" element={<div>랜딩 화면</div>} />
+        <Route path="/login" element={<div>로그인 화면</div>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -54,7 +54,7 @@ describe('MyPage', () => {
     expect(signOut).not.toHaveBeenCalled()
   })
 
-  it('signs out and navigates to the landing page when the account is deleted', async () => {
+  it('signs out and navigates to the login page when the account is deleted', async () => {
     vi.mocked(signOut).mockResolvedValue({ error: null } as never)
     renderPage()
 
@@ -62,6 +62,6 @@ describe('MyPage', () => {
     await userEvent.click(screen.getByText('모달 확인'))
 
     expect(signOut).toHaveBeenCalled()
-    expect(await screen.findByText('랜딩 화면')).toBeInTheDocument()
+    expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
 })
