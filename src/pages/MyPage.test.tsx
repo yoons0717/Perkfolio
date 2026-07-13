@@ -64,4 +64,16 @@ describe('MyPage', () => {
     expect(signOut).toHaveBeenCalled()
     expect(await screen.findByText('로그인 화면')).toBeInTheDocument()
   })
+
+  it('does not navigate to /login when signOut fails after deletion', async () => {
+    vi.mocked(signOut).mockResolvedValue({ error: new Error('network error') } as never)
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    renderPage()
+
+    await userEvent.click(screen.getByRole('button', { name: '회원 탈퇴' }))
+    await userEvent.click(screen.getByText('모달 확인'))
+
+    expect(signOut).toHaveBeenCalled()
+    expect(screen.queryByText('로그인 화면')).not.toBeInTheDocument()
+  })
 })

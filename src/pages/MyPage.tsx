@@ -11,7 +11,11 @@ export default function MyPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   async function handleDeleted() {
-    await signOut()
+    const { error } = await signOut()
+    if (error) {
+      console.error(error)
+      return
+    }
     navigate('/login')
   }
 
