@@ -17,6 +17,7 @@ import CalendarPage from './pages/CalendarPage'
 import DashboardPage from './pages/DashboardPage'
 import AdminFeedbackPage from './pages/AdminFeedbackPage'
 import NaverCallbackPage from './pages/NaverCallbackPage'
+import MyPage from './pages/MyPage'
 
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AdminFeedbackPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mypage"
+              element={
+                <ProtectedRoute>
+                  <MyPage />
                 </ProtectedRoute>
               }
             />

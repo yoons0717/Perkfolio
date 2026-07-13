@@ -39,6 +39,7 @@ export default function NavBar() {
   const showAdminLink = isAdmin(session.user.app_metadata)
   const isRecordsActive = location.pathname === '/table' || location.pathname === '/calendar'
   const isDashboardActive = location.pathname === '/dashboard'
+  const isMyPageActive = location.pathname === '/mypage'
 
   async function handleLogout() {
     const { error } = await signOut()
@@ -78,6 +79,12 @@ export default function NavBar() {
               관리자
             </Link>
           )}
+          <Link
+            to="/mypage"
+            className={`transition-colors ${isMyPageActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+          >
+            마이페이지
+          </Link>
           <Button variant="ghost" onClick={() => setIsFeedbackOpen(true)} className="font-normal text-muted hover:text-ink">
             문의하기
           </Button>
@@ -120,6 +127,12 @@ export default function NavBar() {
               관리자
             </Link>
           )}
+          <Link
+            to="/mypage"
+            className={`rounded-lg px-2 py-2 transition-colors ${isMyPageActive ? 'text-ink' : 'text-muted hover:text-ink'}`}
+          >
+            마이페이지
+          </Link>
           <Button
             variant="ghost"
             onClick={() => setIsFeedbackOpen(true)}

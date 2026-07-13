@@ -1,4 +1,5 @@
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
+import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from './supabaseClient'
 
 export async function getSession(): Promise<Session | null> {
@@ -37,6 +38,17 @@ export function updatePassword(password: string) {
 
 export function markOnboardingSeen() {
   return supabase.auth.updateUser({ data: { has_seen_onboarding: true } })
+}
+
+export async function deleteAccount(): Promise<void> {
+  const { error } = await supabase.functions.invoke('delete-account')
+  if (error) {
+    if (error instanceof FunctionsHttpError) {
+      const body = await error.context.json().catch(() => null)
+      throw new Error(body?.error ?? '회원 탈퇴에 실패했습니다. 다시 시도해주세요.')
+    }
+    throw error
+  }
 }
 
 function decodeJwtPayload(jwt: string): Record<string, unknown> | null {
