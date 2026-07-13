@@ -102,6 +102,19 @@ function StatusFilterMenu({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [open])
 
+  useEffect(() => {
+    if (!open) return
+    // coords are captured once on open and not tracked to the button's
+    // position afterward, so close on scroll (capture: true also catches
+    // scroll inside the table's own overflow-x-auto wrapper) rather than
+    // leaving the menu visually detached from its trigger
+    function handleScroll() {
+      setOpen(false)
+    }
+    window.addEventListener('scroll', handleScroll, true)
+    return () => window.removeEventListener('scroll', handleScroll, true)
+  }, [open])
+
   function toggleOpen(e: React.MouseEvent) {
     e.stopPropagation()
     if (!open && btnRef.current) {
