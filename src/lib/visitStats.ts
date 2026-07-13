@@ -1,6 +1,6 @@
-import { deadlineDisplay, statusOrder } from './statusStyle'
+import { deadlineDisplay } from './statusStyle'
 import { categories } from '../types/visit'
-import type { Category, Visit, VisitStatus } from '../types/visit'
+import type { Category, Visit } from '../types/visit'
 
 export type Period = 'thisMonth' | 'lastMonth' | 'thisYear' | 'lastYear' | 'all' | 'custom'
 
@@ -45,12 +45,6 @@ export function computeTotals(visits: Visit[]): Totals {
   const net = retail - extra
   const rate = retail === 0 ? 0 : Math.round((net / retail) * 100)
   return { count: visits.length, retail, extra, net, rate }
-}
-
-export function computeStatusCounts(visits: Visit[]): { status: VisitStatus; count: number }[] {
-  const counts = new Map<VisitStatus, number>(statusOrder.map((s) => [s, 0]))
-  for (const v of visits) counts.set(v.status, (counts.get(v.status) ?? 0) + 1)
-  return statusOrder.map((status) => ({ status, count: counts.get(status) ?? 0 }))
 }
 
 function daysUntil(dateStr: string): number {

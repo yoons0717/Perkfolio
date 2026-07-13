@@ -3,7 +3,6 @@ import {
   computeCategoryBreakdown,
   computeMonthlyTrend,
   computePlatformRanking,
-  computeStatusCounts,
   computeTotals,
   computeUpcomingDeadlines,
   confirmedVisits,
@@ -133,16 +132,6 @@ describe('computeTotals', () => {
 
   it('returns zeroed totals and a 0% rate for an empty list (avoids divide-by-zero)', () => {
     expect(computeTotals([])).toEqual({ count: 0, retail: 0, extra: 0, net: 0, rate: 0 })
-  })
-})
-
-describe('computeStatusCounts', () => {
-  it('counts visits per status, including statuses with zero visits, in statusOrder', () => {
-    const visits = [makeVisit({ status: '예정' }), makeVisit({ status: '예정' }), makeVisit({ status: '리뷰완료' })]
-    expect(computeStatusCounts(visits)).toEqual([
-      { status: '예정', count: 2 },
-      { status: '리뷰완료', count: 1 },
-    ])
   })
 })
 
