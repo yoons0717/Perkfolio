@@ -99,4 +99,28 @@ describe('FeedbackModal', () => {
 
     expect(await screen.findByText('제출에 실패했습니다. 잠시 후 다시 시도해주세요.')).toBeInTheDocument()
   })
+
+  it('calls onSubmitted once the feedback is successfully submitted', async () => {
+    vi.mocked(addFeedback).mockResolvedValue(undefined)
+    const onSubmitted = vi.fn()
+    render(<FeedbackModal onClose={vi.fn()} onSubmitted={onSubmitted} />)
+
+    await userEvent.type(screen.getByLabelText('내용'), '테스트')
+    await userEvent.click(screen.getByRole('button', { name: '제출' }))
+    await screen.findByText('제출되었습니다. 감사합니다!')
+
+    expect(onSubmitted).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call onSubmitted when submission fails', async () => {
+    vi.mocked(addFeedback).mockRejectedValue(new Error('network error'))
+    const onSubmitted = vi.fn()
+    render(<FeedbackModal onClose={vi.fn()} onSubmitted={onSubmitted} />)
+
+    await userEvent.type(screen.getByLabelText('내용'), '테스트')
+    await userEvent.click(screen.getByRole('button', { name: '제출' }))
+    await screen.findByText('제출에 실패했습니다. 잠시 후 다시 시도해주세요.')
+
+    expect(onSubmitted).not.toHaveBeenCalled()
+  })
 })

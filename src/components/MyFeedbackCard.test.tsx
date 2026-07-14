@@ -100,12 +100,11 @@ describe('MyFeedbackCard', () => {
     expect(screen.getByText('아직 제출한 문의가 없어요.')).toBeInTheDocument()
   })
 
-  it('shows an error message when the list fails to load', async () => {
+  it('shows an error message even while collapsed, so a failed fetch is never silently hidden', async () => {
     mockSession()
     vi.mocked(getMyFeedbackList).mockRejectedValue(new Error('network error'))
     render(<MyFeedbackCard />)
     await screen.findByRole('button', { name: '내 문의내역' })
-    await open()
 
     expect(screen.getByText('목록을 불러오지 못했습니다.')).toBeInTheDocument()
   })

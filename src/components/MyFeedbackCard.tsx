@@ -2,6 +2,7 @@ import { useState } from 'react'
 import AdminReplyBlock from './AdminReplyBlock'
 import Button from './Button'
 import Card from './Card'
+import Chevron from './Chevron'
 import ConfirmModal from './ConfirmModal'
 import Spinner from './Spinner'
 import { useAuth } from '../context/AuthContext'
@@ -9,24 +10,6 @@ import { useAsyncList } from '../hooks/useAsyncList'
 import { deleteFeedback, getMyFeedbackList } from '../lib/feedback'
 import { formatDate } from '../lib/format'
 import { feedbackTypeBadgeClass, feedbackTypeLabel } from '../types/feedback'
-
-function ChevronIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  )
-}
 
 export default function MyFeedbackCard() {
   const { session } = useAuth()
@@ -43,9 +26,7 @@ export default function MyFeedbackCard() {
   if (!session || !userId) return null
 
   let content
-  if (error) {
-    content = <p className="text-sm text-danger">{error}</p>
-  } else if (loading) {
+  if (loading) {
     content = <Spinner />
   } else if (feedbackList.length === 0) {
     content = <p className="text-sm text-muted">아직 제출한 문의가 없어요.</p>
@@ -103,9 +84,14 @@ export default function MyFeedbackCard() {
         <span className="font-display text-sm font-bold text-ink">
           내 문의내역{!loading && !error && feedbackList.length > 0 ? ` (${feedbackList.length})` : ''}
         </span>
-        <ChevronIcon className={`text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <Chevron
+          size={14}
+          strokeWidth={2.5}
+          className={`text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
       </Button>
-      {isOpen && <div className="mt-2">{content}</div>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+      {!error && isOpen && <div className="mt-2">{content}</div>}
       {deletingId && (
         <ConfirmModal
           title="문의 삭제"

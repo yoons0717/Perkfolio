@@ -19,6 +19,7 @@ export default function MyPage() {
   const { theme, toggleTheme } = useTheme()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
+  const [feedbackListKey, setFeedbackListKey] = useState(0)
 
   async function handleDeleted() {
     // account is already gone at this point, so a signOut failure shouldn't
@@ -30,6 +31,9 @@ export default function MyPage() {
 
   async function handleLogout() {
     const { error } = await signOut()
+    // unlike handleDeleted, the account still exists here, so on failure
+    // stay put (don't navigate) — the session may still be valid and the
+    // user can just retry, instead of being sent to /login for no reason
     if (error) {
       console.error(error)
       return
@@ -47,45 +51,39 @@ export default function MyPage() {
       </div>
       <div className="flex flex-col gap-4">
         <BlogLinkCard />
-        <MyFeedbackCard />
+        <MyFeedbackCard key={feedbackListKey} />
 
-        <div className="rounded-xl border border-line bg-surface">
+        <div className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
           <Button
             variant="ghost"
             onClick={toggleTheme}
-            className="flex w-full items-center gap-2 rounded-t-xl px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-overlay"
+            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-overlay"
           >
             화면 테마
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </Button>
-          <div className="border-t border-line">
-            <Button
-              variant="ghost"
-              onClick={() => setIsFeedbackOpen(true)}
-              className="w-full px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-overlay"
-            >
-              문의하기
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            onClick={() => setIsFeedbackOpen(true)}
+            className="w-full px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-overlay"
+          >
+            문의하기
+          </Button>
           {showAdminLink && (
-            <div className="border-t border-line">
-              <Link
-                to="/admin/feedback"
-                className="block px-4 py-3 text-sm font-semibold text-ink hover:bg-overlay"
-              >
-                관리자 페이지
-              </Link>
-            </div>
-          )}
-          <div className="border-t border-line">
-            <Button
-              variant="ghost"
-              onClick={handleLogout}
-              className="w-full rounded-b-xl px-4 py-3 text-left text-sm font-semibold text-danger hover:bg-overlay"
+            <Link
+              to="/admin/feedback"
+              className="block px-4 py-3 text-sm font-semibold text-ink hover:bg-overlay"
             >
-              로그아웃
-            </Button>
-          </div>
+              관리자 페이지
+            </Link>
+          )}
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="w-full px-4 py-3 text-left text-sm font-semibold text-danger hover:bg-overlay"
+          >
+            로그아웃
+          </Button>
         </div>
 
         <Card>
@@ -101,7 +99,12 @@ export default function MyPage() {
       {isDeleteModalOpen && (
         <DeleteAccountModal onClose={() => setIsDeleteModalOpen(false)} onDeleted={handleDeleted} />
       )}
-      {isFeedbackOpen && <FeedbackModal onClose={() => setIsFeedbackOpen(false)} />}
+      {isFeedbackOpen && (
+        <FeedbackModal
+          onClose={() => setIsFeedbackOpen(false)}
+          onSubmitted={() => setFeedbackListKey((k) => k + 1)}
+        />
+      )}
     </div>
   )
 }
