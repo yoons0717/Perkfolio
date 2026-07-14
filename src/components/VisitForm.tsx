@@ -374,7 +374,12 @@ export default function VisitForm({
                 </Button>
               </div>
             ))}
-            <Button type="button" variant="secondary" onClick={addPostUrl} className="text-sm">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={addPostUrl}
+              className="self-start border-dashed text-sm text-blue hover:bg-blue-bg"
+            >
               + 링크 추가
             </Button>
           </div>
