@@ -145,7 +145,7 @@ function StatusFilterMenu({
           <div
             ref={menuRef}
             style={{ top: coords.top, left: coords.left }}
-            className="fixed z-50 min-w-28 rounded-lg border border-line bg-surface py-1 shadow-lg shadow-black/30"
+            className="fixed z-50 min-w-28 rounded-lg border border-line bg-surface py-1 shadow-sm shadow-black/10"
           >
             {options.map((opt) => (
               <Button
