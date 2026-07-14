@@ -126,7 +126,7 @@ export function computeMonthlyTrend(visits: Visit[]) {
 export function computeGraphData(
   visits: Visit[],
   axis: 'category' | 'platform' | 'month',
-): { label: string; avgNet: number; count: number }[] {
+): { label: string; avgNet: number; totalNet: number; count: number }[] {
   const totals = new Map<string, number>()
   const counts = new Map<string, number>()
 
@@ -144,6 +144,16 @@ export function computeGraphData(
   return labels.map((label) => {
     const count = counts.get(label) ?? 0
     const total = totals.get(label) ?? 0
-    return { label, avgNet: count === 0 ? 0 : Math.round(total / count), count }
+    return { label, avgNet: count === 0 ? 0 : Math.round(total / count), totalNet: total, count }
   })
+}
+
+// 그래프별 scope는 상단 기간 필터와 독립적으로, 그래프 자신의 기간 선택을 따른다.
+// 그래프 카드와 빌더 폼 미리보기가 동일한 필터링 로직을 공유하기 위해 여기 둔다.
+export function visitsForGraphScope(
+  scope: 'all' | 'thisMonth' | 'lastMonth' | 'thisYear' | 'lastYear',
+  allTimeConfirmed: Visit[],
+): Visit[] {
+  if (scope === 'all') return allTimeConfirmed
+  return allTimeConfirmed.filter((v) => v.visitDate !== null && isInPeriod(v.visitDate, scope))
 }

@@ -55,6 +55,7 @@ describe('useDashboardGraphs', () => {
       axis: 'platform',
       chartType: 'line',
       scope: 'thisMonth',
+      metric: 'avgNet',
     })
 
     await waitFor(() => expect(result.current.graphs).toEqual([graph2, graph1]))
@@ -62,6 +63,7 @@ describe('useDashboardGraphs', () => {
       axis: 'platform',
       chartType: 'line',
       scope: 'thisMonth',
+      metric: 'avgNet',
     })
     expect(getDashboardGraphs).toHaveBeenCalledTimes(1)
   })

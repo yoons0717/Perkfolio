@@ -14,6 +14,7 @@ function makeGraph(overrides: Partial<DashboardGraph> = {}): DashboardGraph {
     axis: 'category',
     chartType: 'bar',
     scope: 'all',
+    metric: 'avgNet',
     createdAt: '2026-07-01T00:00:00.000Z',
     ...overrides,
   }
@@ -25,8 +26,8 @@ describe('GraphCard', () => {
       <GraphCard
         graph={makeGraph({ axis: 'category', scope: 'all' })}
         data={[
-          { label: '카페', avgNet: 38000, count: 6 },
-          { label: '음식점', avgNet: -12000, count: 2 },
+          { label: '카페', avgNet: 38000, totalNet: 228000, count: 6 },
+          { label: '음식점', avgNet: -12000, totalNet: -24000, count: 2 },
         ]}
         onDelete={vi.fn()}
       />,
@@ -45,7 +46,7 @@ describe('GraphCard', () => {
     render(
       <GraphCard
         graph={makeGraph({ axis: 'category', scope: 'all' })}
-        data={[{ label: '기타', avgNet: 0, count: 0 }]}
+        data={[{ label: '기타', avgNet: 0, totalNet: 0, count: 0 }]}
         onDelete={vi.fn()}
       />,
     )
@@ -58,7 +59,7 @@ describe('GraphCard', () => {
     render(
       <GraphCard
         graph={makeGraph({ axis: 'month', chartType: 'line', scope: 'all' })}
-        data={[{ label: '2026-01', avgNet: 40000, count: 2 }]}
+        data={[{ label: '2026-01', avgNet: 40000, totalNet: 80000, count: 2 }]}
         onDelete={vi.fn()}
       />,
     )
@@ -78,7 +79,7 @@ describe('GraphCard', () => {
     render(
       <GraphCard
         graph={makeGraph()}
-        data={[{ label: '카페', avgNet: 38000, count: 6 }]}
+        data={[{ label: '카페', avgNet: 38000, totalNet: 228000, count: 6 }]}
         onDelete={onDelete}
       />,
     )
@@ -93,8 +94,8 @@ describe('GraphCard', () => {
       <GraphCard
         graph={makeGraph({ axis: 'month', chartType: 'line', scope: 'all' })}
         data={[
-          { label: '2026-01', avgNet: 40000, count: 2 },
-          { label: '2026-02', avgNet: 52000, count: 3 },
+          { label: '2026-01', avgNet: 40000, totalNet: 80000, count: 2 },
+          { label: '2026-02', avgNet: 52000, totalNet: 156000, count: 3 },
         ]}
         onDelete={vi.fn()}
       />,

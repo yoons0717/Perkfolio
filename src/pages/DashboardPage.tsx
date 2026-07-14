@@ -14,10 +14,15 @@ import Spinner from '../components/Spinner'
 import { useDashboardGraphs } from '../hooks/useDashboardGraphs'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
-import { computeCategoryBreakdown, computeGraphData, computeTotals, confirmedVisits, isInPeriod } from '../lib/visitStats'
+import {
+  computeCategoryBreakdown,
+  computeGraphData,
+  computeTotals,
+  confirmedVisits,
+  isInPeriod,
+  visitsForGraphScope,
+} from '../lib/visitStats'
 import type { CustomRange, Period } from '../lib/visitStats'
-import type { DashboardGraph } from '../types/dashboardGraph'
-import type { Visit } from '../types/visit'
 
 const periodLabel: Record<Period, string> = {
   thisMonth: '이번 달',
@@ -26,12 +31,6 @@ const periodLabel: Record<Period, string> = {
   lastYear: '작년',
   all: '전체',
   custom: '선택한 기간',
-}
-
-// 그래프별 scope는 상단 기간 필터와 독립적으로, 그래프 자신의 기간 선택을 따른다.
-function visitsForGraphScope(scope: DashboardGraph['scope'], allTimeConfirmed: Visit[]): Visit[] {
-  if (scope === 'all') return allTimeConfirmed
-  return allTimeConfirmed.filter((v) => v.visitDate !== null && isInPeriod(v.visitDate, scope))
 }
 
 function StatCard({ label, value, valueClassName = 'text-ink' }: { label: string; value: string; valueClassName?: string }) {
@@ -149,6 +148,7 @@ export default function DashboardPage() {
           {showGraphBuilder && (
             <Panel className="mb-3">
               <GraphBuilderForm
+                previewVisits={allTimeConfirmed}
                 onSave={async (g) => {
                   try {
                     await addGraph(g)

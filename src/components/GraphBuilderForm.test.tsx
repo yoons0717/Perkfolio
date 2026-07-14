@@ -9,7 +9,7 @@ afterEach(() => {
 
 describe('GraphBuilderForm', () => {
   it('defaults to axis=category with chart type fixed to bar and scope selectable', () => {
-    render(<GraphBuilderForm onSave={vi.fn()} />)
+    render(<GraphBuilderForm onSave={vi.fn()} previewVisits={[]} />)
 
     expect(screen.getByLabelText('축')).toHaveValue('category')
     expect(screen.queryByLabelText('차트 종류')).not.toBeInTheDocument()
@@ -18,7 +18,7 @@ describe('GraphBuilderForm', () => {
   })
 
   it('offers all fixed period options for the scope select', () => {
-    render(<GraphBuilderForm onSave={vi.fn()} />)
+    render(<GraphBuilderForm onSave={vi.fn()} previewVisits={[]} />)
 
     const scopeSelect = screen.getByLabelText('기간')
     const optionLabels = Array.from(scopeSelect.querySelectorAll('option')).map((o) => o.textContent)
@@ -26,7 +26,7 @@ describe('GraphBuilderForm', () => {
   })
 
   it('switching axis to month reveals chart type select and fixes scope to 전체 고정', async () => {
-    render(<GraphBuilderForm onSave={vi.fn()} />)
+    render(<GraphBuilderForm onSave={vi.fn()} previewVisits={[]} />)
 
     await userEvent.selectOptions(screen.getByLabelText('축'), '월')
 
@@ -36,7 +36,7 @@ describe('GraphBuilderForm', () => {
   })
 
   it('switching axis back to category/platform restores scope select and fixes chart type to bar', async () => {
-    render(<GraphBuilderForm onSave={vi.fn()} />)
+    render(<GraphBuilderForm onSave={vi.fn()} previewVisits={[]} />)
 
     await userEvent.selectOptions(screen.getByLabelText('축'), '월')
     await userEvent.selectOptions(screen.getByLabelText('차트 종류'), '라인')
@@ -49,22 +49,32 @@ describe('GraphBuilderForm', () => {
 
   it('saves category axis with chartType forced to bar and the selected scope', async () => {
     const onSave = vi.fn()
-    render(<GraphBuilderForm onSave={onSave} />)
+    render(<GraphBuilderForm onSave={onSave} previewVisits={[]} />)
 
     await userEvent.selectOptions(screen.getByLabelText('기간'), '이번 달')
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
-    expect(onSave).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'thisMonth' })
+    expect(onSave).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'thisMonth', metric: 'avgNet' })
   })
 
   it('saves month axis with the selected chartType and scope forced to all', async () => {
     const onSave = vi.fn()
-    render(<GraphBuilderForm onSave={onSave} />)
+    render(<GraphBuilderForm onSave={onSave} previewVisits={[]} />)
 
     await userEvent.selectOptions(screen.getByLabelText('축'), '월')
     await userEvent.selectOptions(screen.getByLabelText('차트 종류'), '라인')
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
-    expect(onSave).toHaveBeenCalledWith({ axis: 'month', chartType: 'line', scope: 'all' })
+    expect(onSave).toHaveBeenCalledWith({ axis: 'month', chartType: 'line', scope: 'all', metric: 'avgNet' })
+  })
+
+  it('saves the selected metric', async () => {
+    const onSave = vi.fn()
+    render(<GraphBuilderForm onSave={onSave} previewVisits={[]} />)
+
+    await userEvent.selectOptions(screen.getByLabelText('지표'), '건수')
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(onSave).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'all', metric: 'count' })
   })
 })

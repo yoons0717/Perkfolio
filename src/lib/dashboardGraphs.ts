@@ -6,6 +6,7 @@ type DashboardGraphRow = {
   axis: DashboardGraph['axis']
   chart_type: DashboardGraph['chartType']
   scope: DashboardGraph['scope']
+  metric: DashboardGraph['metric']
   created_at: string
 }
 
@@ -15,6 +16,7 @@ function toDashboardGraph(row: DashboardGraphRow): DashboardGraph {
     axis: row.axis,
     chartType: row.chart_type,
     scope: row.scope,
+    metric: row.metric,
     createdAt: row.created_at,
   }
 }
@@ -36,6 +38,7 @@ export async function addDashboardGraph(graph: NewDashboardGraph): Promise<Dashb
       axis: graph.axis,
       chart_type: graph.chartType,
       scope: graph.scope,
+      metric: graph.metric,
     })
     .select()
     .single()

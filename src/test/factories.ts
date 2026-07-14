@@ -39,6 +39,7 @@ export function makeDashboardGraph(overrides: Partial<DashboardGraph> = {}): Das
     axis: 'category',
     chartType: 'bar',
     scope: 'all',
+    metric: 'avgNet',
     createdAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
   }

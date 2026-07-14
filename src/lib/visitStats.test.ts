@@ -10,6 +10,7 @@ import {
   confirmedVisits,
   isInPeriod,
   netSaved,
+  visitsForGraphScope,
 } from './visitStats'
 import { makeVisit } from '../test/factories'
 import { categories } from '../types/visit'
@@ -282,29 +283,29 @@ describe('computeMonthlyTrend', () => {
 })
 
 describe('computeGraphData', () => {
-  it('groups by category (fixed category order, including zero-count categories) and averages net savings', () => {
+  it('groups by category (fixed category order, including zero-count categories) and returns avg/total net savings', () => {
     const visits = [
       makeVisit({ category: '카페', retailValue: 10000, extraPayment: 0 }),
-      makeVisit({ category: '카페', retailValue: 20000, extraPayment: 5000 }), // avg(10000, 15000) = 12500
+      makeVisit({ category: '카페', retailValue: 20000, extraPayment: 5000 }), // avg(10000, 15000) = 12500, total 25000
       makeVisit({ category: '술집', retailValue: 30000, extraPayment: 0 }),
     ]
     expect(computeGraphData(visits, 'category')).toEqual([
-      { label: '카페', avgNet: 12500, count: 2 },
-      { label: '음식점', avgNet: 0, count: 0 },
-      { label: '술집', avgNet: 30000, count: 1 },
-      { label: '기타', avgNet: 0, count: 0 },
+      { label: '카페', avgNet: 12500, totalNet: 25000, count: 2 },
+      { label: '음식점', avgNet: 0, totalNet: 0, count: 0 },
+      { label: '술집', avgNet: 30000, totalNet: 30000, count: 1 },
+      { label: '기타', avgNet: 0, totalNet: 0, count: 0 },
     ])
   })
 
-  it('groups by platform (only platforms present in the data, sorted alphabetically) and averages net savings', () => {
+  it('groups by platform (only platforms present in the data, sorted alphabetically) and returns avg/total net savings', () => {
     const visits = [
       makeVisit({ platform: '포포몬', retailValue: 10000, extraPayment: 0 }), // 10000
       makeVisit({ platform: '캐시노트', retailValue: 30000, extraPayment: 5000 }), // 25000
-      makeVisit({ platform: '포포몬', retailValue: 5000, extraPayment: 0 }), // avg(10000, 5000) = 7500
+      makeVisit({ platform: '포포몬', retailValue: 5000, extraPayment: 0 }), // avg(10000, 5000) = 7500, total 15000
     ]
     expect(computeGraphData(visits, 'platform')).toEqual([
-      { label: '캐시노트', avgNet: 25000, count: 1 },
-      { label: '포포몬', avgNet: 7500, count: 2 },
+      { label: '캐시노트', avgNet: 25000, totalNet: 25000, count: 1 },
+      { label: '포포몬', avgNet: 7500, totalNet: 15000, count: 2 },
     ])
   })
 
@@ -312,21 +313,38 @@ describe('computeGraphData', () => {
     const visits = [
       makeVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
       makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500
+      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500, total 25000
       makeVisit({ visitDate: null, retailValue: 99999, extraPayment: 0 }),
     ]
     expect(computeGraphData(visits, 'month')).toEqual([
-      { label: '2026-01', avgNet: 12500, count: 2 },
-      { label: '2026-02', avgNet: 10000, count: 1 },
+      { label: '2026-01', avgNet: 12500, totalNet: 25000, count: 2 },
+      { label: '2026-02', avgNet: 10000, totalNet: 10000, count: 1 },
     ])
   })
 
   it('does not divide by zero when there are no visits, for any axis', () => {
     // category always returns all fixed categories (including zero-count ones), while platform/month return only present labels
     expect(computeGraphData([], 'category')).toEqual(
-      categories.map((label) => ({ label, avgNet: 0, count: 0 }))
+      categories.map((label) => ({ label, avgNet: 0, totalNet: 0, count: 0 }))
     )
     expect(computeGraphData([], 'platform')).toEqual([])
     expect(computeGraphData([], 'month')).toEqual([])
+  })
+})
+
+describe('visitsForGraphScope', () => {
+  it("returns all visits unfiltered when scope is 'all'", () => {
+    const visits = [makeVisit({ visitDate: '2020-01-01' }), makeVisit({ visitDate: '2026-01-01' })]
+    expect(visitsForGraphScope('all', visits)).toEqual(visits)
+  })
+
+  it('filters to visits within the given fixed period', () => {
+    const now = new Date()
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+    const visits = [
+      makeVisit({ id: 'a', visitDate: thisMonth }),
+      makeVisit({ id: 'b', visitDate: '2020-01-01' }),
+    ]
+    expect(visitsForGraphScope('thisMonth', visits).map((v) => v.id)).toEqual(['a'])
   })
 })

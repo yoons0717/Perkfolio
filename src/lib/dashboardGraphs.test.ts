@@ -13,13 +13,14 @@ afterEach(() => {
 })
 
 describe('addDashboardGraph', () => {
-  it('inserts the axis, chartType, and scope and returns the mapped row', async () => {
+  it('inserts the axis, chartType, scope, and metric and returns the mapped row', async () => {
     const single = vi.fn().mockResolvedValue({
       data: {
         id: '1',
         axis: 'category',
         chart_type: 'bar',
         scope: 'all',
+        metric: 'avgNet',
         created_at: '2026-01-02T00:00:00.000Z',
       },
       error: null,
@@ -29,15 +30,16 @@ describe('addDashboardGraph', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(supabase.from).mockReturnValue({ insert } as any)
 
-    const result = await addDashboardGraph({ axis: 'category', chartType: 'bar', scope: 'all' })
+    const result = await addDashboardGraph({ axis: 'category', chartType: 'bar', scope: 'all', metric: 'avgNet' })
 
     expect(supabase.from).toHaveBeenCalledWith('dashboard_graphs')
-    expect(insert).toHaveBeenCalledWith({ axis: 'category', chart_type: 'bar', scope: 'all' })
+    expect(insert).toHaveBeenCalledWith({ axis: 'category', chart_type: 'bar', scope: 'all', metric: 'avgNet' })
     expect(result).toEqual({
       id: '1',
       axis: 'category',
       chartType: 'bar',
       scope: 'all',
+      metric: 'avgNet',
       createdAt: '2026-01-02T00:00:00.000Z',
     })
   })
@@ -50,7 +52,9 @@ describe('addDashboardGraph', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(supabase.from).mockReturnValue({ insert } as any)
 
-    await expect(addDashboardGraph({ axis: 'month', chartType: 'line', scope: 'all' })).rejects.toBe(error)
+    await expect(
+      addDashboardGraph({ axis: 'month', chartType: 'line', scope: 'all', metric: 'avgNet' }),
+    ).rejects.toBe(error)
   })
 })
 
@@ -63,6 +67,7 @@ describe('getDashboardGraphs', () => {
           axis: 'platform',
           chart_type: 'bar',
           scope: 'thisMonth',
+          metric: 'totalNet',
           created_at: '2026-01-02T00:00:00.000Z',
         },
       ],
@@ -78,7 +83,14 @@ describe('getDashboardGraphs', () => {
     expect(select).toHaveBeenCalledWith('*')
     expect(order).toHaveBeenCalledWith('created_at', { ascending: false })
     expect(result).toEqual([
-      { id: '1', axis: 'platform', chartType: 'bar', scope: 'thisMonth', createdAt: '2026-01-02T00:00:00.000Z' },
+      {
+        id: '1',
+        axis: 'platform',
+        chartType: 'bar',
+        scope: 'thisMonth',
+        metric: 'totalNet',
+        createdAt: '2026-01-02T00:00:00.000Z',
+      },
     ])
   })
 

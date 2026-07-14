@@ -146,7 +146,12 @@ describe('DashboardPage', () => {
     await userEvent.selectOptions(screen.getByLabelText('기간'), '이번 달')
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
-    expect(addDashboardGraph).toHaveBeenCalledWith({ axis: 'category', chartType: 'bar', scope: 'thisMonth' })
+    expect(addDashboardGraph).toHaveBeenCalledWith({
+      axis: 'category',
+      chartType: 'bar',
+      scope: 'thisMonth',
+      metric: 'avgNet',
+    })
     const title = await screen.findByText('카테고리별 평균 절감액')
     const card = within(title.closest('.rounded-xl')!)
     // scope='thisMonth' excludes visit '2' (outside 이번 달), so 카페's avg is 10000, not blended with 50000.
@@ -227,7 +232,7 @@ describe('DashboardPage', () => {
     await userEvent.selectOptions(screen.getByLabelText('차트 종류'), '라인')
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
-    expect(addDashboardGraph).toHaveBeenCalledWith({ axis: 'month', chartType: 'line', scope: 'all' })
+    expect(addDashboardGraph).toHaveBeenCalledWith({ axis: 'month', chartType: 'line', scope: 'all', metric: 'avgNet' })
     expect(await screen.findByText('월별 평균 절감액')).toBeInTheDocument()
   })
 })
