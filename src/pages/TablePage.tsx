@@ -340,43 +340,68 @@ export default function TablePage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-4 flex gap-3">
-        <Button
-          variant="ghost"
-          onClick={() => setStatusFilter(statusFilter === '예정' ? '전체' : '예정')}
-          className={`flex-1 rounded-2xl border p-4 text-left ${
-            statusFilter === '예정' ? 'border-blue bg-blue-bg' : 'border-line bg-surface'
-          }`}
-        >
-          <p className="text-xs font-semibold text-muted">방문 예정</p>
-          <p className={`mt-1 font-mono text-3xl font-extrabold ${statusFilter === '예정' ? 'text-blue' : 'text-ink'}`}>
-            {statusCounts.예정}
-          </p>
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => setStatusFilter(statusFilter === '리뷰완료' ? '전체' : '리뷰완료')}
-          className={`flex-1 rounded-2xl border p-4 text-left ${
-            statusFilter === '리뷰완료' ? 'border-violet bg-violet-bg' : 'border-line bg-surface'
-          }`}
-        >
-          <p className="text-xs font-semibold text-muted">리뷰 완료</p>
-          <p
-            className={`mt-1 font-mono text-3xl font-extrabold ${statusFilter === '리뷰완료' ? 'text-violet' : 'text-ink'}`}
+      {isMobile ? (
+        <div className="mb-4 flex gap-2.5">
+          <Button
+            variant="ghost"
+            onClick={() => setStatusFilter(statusFilter === '예정' ? '전체' : '예정')}
+            className={`flex flex-1 flex-col items-center gap-0.5 rounded-full py-3 ${
+              statusFilter === '예정' ? 'bg-blue text-white' : 'bg-blue-bg text-blue'
+            }`}
           >
-            {statusCounts.리뷰완료}
-          </p>
-        </Button>
-      </div>
+            <span className="font-mono text-lg font-extrabold">{statusCounts.예정}</span>
+            <span className="text-[11px] font-semibold">방문 예정</span>
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setStatusFilter(statusFilter === '리뷰완료' ? '전체' : '리뷰완료')}
+            className={`flex flex-1 flex-col items-center gap-0.5 rounded-full py-3 ${
+              statusFilter === '리뷰완료' ? 'bg-violet text-white' : 'bg-violet-bg text-violet'
+            }`}
+          >
+            <span className="font-mono text-lg font-extrabold">{statusCounts.리뷰완료}</span>
+            <span className="text-[11px] font-semibold">리뷰 완료</span>
+          </Button>
+        </div>
+      ) : (
+        <div className="mb-4 flex gap-3">
+          <Button
+            variant="ghost"
+            onClick={() => setStatusFilter(statusFilter === '예정' ? '전체' : '예정')}
+            className={`flex-1 rounded-2xl border p-4 text-left ${
+              statusFilter === '예정' ? 'border-blue bg-blue-bg' : 'border-line bg-surface'
+            }`}
+          >
+            <p className="text-xs font-semibold text-muted">방문 예정</p>
+            <p className={`mt-1 font-mono text-3xl font-extrabold ${statusFilter === '예정' ? 'text-blue' : 'text-ink'}`}>
+              {statusCounts.예정}
+            </p>
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setStatusFilter(statusFilter === '리뷰완료' ? '전체' : '리뷰완료')}
+            className={`flex-1 rounded-2xl border p-4 text-left ${
+              statusFilter === '리뷰완료' ? 'border-violet bg-violet-bg' : 'border-line bg-surface'
+            }`}
+          >
+            <p className="text-xs font-semibold text-muted">리뷰 완료</p>
+            <p
+              className={`mt-1 font-mono text-3xl font-extrabold ${statusFilter === '리뷰완료' ? 'text-violet' : 'text-ink'}`}
+            >
+              {statusCounts.리뷰완료}
+            </p>
+          </Button>
+        </div>
+      )}
 
-      <div className="mb-4 flex gap-3">
-        {isMobile && (
-          <div className="w-36">
+      {isMobile ? (
+        <div className="mb-4 flex gap-2.5">
+          <div className="flex-1">
             <Select
               aria-label="상태 필터"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as '전체' | VisitStatus)}
-              className="rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink"
+              className="rounded-xl border border-line bg-surface px-3.5 py-3.5 text-sm text-ink"
             >
               <option value="전체">상태 전체</option>
               {statusOrder.map((s) => (
@@ -386,23 +411,41 @@ export default function TablePage() {
               ))}
             </Select>
           </div>
-        )}
-        <div className="w-36">
-          <Select
-            aria-label="플랫폼 필터"
-            value={platformFilter}
-            onChange={(e) => setPlatformFilter(e.target.value as '전체' | Platform)}
-            className="rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink"
-          >
-            <option value="전체">플랫폼 전체</option>
-            {platforms.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </Select>
+          <div className="flex-1">
+            <Select
+              aria-label="플랫폼 필터"
+              value={platformFilter}
+              onChange={(e) => setPlatformFilter(e.target.value as '전체' | Platform)}
+              className="rounded-xl border border-line bg-surface px-3.5 py-3.5 text-sm text-ink"
+            >
+              <option value="전체">플랫폼 전체</option>
+              {platforms.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mb-4 flex gap-3">
+          <div className="w-36">
+            <Select
+              aria-label="플랫폼 필터"
+              value={platformFilter}
+              onChange={(e) => setPlatformFilter(e.target.value as '전체' | Platform)}
+              className="rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink"
+            >
+              <option value="전체">플랫폼 전체</option>
+              {platforms.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </div>
+      )}
 
       {visible.length === 0 ? (
         <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-muted">
