@@ -54,6 +54,14 @@ describe('TablePage loading states', () => {
     renderTablePage()
     expect(await screen.findByText('아직 등록된 체험단 기록이 없습니다.')).toBeInTheDocument()
   })
+
+  it('links the top 체험단 추가 button to /add', async () => {
+    vi.mocked(getVisits).mockResolvedValue([])
+    renderTablePage()
+    await screen.findByText('아직 등록된 체험단 기록이 없습니다.')
+
+    expect(screen.getByRole('link', { name: /체험단 추가/ })).toHaveAttribute('href', '/add')
+  })
 })
 
 describe('TablePage columns', () => {

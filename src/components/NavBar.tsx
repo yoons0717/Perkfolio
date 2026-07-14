@@ -1,7 +1,5 @@
-import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from './Button'
-import FeedbackModal from './FeedbackModal'
 import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/auth'
@@ -11,7 +9,6 @@ export default function NavBar() {
   const { session, isPasswordRecovery } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
 
   if (!session || isPasswordRecovery) return null
 
@@ -64,16 +61,12 @@ export default function NavBar() {
           >
             마이페이지
           </Link>
-          <Button variant="ghost" onClick={() => setIsFeedbackOpen(true)} className="font-normal text-muted hover:text-ink">
-            문의하기
-          </Button>
           <Button variant="ghost" onClick={handleLogout} className="font-normal text-muted hover:text-ink">
             로그아웃
           </Button>
           <ThemeToggle />
         </div>
       </div>
-      {isFeedbackOpen && <FeedbackModal onClose={() => setIsFeedbackOpen(false)} />}
     </nav>
   )
 }

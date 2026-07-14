@@ -49,7 +49,7 @@ export default function MyPage() {
         <MyFeedbackCard />
 
         <div className="rounded-xl border border-line bg-surface">
-          <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center justify-between px-4 py-1.5">
             <span className="text-sm font-semibold text-ink">화면 테마</span>
             <ThemeToggle />
           </div>

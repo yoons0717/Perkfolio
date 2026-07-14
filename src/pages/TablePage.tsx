@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Button from '../components/Button'
 import Select from '../components/Select'
 import Spinner from '../components/Spinner'
@@ -340,6 +340,18 @@ export default function TablePage() {
 
   return (
     <div className="mx-auto max-w-5xl">
+      <div className="mb-4 flex justify-end">
+        <Link
+          to="/add"
+          className="flex items-center gap-1.5 rounded-full bg-blue px-5 py-2.5 font-display text-sm font-bold text-white hover:bg-blue/90"
+        >
+          <span aria-hidden="true" className="text-base leading-none">
+            +
+          </span>
+          체험단 추가
+        </Link>
+      </div>
+
       {isMobile ? (
         <div className="mb-4 flex gap-2.5">
           <Button
