@@ -421,7 +421,7 @@ export default function TablePage() {
               <table className="w-full min-w-[860px] border-collapse whitespace-nowrap text-xs">
                 <thead>
                   <tr className="border-b border-line bg-surface text-left text-muted">
-                    {columns.map((col) => (
+                    {columns.slice(0, 3).map((col) => (
                       <th
                         key={col.key}
                         onClick={() => handleSort(col.key)}
@@ -440,6 +440,22 @@ export default function TablePage() {
                     <th className="w-[170px] px-4 py-2.5 font-mono text-[11px] font-normal tracking-wide uppercase">
                       리뷰 타입
                     </th>
+                    {columns.slice(3).map((col) => (
+                      <th
+                        key={col.key}
+                        onClick={() => handleSort(col.key)}
+                        className={`cursor-pointer select-none px-4 py-2.5 font-mono text-[11px] font-normal tracking-wide uppercase transition-colors hover:text-ink ${
+                          sortKey === col.key ? 'text-ink' : ''
+                        }`}
+                      >
+                        {col.label}{' '}
+                        <Chevron
+                          className={`inline-block transition-transform ${
+                            sortKey === col.key ? `text-blue ${sortDir === 'asc' ? 'rotate-180' : ''}` : 'text-muted/40'
+                          }`}
+                        />
+                      </th>
+                    ))}
                     <th className="py-2.5 pr-6 pl-4 font-mono text-[11px] font-normal tracking-wide uppercase">
                       <StatusFilterMenu value={statusFilter} onChange={setStatusFilter} />
                     </th>
