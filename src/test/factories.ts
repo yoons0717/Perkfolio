@@ -28,6 +28,9 @@ export function makeFeedback(overrides: Partial<Feedback> = {}): Feedback {
     type: '버그',
     content: '버튼이 안 눌려요',
     createdAt: '2026-01-01T00:00:00.000Z',
+    userEmail: 'user@example.com',
+    adminReply: null,
+    repliedAt: null,
     ...overrides,
   }
 }

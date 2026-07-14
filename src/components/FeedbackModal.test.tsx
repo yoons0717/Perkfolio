@@ -1,12 +1,24 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import FeedbackModal from './FeedbackModal'
+import { useAuth } from '../context/AuthContext'
 import { addFeedback } from '../lib/feedback'
+
+vi.mock('../context/AuthContext', () => ({
+  useAuth: vi.fn(),
+}))
 
 vi.mock('../lib/feedback', () => ({
   addFeedback: vi.fn(),
 }))
+
+beforeEach(() => {
+  vi.mocked(useAuth).mockReturnValue({
+    session: { user: { id: '1', email: 'user@example.com' } },
+    loading: false,
+  } as never)
+})
 
 afterEach(() => {
   vi.clearAllMocks()
@@ -32,7 +44,11 @@ describe('FeedbackModal', () => {
     await userEvent.type(screen.getByLabelText('내용'), '버튼이 안 눌려요')
     await userEvent.click(screen.getByRole('button', { name: '제출' }))
 
-    expect(addFeedback).toHaveBeenCalledWith({ type: '건의', content: '버튼이 안 눌려요' })
+    expect(addFeedback).toHaveBeenCalledWith({
+      type: '건의',
+      content: '버튼이 안 눌려요',
+      userEmail: 'user@example.com',
+    })
     expect(await screen.findByText('제출되었습니다. 감사합니다!')).toBeInTheDocument()
   })
 

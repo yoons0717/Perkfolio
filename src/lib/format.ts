@@ -9,6 +9,14 @@ export function toDateString(date: Date): string {
   return `${year}-${month}-${day}`
 }
 
+export function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('ko-KR')
+}
+
+export function formatDateTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleString('ko-KR')
+}
+
 export function formatDDay(dateStr: string): string {
   const today = new Date()
   today.setHours(0, 0, 0, 0)

@@ -4,10 +4,12 @@ import Button from './Button'
 import Select from './Select'
 import { inputClass, selectClass } from './formStyles'
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
+import { useAuth } from '../context/AuthContext'
 import { addFeedback } from '../lib/feedback'
 import type { FeedbackType } from '../types/feedback'
 
 export default function FeedbackModal({ onClose }: { onClose: () => void }) {
+  const { session } = useAuth()
   const [type, setType] = useState<FeedbackType>('버그')
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -22,7 +24,7 @@ export default function FeedbackModal({ onClose }: { onClose: () => void }) {
     setSubmitting(true)
 
     try {
-      await addFeedback({ type, content })
+      await addFeedback({ type, content, userEmail: session?.user.email ?? null })
       setSubmitted(true)
     } catch {
       setError('제출에 실패했습니다. 잠시 후 다시 시도해주세요.')
