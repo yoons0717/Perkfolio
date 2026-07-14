@@ -48,7 +48,7 @@ export default function MyPage() {
         <BlogLinkCard />
         <MyFeedbackCard />
 
-        <Card className="p-0">
+        <div className="rounded-xl border border-line bg-surface">
           <div className="flex items-center justify-between px-4 py-3">
             <span className="text-sm font-semibold text-ink">화면 테마</span>
             <ThemeToggle />
@@ -78,7 +78,7 @@ export default function MyPage() {
               로그아웃
             </Button>
           </div>
-        </Card>
+        </div>
 
         <Card>
           <h2 className="mb-2 font-display text-sm font-bold text-ink">회원 탈퇴</h2>
