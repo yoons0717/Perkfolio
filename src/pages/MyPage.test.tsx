@@ -148,4 +148,15 @@ describe('MyPage', () => {
 
     expect(screen.queryByRole('link', { name: '관리자 페이지' })).not.toBeInTheDocument()
   })
+
+  it('toggles the theme when the 화면 테마 row is clicked anywhere, not just the icon', async () => {
+    localStorage.setItem('perktrack-theme', 'dark')
+    renderPage()
+    expect(document.documentElement.dataset.theme).not.toBe('light')
+
+    await userEvent.click(screen.getByRole('button', { name: /화면 테마/ }))
+
+    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(localStorage.getItem('perktrack-theme')).toBe('light')
+  })
 })

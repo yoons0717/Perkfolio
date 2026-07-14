@@ -8,14 +8,16 @@ import MyFeedbackCard from '../components/MyFeedbackCard'
 import PageContainer from '../components/PageContainer'
 import DeleteAccountModal from '../components/DeleteAccountModal'
 import FeedbackModal from '../components/FeedbackModal'
-import ThemeToggle from '../components/ThemeToggle'
+import { MoonIcon, SunIcon } from '../components/ThemeToggle'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../hooks/useTheme'
 import { isAdmin } from '../lib/admin'
 import { signOut } from '../lib/auth'
 
 export default function MyPage() {
   const navigate = useNavigate()
   const { session } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
 
@@ -49,22 +51,29 @@ export default function MyPage() {
         <MyFeedbackCard />
 
         <div className="rounded-xl border border-line bg-surface">
-          <div className="flex items-center justify-between px-4 py-1.5">
-            <span className="text-sm font-semibold text-ink">화면 테마</span>
-            <ThemeToggle />
-          </div>
+          <Button
+            variant="ghost"
+            onClick={toggleTheme}
+            className="flex w-full items-center gap-2 rounded-t-xl px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-overlay"
+          >
+            화면 테마
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+          </Button>
           <div className="border-t border-line">
             <Button
               variant="ghost"
               onClick={() => setIsFeedbackOpen(true)}
-              className="w-full px-4 py-3 text-left text-sm font-semibold text-ink"
+              className="w-full px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-overlay"
             >
               문의하기
             </Button>
           </div>
           {showAdminLink && (
-            <div className="border-t border-line px-4 py-3">
-              <Link to="/admin/feedback" className="block text-sm font-semibold text-ink">
+            <div className="border-t border-line">
+              <Link
+                to="/admin/feedback"
+                className="block px-4 py-3 text-sm font-semibold text-ink hover:bg-overlay"
+              >
                 관리자 페이지
               </Link>
             </div>
@@ -73,7 +82,7 @@ export default function MyPage() {
             <Button
               variant="ghost"
               onClick={handleLogout}
-              className="w-full px-4 py-3 text-left text-sm font-semibold text-danger"
+              className="w-full rounded-b-xl px-4 py-3 text-left text-sm font-semibold text-danger hover:bg-overlay"
             >
               로그아웃
             </Button>
