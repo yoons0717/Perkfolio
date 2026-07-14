@@ -437,6 +437,9 @@ export default function TablePage() {
                         />
                       </th>
                     ))}
+                    <th className="w-[170px] px-4 py-2.5 font-mono text-[11px] font-normal tracking-wide uppercase">
+                      리뷰 타입
+                    </th>
                     <th className="py-2.5 pr-6 pl-4 font-mono text-[11px] font-normal tracking-wide uppercase">
                       <StatusFilterMenu value={statusFilter} onChange={setStatusFilter} />
                     </th>
@@ -458,6 +461,18 @@ export default function TablePage() {
                         <div className="max-w-[220px] truncate text-xs text-muted">
                           {v.platform} · {v.category}
                           {v.reservationNote && ` · ${v.reservationNote}`}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex w-full flex-wrap gap-1">
+                          {v.reviewTypes.map((rt) => (
+                            <span
+                              key={rt}
+                              className="rounded-full bg-line px-1.5 py-0.5 text-[10px] text-ink"
+                            >
+                              {rt}
+                            </span>
+                          ))}
                         </div>
                       </td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
