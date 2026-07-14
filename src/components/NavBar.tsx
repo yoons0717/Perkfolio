@@ -42,9 +42,14 @@ export default function NavBar() {
   const isMyPageActive = location.pathname === '/mypage'
 
   async function handleLogout() {
-    const { error } = await signOut()
-    if (error) {
-      console.error(error)
+    try {
+      const { error } = await signOut()
+      if (error) {
+        console.error(error)
+        return
+      }
+    } catch (err) {
+      console.error(err)
       return
     }
     navigate('/login')

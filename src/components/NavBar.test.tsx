@@ -72,6 +72,19 @@ describe('NavBar', () => {
     expect(screen.getByRole('button', { name: '로그아웃' })).toBeInTheDocument()
   })
 
+  it('does not navigate to /login when signOut rejects outright, leaving the session intact', async () => {
+    vi.mocked(useAuth).mockReturnValue({ session: { user: { id: '1' } }, loading: false } as never)
+    vi.mocked(signOut).mockRejectedValue(new Error('network error'))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    renderNavBar()
+
+    await userEvent.click(screen.getByRole('button', { name: '로그아웃' }))
+
+    expect(signOut).toHaveBeenCalled()
+    expect(screen.queryByText('로그인 화면')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '로그아웃' })).toBeInTheDocument()
+  })
+
   it('renders nothing during a password-recovery session, even though a session exists', () => {
     vi.mocked(useAuth).mockReturnValue({
       session: { user: { id: '1' } },

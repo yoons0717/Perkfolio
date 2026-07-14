@@ -26,10 +26,20 @@ export default function AdminFeedbackPage() {
       return
     }
 
+    let cancelled = false
     getFeedbackList()
-      .then(setFeedbackList)
-      .catch(() => setError('목록을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false))
+      .then((list) => {
+        if (!cancelled) setFeedbackList(list)
+      })
+      .catch(() => {
+        if (!cancelled) setError('목록을 불러오지 못했습니다.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [admin])
 
   if (!admin) return <Navigate to="/table" replace />

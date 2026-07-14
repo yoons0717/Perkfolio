@@ -78,7 +78,7 @@ export default function FeedbackModal({ onClose }: { onClose: () => void }) {
           </label>
           {error && <p className="text-sm text-danger">{error}</p>}
           <div className="flex gap-3">
-            <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+            <Button type="button" variant="secondary" disabled={submitting} onClick={onClose} className="flex-1">
               취소
             </Button>
             <Button type="submit" disabled={submitting} className="flex-1">

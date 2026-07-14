@@ -42,7 +42,7 @@ export default function DeleteAccountModal({
         </p>
         {error && <p className="mb-4 text-sm text-danger">{error}</p>}
         <div className="flex gap-3">
-          <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+          <Button type="button" variant="secondary" disabled={submitting} onClick={onClose} className="flex-1">
             취소
           </Button>
           <Button type="button" variant="danger" disabled={submitting} onClick={handleConfirm} className="flex-1">

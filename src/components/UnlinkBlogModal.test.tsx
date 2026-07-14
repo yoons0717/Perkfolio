@@ -34,6 +34,21 @@ describe('UnlinkBlogModal', () => {
     expect(deleteProfile).not.toHaveBeenCalled()
   })
 
+  it('disables the 취소 button while submitting', async () => {
+    let resolveDelete: () => void = () => {}
+    vi.mocked(deleteProfile).mockReturnValue(
+      new Promise((resolve) => {
+        resolveDelete = resolve
+      }),
+    )
+    render(<UnlinkBlogModal userId="user-1" onClose={vi.fn()} onUnlinked={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: '삭제하기' }))
+
+    expect(screen.getByRole('button', { name: '취소' })).toBeDisabled()
+    resolveDelete()
+  })
+
   it('calls deleteProfile and onUnlinked when confirmed', async () => {
     vi.mocked(deleteProfile).mockResolvedValue(undefined)
     const onUnlinked = vi.fn()

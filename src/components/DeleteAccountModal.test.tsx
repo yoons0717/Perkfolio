@@ -34,6 +34,21 @@ describe('DeleteAccountModal', () => {
     expect(deleteAccount).not.toHaveBeenCalled()
   })
 
+  it('disables the 취소 button while submitting', async () => {
+    let resolveDelete: () => void = () => {}
+    vi.mocked(deleteAccount).mockReturnValue(
+      new Promise((resolve) => {
+        resolveDelete = resolve
+      }),
+    )
+    render(<DeleteAccountModal onClose={vi.fn()} onDeleted={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: '탈퇴하기' }))
+
+    expect(screen.getByRole('button', { name: '취소' })).toBeDisabled()
+    resolveDelete()
+  })
+
   it('calls deleteAccount and onDeleted when confirmed', async () => {
     vi.mocked(deleteAccount).mockResolvedValue(undefined)
     const onDeleted = vi.fn()

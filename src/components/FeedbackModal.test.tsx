@@ -36,6 +36,22 @@ describe('FeedbackModal', () => {
     expect(await screen.findByText('제출되었습니다. 감사합니다!')).toBeInTheDocument()
   })
 
+  it('disables the 취소 button while submitting', async () => {
+    let resolveSubmit: () => void = () => {}
+    vi.mocked(addFeedback).mockReturnValue(
+      new Promise((resolve) => {
+        resolveSubmit = resolve
+      }),
+    )
+    render(<FeedbackModal onClose={vi.fn()} />)
+
+    await userEvent.type(screen.getByLabelText('내용'), '테스트')
+    await userEvent.click(screen.getByRole('button', { name: '제출' }))
+
+    expect(screen.getByRole('button', { name: '취소' })).toBeDisabled()
+    resolveSubmit()
+  })
+
   it('closes via the confirmation view\'s 닫기 button', async () => {
     vi.mocked(addFeedback).mockResolvedValue(undefined)
     const onClose = vi.fn()
