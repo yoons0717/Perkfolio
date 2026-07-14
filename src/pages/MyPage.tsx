@@ -5,7 +5,6 @@ import BlogLinkCard from '../components/BlogLinkCard'
 import Button from '../components/Button'
 import Card from '../components/Card'
 import MyFeedbackCard from '../components/MyFeedbackCard'
-import PageContainer from '../components/PageContainer'
 import DeleteAccountModal from '../components/DeleteAccountModal'
 import FeedbackModal from '../components/FeedbackModal'
 import { MoonIcon, SunIcon } from '../components/ThemeToggle'
@@ -41,7 +40,7 @@ export default function MyPage() {
   const showAdminLink = isAdmin(session?.user.app_metadata)
 
   return (
-    <PageContainer>
+    <div className="mx-auto max-w-3xl px-4 pt-6 pb-24">
       <div className="mb-4 flex items-center gap-3">
         <BackButton />
         <h1 className="font-display text-2xl font-extrabold text-ink">마이페이지</h1>
@@ -103,6 +102,6 @@ export default function MyPage() {
         <DeleteAccountModal onClose={() => setIsDeleteModalOpen(false)} onDeleted={handleDeleted} />
       )}
       {isFeedbackOpen && <FeedbackModal onClose={() => setIsFeedbackOpen(false)} />}
-    </PageContainer>
+    </div>
   )
 }
