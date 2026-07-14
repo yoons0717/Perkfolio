@@ -14,6 +14,7 @@ async function fillRequiredFields(opts: { skip?: string[] } = {}) {
   if (!skip.includes('플랫폼')) await userEvent.selectOptions(screen.getByLabelText('플랫폼'), '포포몬')
   if (!skip.includes('카테고리')) await userEvent.selectOptions(screen.getByLabelText('카테고리'), '카페')
   if (!skip.includes('상태')) await userEvent.selectOptions(screen.getByLabelText('상태'), '예정')
+  if (!skip.includes('리뷰 타입')) await userEvent.click(screen.getByRole('checkbox', { name: '블로그' }))
   await userEvent.type(screen.getByLabelText('업체명'), '카페 온도')
   if (!skip.includes('가게 정보 URL')) {
     await userEvent.type(screen.getByLabelText('가게 정보 URL (선택)'), 'https://store.example.com')
@@ -92,6 +93,15 @@ describe('VisitForm validation', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
+  it('blocks submission and shows an error when no review type is checked', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields({ skip: ['리뷰 타입'] })
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(await screen.findByText('리뷰 타입을 1개 이상 선택해주세요.')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it('starts with 플랫폼/카테고리/상태 unselected (placeholder), extra payment defaulting to 0, and no visit date prefilled', () => {
     renderForm()
     expect(screen.getByLabelText('플랫폼')).toHaveValue('')
@@ -120,12 +130,12 @@ describe('VisitForm submission payload', () => {
       platform: '캐시노트',
       storeName: '카페 온도',
       category: '음식점',
+      reviewTypes: ['블로그'],
       storeInfoUrl: 'https://store.example.com',
       sponsoredItems: '파스타 2, 음료 2',
       retailValue: 48000,
       extraPayment: 5000,
       campaignUrl: 'https://campaign.example.com',
-      postUrl: null,
       reviewDeadline: '2026-09-01',
       status: '리뷰완료',
     })
@@ -146,23 +156,40 @@ describe('VisitForm submission payload', () => {
   it('submits a filled post URL as-is', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields()
-    await userEvent.type(screen.getByLabelText('포스팅 링크 (선택)'), 'https://blog.example.com/post')
+    await userEvent.click(screen.getByRole('button', { name: '+ 링크 추가' }))
+    await userEvent.type(screen.getByLabelText('포스팅 링크 1'), 'https://blog.example.com/post')
 
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
     const submitted = onSubmit.mock.calls[0][0] as NewVisit
-    expect(submitted.postUrl).toBe('https://blog.example.com/post')
+    expect(submitted.postUrls).toEqual(['https://blog.example.com/post'])
   })
 
-  it('submits a whitespace-only post URL as null', async () => {
+  it('drops a whitespace-only post URL entry from the submitted array', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields()
-    await userEvent.type(screen.getByLabelText('포스팅 링크 (선택)'), '   ')
+    await userEvent.click(screen.getByRole('button', { name: '+ 링크 추가' }))
+    await userEvent.type(screen.getByLabelText('포스팅 링크 1'), '   ')
 
     await userEvent.click(screen.getByRole('button', { name: '저장' }))
 
     const submitted = onSubmit.mock.calls[0][0] as NewVisit
-    expect(submitted.postUrl).toBeNull()
+    expect(submitted.postUrls).toEqual([])
+  })
+
+  it('removes a post URL row when its delete button is clicked', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields()
+    await userEvent.click(screen.getByRole('button', { name: '+ 링크 추가' }))
+    await userEvent.type(screen.getByLabelText('포스팅 링크 1'), 'https://blog.example.com/a')
+    await userEvent.click(screen.getByRole('button', { name: '+ 링크 추가' }))
+    await userEvent.type(screen.getByLabelText('포스팅 링크 2'), 'https://blog.example.com/b')
+    await userEvent.click(screen.getByRole('button', { name: '포스팅 링크 1 삭제' }))
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.postUrls).toEqual(['https://blog.example.com/b'])
   })
 
   it('submits an empty 체험단 URL as null, since a campaign post can disappear before it is captured', async () => {
@@ -298,6 +325,7 @@ describe('VisitForm with initialValues', () => {
       platform: '레뷰',
       storeName: '기존 업체',
       category: '음식점',
+      reviewTypes: ['블로그', '릴스'],
       sponsoredItems: '세트메뉴',
       reservationNote: '예약 필수, 저녁 7시',
       campaignUrl: 'https://campaign.example.com/existing',
@@ -305,7 +333,7 @@ describe('VisitForm with initialValues', () => {
       retailValue: 30000,
       extraPayment: 2000,
       status: '리뷰완료',
-      postUrl: 'https://blog.example.com/post',
+      postUrls: ['https://blog.example.com/post'],
       reviewDeadline: '2026-08-20',
     }
     render(
@@ -318,13 +346,16 @@ describe('VisitForm with initialValues', () => {
     )
 
     expect(screen.getByLabelText('업체명')).toHaveValue('기존 업체')
+    expect(screen.getByRole('checkbox', { name: '블로그' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: '릴스' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: '클립' })).not.toBeChecked()
     expect(screen.getByLabelText('가게 정보 URL (선택)')).toHaveValue('https://store.example.com/existing')
     expect(screen.getByLabelText('체험 내역 (선택)')).toHaveValue('세트메뉴')
     expect(screen.getByLabelText('예약 정보 (선택)')).toHaveValue('예약 필수, 저녁 7시')
     expect(screen.getByLabelText('체험가')).toHaveValue(30000)
     expect(screen.getByLabelText('추가결제액')).toHaveValue(2000)
     expect(screen.getByLabelText('체험단 URL (선택)')).toHaveValue('https://campaign.example.com/existing')
-    expect(screen.getByLabelText('포스팅 링크 (선택)')).toHaveValue('https://blog.example.com/post')
+    expect(screen.getByLabelText('포스팅 링크 1')).toHaveValue('https://blog.example.com/post')
     expect(screen.getByLabelText('플랫폼')).toHaveValue('레뷰')
     expect(screen.getByLabelText('카테고리')).toHaveValue('음식점')
     expect(screen.getByLabelText('상태')).toHaveValue('리뷰완료')

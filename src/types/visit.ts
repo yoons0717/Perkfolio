@@ -23,6 +23,10 @@ export type Category = '카페' | '음식점' | '술집' | '기타'
 
 export const categories: Category[] = ['카페', '음식점', '술집', '기타']
 
+export type ReviewType = '블로그' | '클립' | '유튜브' | '인스타 게시물' | '릴스'
+
+export const reviewTypes: ReviewType[] = ['블로그', '클립', '유튜브', '인스타 게시물', '릴스']
+
 export type VisitStatus = '예정' | '리뷰완료'
 
 export type Visit = {
@@ -31,6 +35,7 @@ export type Visit = {
   platform: Platform
   storeName: string
   category: Category
+  reviewTypes: ReviewType[]
   sponsoredItems: string | null
   reservationNote: string | null
   campaignUrl: string | null
@@ -38,7 +43,7 @@ export type Visit = {
   retailValue: number
   extraPayment: number
   status: VisitStatus
-  postUrl: string | null
+  postUrls: string[]
   reviewDeadline: string | null
   createdAt: string
 }

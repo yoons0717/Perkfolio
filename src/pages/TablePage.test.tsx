@@ -67,6 +67,7 @@ describe('TablePage columns', () => {
         retailValue: 48000,
         extraPayment: 5000,
         status: '리뷰완료',
+        reviewTypes: ['블로그'],
       }),
     ])
     renderTablePage()
@@ -77,11 +78,30 @@ describe('TablePage columns', () => {
       '-',
       '2026-01-10',
       '카페 온도캐시노트 · 카페',
+      '블로그',
       '₩48,000',
       '₩5,000',
       '₩43,000',
       '리뷰완료',
     ])
+  })
+
+  it('shows review types as chips in the desktop table', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '파스타공방', reviewTypes: ['블로그', '릴스'] }),
+    ])
+    renderTablePage()
+
+    expect(await screen.findByText('블로그')).toBeInTheDocument()
+    expect(screen.getByText('릴스')).toBeInTheDocument()
+  })
+
+  it('shows "-" in the review type column for a visit with none set', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ storeName: '카페 온도', reviewTypes: [] })])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    expect(getRowCells('카페 온도')[3]).toHaveTextContent('-')
   })
 
   it('shows the net savings in red when extra payment exceeds retail value (a loss)', async () => {
@@ -104,7 +124,7 @@ describe('TablePage columns', () => {
 
     await screen.findByText('카페 온도')
     expect(screen.queryByText('₩43,000')).not.toBeInTheDocument()
-    const netSavedCell = getRowCells('카페 온도')[5]
+    const netSavedCell = getRowCells('카페 온도')[6]
     expect(netSavedCell).toHaveTextContent('-')
     expect(netSavedCell).toHaveClass('text-muted')
   })

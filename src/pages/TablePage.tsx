@@ -421,7 +421,26 @@ export default function TablePage() {
               <table className="w-full min-w-[860px] border-collapse whitespace-nowrap text-xs">
                 <thead>
                   <tr className="border-b border-line bg-surface text-left text-muted">
-                    {columns.map((col) => (
+                    {columns.slice(0, 3).map((col) => (
+                      <th
+                        key={col.key}
+                        onClick={() => handleSort(col.key)}
+                        className={`cursor-pointer select-none px-4 py-2.5 font-mono text-[11px] font-normal tracking-wide uppercase transition-colors hover:text-ink ${
+                          sortKey === col.key ? 'text-ink' : ''
+                        }`}
+                      >
+                        {col.label}{' '}
+                        <Chevron
+                          className={`inline-block transition-transform ${
+                            sortKey === col.key ? `text-blue ${sortDir === 'asc' ? 'rotate-180' : ''}` : 'text-muted/40'
+                          }`}
+                        />
+                      </th>
+                    ))}
+                    <th className="w-[170px] px-4 py-2.5 font-mono text-[11px] font-normal tracking-wide uppercase">
+                      리뷰 타입
+                    </th>
+                    {columns.slice(3).map((col) => (
                       <th
                         key={col.key}
                         onClick={() => handleSort(col.key)}
@@ -459,6 +478,22 @@ export default function TablePage() {
                           {v.platform} · {v.category}
                           {v.reservationNote && ` · ${v.reservationNote}`}
                         </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {v.reviewTypes.length === 0 ? (
+                          <span className="text-muted">-</span>
+                        ) : (
+                          <div className="flex w-full flex-wrap gap-1">
+                            {v.reviewTypes.map((rt) => (
+                              <span
+                                key={rt}
+                                className="rounded-full bg-line px-1.5 py-0.5 text-[10px] text-ink"
+                              >
+                                {rt}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
