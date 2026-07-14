@@ -5,6 +5,11 @@ export const feedbackTypeLabel: Record<FeedbackType, string> = {
   건의: '건의사항',
 }
 
+export const feedbackTypeBadgeClass: Record<FeedbackType, string> = {
+  버그: 'bg-danger/10 text-danger',
+  건의: 'bg-blue-bg text-blue',
+}
+
 export type Feedback = {
   id: string
   type: FeedbackType

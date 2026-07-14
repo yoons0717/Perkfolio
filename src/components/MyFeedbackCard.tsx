@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { useAsyncList } from '../hooks/useAsyncList'
 import { deleteFeedback, getMyFeedbackList } from '../lib/feedback'
 import { formatDate } from '../lib/format'
-import { feedbackTypeLabel } from '../types/feedback'
+import { feedbackTypeBadgeClass, feedbackTypeLabel } from '../types/feedback'
 
 export default function MyFeedbackCard() {
   const { session } = useAuth()
@@ -34,12 +34,22 @@ export default function MyFeedbackCard() {
     content = (
       <ul className="flex flex-col gap-3">
         {feedbackList.map((feedback) => (
-          <li key={feedback.id} className="border-b border-line pb-3 last:border-b-0 last:pb-0">
-            <div className="mb-1 flex items-center gap-2">
-              <span className="rounded-full bg-overlay px-3 py-1 font-mono text-xs text-ink">
-                {feedbackTypeLabel[feedback.type]}
+          <li key={feedback.id} className="rounded-lg border border-line p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${feedbackTypeBadgeClass[feedback.type]}`}
+                >
+                  {feedbackTypeLabel[feedback.type]}
+                </span>
+                <span className="text-xs text-muted">{formatDate(feedback.createdAt)}</span>
+              </div>
+              <span
+                className={`flex items-center gap-1.5 text-xs ${feedback.adminReply !== null ? 'text-violet' : 'text-muted'}`}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                {feedback.adminReply !== null ? '답변완료' : '답변 대기중'}
               </span>
-              <span className="text-xs text-muted">{formatDate(feedback.createdAt)}</span>
             </div>
             <p className="whitespace-pre-wrap text-sm text-ink">{feedback.content}</p>
             {feedback.adminReply !== null ? (
@@ -47,17 +57,16 @@ export default function MyFeedbackCard() {
                 <AdminReplyBlock reply={feedback.adminReply} repliedAt={feedback.repliedAt} />
               </div>
             ) : (
-              <>
-                <p className="mt-2 text-xs text-muted">아직 답변이 없습니다.</p>
+              <div className="mt-2 flex justify-end">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setDeletingId(feedback.id)}
-                  className="mt-2 font-normal text-muted hover:text-danger"
+                  className="font-normal text-muted hover:text-danger"
                 >
                   삭제
                 </Button>
-              </>
+              </div>
             )}
           </li>
         ))}

@@ -80,7 +80,7 @@ describe('MyFeedbackCard', () => {
     render(<MyFeedbackCard />)
 
     expect(await screen.findByText('다크모드 추가해주세요')).toBeInTheDocument()
-    expect(screen.getByText('아직 답변이 없습니다.')).toBeInTheDocument()
+    expect(screen.getByText('답변 대기중')).toBeInTheDocument()
   })
 
   it('shows a delete button for feedback with no reply yet', async () => {
