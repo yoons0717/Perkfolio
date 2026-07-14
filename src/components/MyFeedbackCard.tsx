@@ -10,6 +10,24 @@ import { deleteFeedback, getMyFeedbackList } from '../lib/feedback'
 import { formatDate } from '../lib/format'
 import { feedbackTypeBadgeClass, feedbackTypeLabel } from '../types/feedback'
 
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  )
+}
+
 export default function MyFeedbackCard() {
   const { session } = useAuth()
   const userId = session?.user.id
@@ -20,6 +38,7 @@ export default function MyFeedbackCard() {
     error,
   } = useAsyncList(() => getMyFeedbackList(userId as string), [userId], { enabled: !!userId })
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
 
   if (!session || !userId) return null
 
@@ -76,8 +95,17 @@ export default function MyFeedbackCard() {
 
   return (
     <Card>
-      <h2 className="mb-2 font-display text-sm font-bold text-ink">내 문의내역</h2>
-      {content}
+      <Button
+        variant="ghost"
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex w-full items-center justify-between text-left"
+      >
+        <span className="font-display text-sm font-bold text-ink">
+          내 문의내역{!loading && !error && feedbackList.length > 0 ? ` (${feedbackList.length})` : ''}
+        </span>
+        <ChevronIcon className={`text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </Button>
+      {isOpen && <div className="mt-2">{content}</div>}
       {deletingId && (
         <ConfirmModal
           title="문의 삭제"
