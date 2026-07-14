@@ -116,6 +116,20 @@ describe('signOut', () => {
 
     expect(supabase.auth.signOut).toHaveBeenCalled()
   })
+
+  it('resolves with the error supabase returns instead of throwing', async () => {
+    const error = new Error('network error')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(supabase.auth.signOut).mockResolvedValue({ error } as any)
+
+    await expect(signOut()).resolves.toEqual({ error })
+  })
+
+  it('wraps a rejection from the underlying call into an { error } result instead of throwing', async () => {
+    vi.mocked(supabase.auth.signOut).mockRejectedValue(new Error('network error'))
+
+    await expect(signOut()).resolves.toEqual({ error: new Error('network error') })
+  })
 })
 
 describe('signUpWithPassword', () => {

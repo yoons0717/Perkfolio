@@ -43,11 +43,7 @@ export default function ResetPasswordPage() {
       // reused as a standing login — the user logs back in with the new
       // password like normal. The password change already succeeded, so a
       // failure here shouldn't be reported as if the change itself failed.
-      try {
-        await signOut()
-      } catch (err) {
-        console.error(err)
-      }
+      await signOut()
       navigate('/login', { state: { passwordResetSuccess: true } })
     } catch (err) {
       console.error(err)

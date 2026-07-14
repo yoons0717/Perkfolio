@@ -24,8 +24,13 @@ export function signInWithPassword(email: string, password: string) {
   return supabase.auth.signInWithPassword({ email, password })
 }
 
-export function signOut() {
-  return supabase.auth.signOut()
+export async function signOut(): Promise<{ error: Error | null }> {
+  try {
+    const { error } = await supabase.auth.signOut()
+    return { error }
+  } catch (err) {
+    return { error: err instanceof Error ? err : new Error(String(err)) }
+  }
 }
 
 export function signUpWithPassword(email: string, password: string) {
