@@ -195,6 +195,7 @@ export default function CalendarPage() {
                       <p className="text-ink">{v.storeName}</p>
                       <p className="mt-0.5 text-xs text-muted">
                         {v.platform} · {v.category}
+                        {v.reviewTypes.length > 0 && ` · ${v.reviewTypes.join(', ')}`}
                       </p>
                     </div>
                   </div>
@@ -215,6 +216,9 @@ export default function CalendarPage() {
                       />
                       <div>
                         <p className="text-ink">{v.storeName}</p>
+                        {v.reviewTypes.length > 0 && (
+                          <p className="mt-0.5 text-xs text-muted">{v.reviewTypes.join(', ')}</p>
+                        )}
                         <p className={`mt-0.5 text-xs ${deadline.reviewed ? statusTextClass('리뷰완료') : deadlineUrgentTextClass}`}>
                           {deadline.reviewed ? '리뷰 완료' : '리뷰 마감'}
                         </p>

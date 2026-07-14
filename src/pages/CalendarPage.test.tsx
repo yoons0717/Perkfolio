@@ -167,6 +167,16 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('캐시노트 · 카페')).toBeInTheDocument()
   })
 
+  it('appends review types to the platform/category line when set', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ visitDate: DAY_15, platform: '캐시노트', category: '카페', reviewTypes: ['블로그', '릴스'] }),
+    ])
+    renderCalendar()
+
+    await userEvent.click(await screen.findByText('15'))
+    expect(await screen.findByText('캐시노트 · 카페 · 블로그, 릴스')).toBeInTheDocument()
+  })
+
   it('shows "+N개" when more than 2 visits fall on the same day', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', storeName: '가게1', visitDate: DAY_15 }),
