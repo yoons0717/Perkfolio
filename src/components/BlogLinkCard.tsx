@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import Button from './Button'
+import Card from './Card'
 import Spinner from './Spinner'
 import UnlinkBlogModal from './UnlinkBlogModal'
 import { inputClass } from './formStyles'
@@ -94,27 +95,27 @@ export default function BlogLinkCard() {
 
   if (loadError) {
     return (
-      <div className="rounded-xl border border-line bg-surface p-4">
+      <Card>
         <h2 className="mb-2 font-display text-sm font-bold text-ink">내 블로그</h2>
         <p className="text-sm text-danger">
           블로그 정보를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.
         </p>
-      </div>
+      </Card>
     )
   }
 
   if (profile === undefined) {
     return (
-      <div className="rounded-xl border border-line bg-surface p-4">
+      <Card>
         <h2 className="mb-2 font-display text-sm font-bold text-ink">내 블로그</h2>
         <Spinner />
-      </div>
+      </Card>
     )
   }
 
   if (mode === 'edit') {
     return (
-      <div className="rounded-xl border border-line bg-surface p-4">
+      <Card>
         <h2 className="mb-4 font-display text-sm font-bold text-ink">내 블로그</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1 text-sm">
@@ -147,24 +148,24 @@ export default function BlogLinkCard() {
             </Button>
           </div>
         </form>
-      </div>
+      </Card>
     )
   }
 
   if (!profile) {
     return (
-      <div className="rounded-xl border border-line bg-surface p-4">
+      <Card>
         <h2 className="mb-2 font-display text-sm font-bold text-ink">내 블로그</h2>
         <p className="mb-4 text-sm text-muted">
           아직 등록된 블로그가 없어요. 블로그 주소를 등록하면 마이페이지에 노출돼요.
         </p>
         <Button onClick={startEdit}>블로그 등록하기</Button>
-      </div>
+      </Card>
     )
   }
 
   return (
-    <div className="rounded-xl border border-line bg-surface p-4">
+    <Card>
       <h2 className="mb-2 font-display text-sm font-bold text-ink">내 블로그</h2>
       <a
         href={profile.blogUrl}
@@ -192,6 +193,6 @@ export default function BlogLinkCard() {
           }}
         />
       )}
-    </div>
+    </Card>
   )
 }

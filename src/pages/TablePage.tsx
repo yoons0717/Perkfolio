@@ -16,7 +16,7 @@ import {
   deadlineUrgentTextClass,
   statusOrder,
 } from '../lib/statusStyle'
-import { netSaved } from '../lib/visitStats'
+import { netColorClass, netSaved } from '../lib/visitStats'
 import { platforms } from '../types/visit'
 import type { Category, Platform, Visit, VisitStatus } from '../types/visit'
 
@@ -196,7 +196,7 @@ const categoryIcon: Record<Category, string> = {
 
 function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void }) {
   const net = netSaved(visit)
-  const netColor = visit.status === '예정' ? 'text-muted' : net < 0 ? 'text-danger' : 'text-positive'
+  const netColor = netColorClass(visit)
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
 
   return (
@@ -463,11 +463,7 @@ export default function TablePage() {
                       <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
                       <td
-                        className={`px-4 py-3 font-mono ${
-                          v.status === '예정'
-                            ? 'text-muted'
-                            : `font-semibold ${netSaved(v) < 0 ? 'text-danger' : 'text-positive'}`
-                        }`}
+                        className={`px-4 py-3 font-mono ${netColorClass(v)} ${v.status === '예정' ? '' : 'font-semibold'}`}
                       >
                         {v.status === '예정' ? '-' : formatWon(netSaved(v))}
                       </td>

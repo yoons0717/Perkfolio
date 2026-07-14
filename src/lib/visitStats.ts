@@ -8,6 +8,11 @@ export function netSaved(visit: Visit): number {
   return visit.retailValue - visit.extraPayment
 }
 
+export function netColorClass(visit: Visit): 'text-muted' | 'text-danger' | 'text-positive' {
+  if (visit.status === '예정') return 'text-muted'
+  return netSaved(visit) < 0 ? 'text-danger' : 'text-positive'
+}
+
 // 예정 상태는 아직 실제로 일어나지 않았으므로, 절감액/통계 집계에서는 제외한다.
 export function confirmedVisits(visits: Visit[]): Visit[] {
   return visits.filter((v) => v.status !== '예정')

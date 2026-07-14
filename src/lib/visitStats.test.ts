@@ -7,6 +7,7 @@ import {
   computeUpcomingDeadlines,
   confirmedVisits,
   isInPeriod,
+  netColorClass,
   netSaved,
 } from './visitStats'
 import { makeVisit } from '../test/factories'
@@ -29,6 +30,24 @@ describe('netSaved', () => {
 
   it('can be negative when extraPayment exceeds retailValue', () => {
     expect(netSaved(makeVisit({ retailValue: 10000, extraPayment: 15000 }))).toBe(-5000)
+  })
+})
+
+describe('netColorClass', () => {
+  it('returns text-muted for 예정 visits, regardless of net amount', () => {
+    expect(netColorClass(makeVisit({ status: '예정', retailValue: 50000, extraPayment: 0 }))).toBe('text-muted')
+  })
+
+  it('returns text-danger when net savings is negative', () => {
+    expect(netColorClass(makeVisit({ status: '리뷰완료', retailValue: 10000, extraPayment: 20000 }))).toBe(
+      'text-danger',
+    )
+  })
+
+  it('returns text-positive when net savings is zero or positive', () => {
+    expect(netColorClass(makeVisit({ status: '리뷰완료', retailValue: 20000, extraPayment: 10000 }))).toBe(
+      'text-positive',
+    )
   })
 })
 

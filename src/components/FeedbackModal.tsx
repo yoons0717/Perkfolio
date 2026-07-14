@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import Button from './Button'
 import Select from './Select'
 import { inputClass, selectClass } from './formStyles'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { addFeedback } from '../lib/feedback'
 import type { FeedbackType } from '../types/feedback'
 
@@ -13,13 +14,7 @@ export default function FeedbackModal({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
-  useEffect(() => {
-    const original = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = original
-    }
-  }, [])
+  useBodyScrollLock()
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()

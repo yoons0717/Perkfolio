@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import BackButton from '../components/BackButton'
+import Card from '../components/Card'
 import PageContainer from '../components/PageContainer'
 import Spinner from '../components/Spinner'
 import { useAuth } from '../context/AuthContext'
@@ -57,16 +58,18 @@ export default function AdminFeedbackPage() {
       ) : (
         <ul className="flex flex-col gap-3">
           {feedbackList.map((feedback) => (
-            <li key={feedback.id} className="rounded-xl border border-line bg-surface p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="rounded-full bg-overlay px-3 py-1 font-mono text-xs text-ink">
-                  {typeLabel[feedback.type]}
-                </span>
-                <span className="text-xs text-muted">
-                  {new Date(feedback.createdAt).toLocaleString('ko-KR')}
-                </span>
-              </div>
-              <p className="whitespace-pre-wrap text-sm text-ink">{feedback.content}</p>
+            <li key={feedback.id}>
+              <Card>
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="rounded-full bg-overlay px-3 py-1 font-mono text-xs text-ink">
+                    {typeLabel[feedback.type]}
+                  </span>
+                  <span className="text-xs text-muted">
+                    {new Date(feedback.createdAt).toLocaleString('ko-KR')}
+                  </span>
+                </div>
+                <p className="whitespace-pre-wrap text-sm text-ink">{feedback.content}</p>
+              </Card>
             </li>
           ))}
         </ul>

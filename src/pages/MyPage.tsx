@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import BackButton from '../components/BackButton'
 import BlogLinkCard from '../components/BlogLinkCard'
 import Button from '../components/Button'
+import Card from '../components/Card'
 import PageContainer from '../components/PageContainer'
 import DeleteAccountModal from '../components/DeleteAccountModal'
 import { signOut } from '../lib/auth'
@@ -32,7 +33,7 @@ export default function MyPage() {
       </div>
       <div className="flex flex-col gap-4">
         <BlogLinkCard />
-        <div className="rounded-xl border border-line bg-surface p-4">
+        <Card>
           <h2 className="mb-2 font-display text-sm font-bold text-ink">회원 탈퇴</h2>
           <p className="mb-4 text-sm text-muted">
             계정을 삭제하면 모든 체험단 데이터가 함께 삭제되며 복구할 수 없습니다.
@@ -40,7 +41,7 @@ export default function MyPage() {
           <Button variant="danger" onClick={() => setIsDeleteModalOpen(true)} className="w-full">
             회원 탈퇴
           </Button>
-        </div>
+        </Card>
       </div>
       {isDeleteModalOpen && (
         <DeleteAccountModal onClose={() => setIsDeleteModalOpen(false)} onDeleted={handleDeleted} />
