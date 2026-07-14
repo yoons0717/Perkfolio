@@ -28,6 +28,14 @@
   --color-overlay: rgba(255, 255, 255, 0.05);
 }
 
+:root {
+  /* BottomTabBar's own rendered height (padding + icon + label). Any
+     fixed-bottom mobile element that needs to clear the tab bar (currently
+     just FloatingAddButton) should read this instead of hardcoding its own
+     guess, so a future tab-bar sizing change only needs updating here. */
+  --bottom-tab-bar-h: 3.5rem;
+}
+
 :root[data-theme="light"] {
   --color-bg: #f4f8f7;
   --color-surface: #ffffff;

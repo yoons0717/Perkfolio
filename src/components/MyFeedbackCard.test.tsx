@@ -28,6 +28,10 @@ function mockSession() {
   } as any)
 }
 
+async function open() {
+  await userEvent.click(screen.getByRole('button', { name: /내 문의내역/ }))
+}
+
 describe('MyFeedbackCard', () => {
   it('renders nothing when there is no session', () => {
     vi.mocked(useAuth).mockReturnValue({ session: null, loading: false, isPasswordRecovery: false })
@@ -36,12 +40,53 @@ describe('MyFeedbackCard', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  it('starts collapsed, showing neither the empty state nor the list', async () => {
+    mockSession()
+    vi.mocked(getMyFeedbackList).mockResolvedValue([
+      makeFeedback({ id: '1', content: '다크모드 추가해주세요' }),
+    ])
+    render(<MyFeedbackCard />)
+
+    await screen.findByRole('button', { name: /내 문의내역 \(1\)/ })
+    expect(screen.queryByText('다크모드 추가해주세요')).not.toBeInTheDocument()
+  })
+
+  it('shows the item count in the header once loaded, and expands on click', async () => {
+    mockSession()
+    vi.mocked(getMyFeedbackList).mockResolvedValue([
+      makeFeedback({ id: '1', content: '다크모드 추가해주세요' }),
+      makeFeedback({ id: '2', content: '버튼이 안 눌려요' }),
+    ])
+    render(<MyFeedbackCard />)
+
+    await screen.findByRole('button', { name: /내 문의내역 \(2\)/ })
+    await open()
+
+    expect(screen.getByText('다크모드 추가해주세요')).toBeInTheDocument()
+    expect(screen.getByText('버튼이 안 눌려요')).toBeInTheDocument()
+  })
+
+  it('collapses again on a second click', async () => {
+    mockSession()
+    vi.mocked(getMyFeedbackList).mockResolvedValue([
+      makeFeedback({ id: '1', content: '다크모드 추가해주세요' }),
+    ])
+    render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: /내 문의내역/ })
+
+    await open()
+    expect(screen.getByText('다크모드 추가해주세요')).toBeInTheDocument()
+
+    await open()
+    expect(screen.queryByText('다크모드 추가해주세요')).not.toBeInTheDocument()
+  })
+
   it("fetches only the current user's own feedback, never another user's", async () => {
     mockSession()
     vi.mocked(getMyFeedbackList).mockResolvedValue([])
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: '내 문의내역' })
 
-    await screen.findByText('아직 제출한 문의가 없어요.')
     expect(getMyFeedbackList).toHaveBeenCalledWith('user-1')
   })
 
@@ -49,16 +94,19 @@ describe('MyFeedbackCard', () => {
     mockSession()
     vi.mocked(getMyFeedbackList).mockResolvedValue([])
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: '내 문의내역' })
+    await open()
 
-    expect(await screen.findByText('아직 제출한 문의가 없어요.')).toBeInTheDocument()
+    expect(screen.getByText('아직 제출한 문의가 없어요.')).toBeInTheDocument()
   })
 
-  it('shows an error message when the list fails to load', async () => {
+  it('shows an error message even while collapsed, so a failed fetch is never silently hidden', async () => {
     mockSession()
     vi.mocked(getMyFeedbackList).mockRejectedValue(new Error('network error'))
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: '내 문의내역' })
 
-    expect(await screen.findByText('목록을 불러오지 못했습니다.')).toBeInTheDocument()
+    expect(screen.getByText('목록을 불러오지 못했습니다.')).toBeInTheDocument()
   })
 
   it('shows the admin reply when one exists', async () => {
@@ -67,8 +115,10 @@ describe('MyFeedbackCard', () => {
       makeFeedback({ id: '1', content: '버튼이 안 눌려요', adminReply: '확인해서 수정했어요', repliedAt: '2026-01-03T00:00:00.000Z' }),
     ])
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: /내 문의내역/ })
+    await open()
 
-    expect(await screen.findByText('버튼이 안 눌려요')).toBeInTheDocument()
+    expect(screen.getByText('버튼이 안 눌려요')).toBeInTheDocument()
     expect(screen.getByText('확인해서 수정했어요')).toBeInTheDocument()
   })
 
@@ -78,8 +128,10 @@ describe('MyFeedbackCard', () => {
       makeFeedback({ id: '1', content: '다크모드 추가해주세요', adminReply: null, repliedAt: null }),
     ])
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: /내 문의내역/ })
+    await open()
 
-    expect(await screen.findByText('다크모드 추가해주세요')).toBeInTheDocument()
+    expect(screen.getByText('다크모드 추가해주세요')).toBeInTheDocument()
     expect(screen.getByText('답변 대기중')).toBeInTheDocument()
   })
 
@@ -89,8 +141,10 @@ describe('MyFeedbackCard', () => {
       makeFeedback({ id: '1', content: '다크모드 추가해주세요', adminReply: null, repliedAt: null }),
     ])
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: /내 문의내역/ })
+    await open()
 
-    expect(await screen.findByRole('button', { name: '삭제' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '삭제' })).toBeInTheDocument()
   })
 
   it('does not show a delete button once an admin has replied', async () => {
@@ -99,8 +153,10 @@ describe('MyFeedbackCard', () => {
       makeFeedback({ id: '1', content: '버튼이 안 눌려요', adminReply: '확인해서 수정했어요', repliedAt: '2026-01-03T00:00:00.000Z' }),
     ])
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: /내 문의내역/ })
+    await open()
 
-    await screen.findByText('버튼이 안 눌려요')
+    expect(screen.getByText('버튼이 안 눌려요')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '삭제' })).not.toBeInTheDocument()
   })
 
@@ -111,8 +167,10 @@ describe('MyFeedbackCard', () => {
     ])
     vi.mocked(deleteFeedback).mockResolvedValue(undefined)
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: /내 문의내역/ })
+    await open()
 
-    await userEvent.click(await screen.findByRole('button', { name: '삭제' }))
+    await userEvent.click(screen.getByRole('button', { name: '삭제' }))
     await userEvent.click(screen.getByRole('button', { name: '삭제하기' }))
 
     expect(deleteFeedback).toHaveBeenCalledWith('1')
@@ -125,8 +183,10 @@ describe('MyFeedbackCard', () => {
       makeFeedback({ id: '1', content: '다크모드 추가해주세요', adminReply: null, repliedAt: null }),
     ])
     render(<MyFeedbackCard />)
+    await screen.findByRole('button', { name: /내 문의내역/ })
+    await open()
 
-    await userEvent.click(await screen.findByRole('button', { name: '삭제' }))
+    await userEvent.click(screen.getByRole('button', { name: '삭제' }))
     await userEvent.click(screen.getByRole('button', { name: '취소' }))
 
     expect(deleteFeedback).not.toHaveBeenCalled()

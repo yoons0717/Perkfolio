@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import FloatingAddButton from '../components/FloatingAddButton'
 import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
@@ -238,6 +239,7 @@ export default function CalendarPage() {
           )}
         </div>
       )}
+      <FloatingAddButton />
     </div>
   )
 }

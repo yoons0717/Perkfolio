@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import FloatingAddButton from './FloatingAddButton'
 import WelcomeModal from './WelcomeModal'
 import { useAuth } from '../context/AuthContext'
 
@@ -36,8 +35,6 @@ export default function RecordsLayout() {
 
         <Outlet />
       </div>
-
-      <FloatingAddButton />
     </div>
   )
 }

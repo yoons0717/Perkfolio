@@ -2,6 +2,7 @@ import { useState } from 'react'
 import AdminReplyBlock from './AdminReplyBlock'
 import Button from './Button'
 import Card from './Card'
+import Chevron from './Chevron'
 import ConfirmModal from './ConfirmModal'
 import Spinner from './Spinner'
 import { useAuth } from '../context/AuthContext'
@@ -20,13 +21,12 @@ export default function MyFeedbackCard() {
     error,
   } = useAsyncList(() => getMyFeedbackList(userId as string), [userId], { enabled: !!userId })
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
 
   if (!session || !userId) return null
 
   let content
-  if (error) {
-    content = <p className="text-sm text-danger">{error}</p>
-  } else if (loading) {
+  if (loading) {
     content = <Spinner />
   } else if (feedbackList.length === 0) {
     content = <p className="text-sm text-muted">아직 제출한 문의가 없어요.</p>
@@ -76,8 +76,22 @@ export default function MyFeedbackCard() {
 
   return (
     <Card>
-      <h2 className="mb-2 font-display text-sm font-bold text-ink">내 문의내역</h2>
-      {content}
+      <Button
+        variant="ghost"
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex w-full items-center justify-between text-left"
+      >
+        <span className="font-display text-sm font-bold text-ink">
+          내 문의내역{!loading && !error && feedbackList.length > 0 ? ` (${feedbackList.length})` : ''}
+        </span>
+        <Chevron
+          size={14}
+          strokeWidth={2.5}
+          className={`text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </Button>
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+      {!error && isOpen && <div className="mt-2">{content}</div>}
       {deletingId && (
         <ConfirmModal
           title="문의 삭제"

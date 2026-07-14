@@ -8,7 +8,13 @@ import { useAuth } from '../context/AuthContext'
 import { addFeedback } from '../lib/feedback'
 import type { FeedbackType } from '../types/feedback'
 
-export default function FeedbackModal({ onClose }: { onClose: () => void }) {
+export default function FeedbackModal({
+  onClose,
+  onSubmitted,
+}: {
+  onClose: () => void
+  onSubmitted?: () => void
+}) {
   const { session } = useAuth()
   const [type, setType] = useState<FeedbackType>('버그')
   const [content, setContent] = useState('')
@@ -26,6 +32,7 @@ export default function FeedbackModal({ onClose }: { onClose: () => void }) {
     try {
       await addFeedback({ type, content, userEmail: session?.user.email ?? null })
       setSubmitted(true)
+      onSubmitted?.()
     } catch {
       setError('제출에 실패했습니다. 잠시 후 다시 시도해주세요.')
     } finally {

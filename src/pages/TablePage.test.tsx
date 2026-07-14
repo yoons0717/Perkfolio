@@ -54,6 +54,14 @@ describe('TablePage loading states', () => {
     renderTablePage()
     expect(await screen.findByText('아직 등록된 체험단 기록이 없습니다.')).toBeInTheDocument()
   })
+
+  it('links the top 체험단 추가 button to /add', async () => {
+    vi.mocked(getVisits).mockResolvedValue([])
+    renderTablePage()
+    await screen.findByText('아직 등록된 체험단 기록이 없습니다.')
+
+    expect(screen.getByRole('link', { name: /체험단 추가/ })).toHaveAttribute('href', '/add')
+  })
 })
 
 describe('TablePage columns', () => {
@@ -312,6 +320,24 @@ describe('TablePage filters', () => {
 
     await userEvent.click(screen.getByRole('button', { name: '상태' }))
     await userEvent.click(screen.getByRole('button', { name: '전체' }))
+    expect(screen.getByText('가게A')).toBeInTheDocument()
+    expect(screen.getByText('가게B')).toBeInTheDocument()
+  })
+
+  it('filters by status when a mobile stat pill is tapped, and toggles off on a second tap', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', storeName: '가게A', status: '예정' }),
+      makeVisit({ id: '2', storeName: '가게B', status: '리뷰완료' }),
+    ])
+    renderTablePage()
+    await screen.findByText('가게A')
+
+    await userEvent.click(screen.getByRole('button', { name: /방문 예정/ }))
+    expect(screen.queryByText('가게B')).not.toBeInTheDocument()
+    expect(screen.getByText('가게A')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /방문 예정/ }))
     expect(screen.getByText('가게A')).toBeInTheDocument()
     expect(screen.getByText('가게B')).toBeInTheDocument()
   })

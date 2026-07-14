@@ -43,6 +43,13 @@ afterEach(() => {
 })
 
 describe('CalendarPage', () => {
+  it('renders the floating add button', async () => {
+    vi.mocked(getVisits).mockResolvedValue([])
+    renderCalendar()
+
+    expect(await screen.findByRole('link', { name: '체험단 추가' })).toHaveAttribute('href', '/add')
+  })
+
   it('shows an error message when loading visits fails', async () => {
     vi.mocked(getVisits).mockRejectedValue(new Error('network error'))
     renderCalendar()

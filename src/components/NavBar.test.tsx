@@ -14,10 +14,6 @@ vi.mock('../lib/auth', () => ({
   signOut: vi.fn(),
 }))
 
-vi.mock('../lib/feedback', () => ({
-  addFeedback: vi.fn(),
-}))
-
 afterEach(() => {
   vi.clearAllMocks()
 })
@@ -112,12 +108,10 @@ describe('NavBar', () => {
     expect(screen.getByRole('link', { name: '마이페이지' })).toHaveAttribute('href', '/mypage')
   })
 
-  it('opens the feedback modal when 문의하기 is clicked', async () => {
+  it('does not show a 문의하기 button — it now lives only in MyPage', () => {
     vi.mocked(useAuth).mockReturnValue({ session: { user: { id: '1' } }, loading: false } as never)
     renderNavBar()
 
-    await userEvent.click(screen.getByRole('button', { name: '문의하기' }))
-
-    expect(screen.getByRole('heading', { name: '문의하기' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '문의하기' })).not.toBeInTheDocument()
   })
 })

@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
+import BottomTabBar from './components/BottomTabBar'
 import ErrorFallback from './components/ErrorFallback'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
@@ -86,6 +87,7 @@ function App() {
         </div>
       </ErrorBoundary>
       <Footer />
+      <BottomTabBar />
     </div>
   )
 }

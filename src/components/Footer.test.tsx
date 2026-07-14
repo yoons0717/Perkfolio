@@ -40,4 +40,15 @@ describe('Footer', () => {
 
     expect(screen.getByText('© 2026 PerkTrack')).toBeInTheDocument()
   })
+
+  it('is hidden on mobile so it does not overlap the fixed BottomTabBar, and only shown from sm: up', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      session: { user: { id: '1' } },
+      loading: false,
+      isPasswordRecovery: false,
+    } as never)
+    render(<Footer />)
+
+    expect(screen.getByText('© 2026 PerkTrack').closest('footer')).toHaveClass('hidden', 'sm:block')
+  })
 })

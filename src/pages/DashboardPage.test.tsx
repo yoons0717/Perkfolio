@@ -164,12 +164,4 @@ describe('DashboardPage', () => {
 
     expect(await screen.findByText('아직 확정된 체험단 기록이 없습니다.')).toBeInTheDocument()
   })
-
-  it('shows a floating button linking to the add-visit page', async () => {
-    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
-    renderDashboard()
-
-    await screen.findByText('총 체험단')
-    expect(screen.getByRole('link', { name: '체험단 추가' })).toHaveAttribute('href', '/add')
-  })
 })
