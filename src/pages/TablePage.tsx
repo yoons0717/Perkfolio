@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Button from '../components/Button'
+import Chevron from '../components/Chevron'
 import Select from '../components/Select'
 import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
@@ -57,24 +58,6 @@ function parseStatusFilter(value: string | null): '전체' | VisitStatus {
 
 function parsePlatformFilter(value: string | null): '전체' | Platform {
   return value && (platforms as string[]).includes(value) ? (value as Platform) : '전체'
-}
-
-function Chevron({ className }: { className?: string }) {
-  return (
-    <svg
-      width="10"
-      height="10"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  )
 }
 
 function StatusFilterMenu({
@@ -243,6 +226,32 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
         </span>
       </div>
     </div>
+  )
+}
+
+function PlatformFilterSelect({
+  value,
+  onChange,
+  className,
+}: {
+  value: '전체' | Platform
+  onChange: (value: '전체' | Platform) => void
+  className: string
+}) {
+  return (
+    <Select
+      aria-label="플랫폼 필터"
+      value={value}
+      onChange={(e) => onChange(e.target.value as '전체' | Platform)}
+      className={className}
+    >
+      <option value="전체">플랫폼 전체</option>
+      {platforms.map((p) => (
+        <option key={p} value={p}>
+          {p}
+        </option>
+      ))}
+    </Select>
   )
 }
 
@@ -424,37 +433,21 @@ export default function TablePage() {
             </Select>
           </div>
           <div className="flex-1">
-            <Select
-              aria-label="플랫폼 필터"
+            <PlatformFilterSelect
               value={platformFilter}
-              onChange={(e) => setPlatformFilter(e.target.value as '전체' | Platform)}
+              onChange={setPlatformFilter}
               className="rounded-xl border border-line bg-surface px-3.5 py-3.5 text-sm text-ink"
-            >
-              <option value="전체">플랫폼 전체</option>
-              {platforms.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </Select>
+            />
           </div>
         </div>
       ) : (
         <div className="mb-4 flex gap-3">
           <div className="w-36">
-            <Select
-              aria-label="플랫폼 필터"
+            <PlatformFilterSelect
               value={platformFilter}
-              onChange={(e) => setPlatformFilter(e.target.value as '전체' | Platform)}
+              onChange={setPlatformFilter}
               className="rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink"
-            >
-              <option value="전체">플랫폼 전체</option>
-              {platforms.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </Select>
+            />
           </div>
         </div>
       )}

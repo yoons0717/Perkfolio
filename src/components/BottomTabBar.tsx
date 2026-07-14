@@ -1,5 +1,6 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useActiveNav } from '../hooks/useActiveNav'
 
 function TableIcon() {
   return (
@@ -30,23 +31,18 @@ function UserIcon() {
 
 export default function BottomTabBar() {
   const { session, isPasswordRecovery } = useAuth()
-  const location = useLocation()
+  const { isRecordsActive, isDashboardActive, isMyPageActive } = useActiveNav()
 
   if (!session || isPasswordRecovery) return null
 
   const items = [
-    {
-      to: '/table',
-      label: '체험단내역',
-      active: location.pathname === '/table' || location.pathname === '/calendar',
-      Icon: TableIcon,
-    },
-    { to: '/dashboard', label: '대시보드', active: location.pathname === '/dashboard', Icon: ChartIcon },
-    { to: '/mypage', label: '마이페이지', active: location.pathname === '/mypage', Icon: UserIcon },
+    { to: '/table', label: '체험단내역', active: isRecordsActive, Icon: TableIcon },
+    { to: '/dashboard', label: '대시보드', active: isDashboardActive, Icon: ChartIcon },
+    { to: '/mypage', label: '마이페이지', active: isMyPageActive, Icon: UserIcon },
   ]
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-surface sm:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex min-h-[var(--bottom-tab-bar-h)] border-t border-line bg-surface sm:hidden">
       {items.map(({ to, label, active, Icon }) => (
         <Link
           key={to}

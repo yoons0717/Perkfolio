@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Button from './Button'
 import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
+import { useActiveNav } from '../hooks/useActiveNav'
 import { signOut } from '../lib/auth'
 import { isAdmin } from '../lib/admin'
 
@@ -9,13 +10,11 @@ export default function NavBar() {
   const { session, isPasswordRecovery } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const { isRecordsActive, isDashboardActive, isMyPageActive } = useActiveNav()
 
   if (!session || isPasswordRecovery) return null
 
   const showAdminLink = isAdmin(session.user.app_metadata)
-  const isRecordsActive = location.pathname === '/table' || location.pathname === '/calendar'
-  const isDashboardActive = location.pathname === '/dashboard'
-  const isMyPageActive = location.pathname === '/mypage'
 
   async function handleLogout() {
     const { error } = await signOut()
