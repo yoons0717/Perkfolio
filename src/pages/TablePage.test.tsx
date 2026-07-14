@@ -96,6 +96,14 @@ describe('TablePage columns', () => {
     expect(screen.getByText('릴스')).toBeInTheDocument()
   })
 
+  it('shows "-" in the review type column for a visit with none set', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ storeName: '카페 온도', reviewTypes: [] })])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    expect(getRowCells('카페 온도')[3]).toHaveTextContent('-')
+  })
+
   it('shows the net savings in red when extra payment exceeds retail value (a loss)', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ storeName: '카페 온도', retailValue: 10000, extraPayment: 15000, status: '리뷰완료' }),

@@ -464,16 +464,20 @@ export default function TablePage() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex w-full flex-wrap gap-1">
-                          {v.reviewTypes.map((rt) => (
-                            <span
-                              key={rt}
-                              className="rounded-full bg-line px-1.5 py-0.5 text-[10px] text-ink"
-                            >
-                              {rt}
-                            </span>
-                          ))}
-                        </div>
+                        {v.reviewTypes.length === 0 ? (
+                          <span className="text-muted">-</span>
+                        ) : (
+                          <div className="flex w-full flex-wrap gap-1">
+                            {v.reviewTypes.map((rt) => (
+                              <span
+                                key={rt}
+                                className="rounded-full bg-line px-1.5 py-0.5 text-[10px] text-ink"
+                              >
+                                {rt}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
