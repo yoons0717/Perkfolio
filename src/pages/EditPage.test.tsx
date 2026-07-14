@@ -96,7 +96,7 @@ describe('EditPage view mode', () => {
   })
 
   it('shows a link row for each filled link, and omits the row for a missing one', async () => {
-    vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrl: null }))
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrls: [] }))
     renderEditPage()
 
     await screen.findByRole('heading', { name: '카페 온도' })
@@ -112,7 +112,7 @@ describe('EditPage view mode', () => {
   })
 
   it('shows a row for 포스팅 링크 once it is filled', async () => {
-    vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrl: 'https://blog.example.com' }))
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ postUrls: ['https://blog.example.com'] }))
     renderEditPage()
 
     await screen.findByRole('heading', { name: '카페 온도' })
@@ -120,6 +120,30 @@ describe('EditPage view mode', () => {
       'href',
       'https://blog.example.com',
     )
+  })
+
+  it('shows review types joined by comma', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ reviewTypes: ['블로그', '릴스'] }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('블로그, 릴스')).toBeInTheDocument()
+  })
+
+  it('shows "-" for review types when none are set', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ reviewTypes: [] }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('리뷰 타입').nextElementSibling).toHaveTextContent('-')
+  })
+
+  it('numbers post URL rows when there is more than one', async () => {
+    vi.mocked(getVisit).mockResolvedValue(
+      makeVisit({ postUrls: ['https://blog.example.com/a', 'https://blog.example.com/b'] }),
+    )
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('포스팅 링크 1')).toBeInTheDocument()
+    expect(screen.getByText('포스팅 링크 2')).toBeInTheDocument()
   })
 
   it('shows "-" when there is no visit date', async () => {
@@ -147,7 +171,7 @@ describe('EditPage view mode', () => {
     // fix postUrl to a real link so its own "바로가기" doesn't add a second
     // link, keeping the "없음" assertion specific to the deadline field
     vi.mocked(getVisit).mockResolvedValue(
-      makeVisit({ reviewDeadline: null, postUrl: 'https://blog.example.com' }),
+      makeVisit({ reviewDeadline: null, postUrls: ['https://blog.example.com'] }),
     )
     renderEditPage()
     await screen.findByRole('heading', { name: '카페 온도' })
@@ -229,7 +253,7 @@ describe('EditPage edit mode', () => {
     const pendingSave = new Promise<Visit>((resolve) => {
       resolveSave = resolve
     })
-    const visit = makeVisit({ storeName: '카페 온도', reviewDeadline: '2026-09-01' })
+    const visit = makeVisit({ storeName: '카페 온도', reviewDeadline: '2026-09-01', reviewTypes: ['블로그'] })
     vi.mocked(getVisit).mockResolvedValue(visit)
     vi.mocked(updateVisit).mockReturnValue(pendingSave)
     renderEditPage()
@@ -245,7 +269,7 @@ describe('EditPage edit mode', () => {
   })
 
   it('saves via updateVisit and shows the updated value back in view mode', async () => {
-    const visit = makeVisit({ storeName: '카페 온도', reviewDeadline: '2026-09-01' })
+    const visit = makeVisit({ storeName: '카페 온도', reviewDeadline: '2026-09-01', reviewTypes: ['블로그'] })
     vi.mocked(getVisit).mockResolvedValue(visit)
     vi.mocked(updateVisit).mockResolvedValue({ ...visit, storeName: '변경된 이름' })
     renderEditPage()

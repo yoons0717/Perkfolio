@@ -25,6 +25,7 @@ async function fillRequiredFields() {
   await userEvent.selectOptions(screen.getByLabelText('플랫폼'), '포포몬')
   await userEvent.selectOptions(screen.getByLabelText('카테고리'), '카페')
   await userEvent.selectOptions(screen.getByLabelText('상태'), '예정')
+  await userEvent.click(screen.getByRole('checkbox', { name: '블로그' }))
   await userEvent.type(screen.getByLabelText('업체명'), '카페 온도')
   await userEvent.type(screen.getByLabelText('가게 정보 URL (선택)'), 'https://store.example.com')
   await userEvent.type(screen.getByLabelText('체험 내역 (선택)'), '파스타 2, 음료 2')

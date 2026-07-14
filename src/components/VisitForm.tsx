@@ -7,8 +7,8 @@ import Select from './Select'
 import { inputClass, selectClass, sectionLabelClass } from './formStyles'
 import { toDateString } from '../lib/format'
 import { statusOrder } from '../lib/statusStyle'
-import { categories, platforms } from '../types/visit'
-import type { Category, NewVisit, Platform, VisitStatus } from '../types/visit'
+import { categories, platforms, reviewTypes as reviewTypeOptions } from '../types/visit'
+import type { Category, NewVisit, Platform, ReviewType, VisitStatus } from '../types/visit'
 
 // Slightly shorter than the shared inputClass/selectClass so the whole form
 // fits on one screen without scrolling; other pages keep the taller default
@@ -40,13 +40,14 @@ type FormFields = {
   platform: Platform | ''
   storeName: string
   category: Category | ''
+  reviewTypes: ReviewType[]
   sponsoredItems: string
   reservationNote: string
   campaignUrl: string
   storeInfoUrl: string
   retailValue: string
   extraPayment: string
-  postUrl: string
+  postUrls: string[]
   reviewDeadline: Date | null
   status: VisitStatus | ''
 }
@@ -57,13 +58,14 @@ function initialFormFields(initialValues: NewVisit | undefined): FormFields {
     platform: initialValues?.platform ?? '',
     storeName: initialValues?.storeName ?? '',
     category: initialValues?.category ?? '',
+    reviewTypes: initialValues?.reviewTypes ?? [],
     sponsoredItems: initialValues?.sponsoredItems ?? '',
     reservationNote: initialValues?.reservationNote ?? '',
     campaignUrl: initialValues?.campaignUrl ?? '',
     storeInfoUrl: initialValues?.storeInfoUrl ?? '',
     retailValue: String(initialValues?.retailValue ?? ''),
     extraPayment: String(initialValues?.extraPayment ?? 0),
-    postUrl: initialValues?.postUrl ?? '',
+    postUrls: initialValues?.postUrls ?? [],
     reviewDeadline: initialValues?.reviewDeadline ? parseDateString(initialValues.reviewDeadline) : null,
     status: initialValues?.status ?? '',
   }
@@ -92,18 +94,44 @@ export default function VisitForm({
     setFields((f) => ({ ...f, [key]: value }))
   }
 
+  function toggleReviewType(rt: ReviewType) {
+    updateField(
+      'reviewTypes',
+      reviewTypes.includes(rt) ? reviewTypes.filter((t) => t !== rt) : [...reviewTypes, rt],
+    )
+  }
+
+  function updatePostUrl(index: number, value: string) {
+    updateField(
+      'postUrls',
+      postUrls.map((u, i) => (i === index ? value : u)),
+    )
+  }
+
+  function addPostUrl() {
+    updateField('postUrls', [...postUrls, ''])
+  }
+
+  function removePostUrl(index: number) {
+    updateField(
+      'postUrls',
+      postUrls.filter((_, i) => i !== index),
+    )
+  }
+
   const {
     visitDate,
     platform,
     storeName,
     category,
+    reviewTypes,
     sponsoredItems,
     reservationNote,
     campaignUrl,
     storeInfoUrl,
     retailValue,
     extraPayment,
-    postUrl,
+    postUrls,
     reviewDeadline,
     status,
   } = fields
@@ -115,6 +143,12 @@ export default function VisitForm({
     // runs). visitDate is NOT required — it may be null when the actual
     // visit date isn't confirmed yet.
     setError(null)
+
+    if (reviewTypes.length === 0) {
+      setError('리뷰 타입을 1개 이상 선택해주세요.')
+      return
+    }
+
     setSubmitting(true)
 
     try {
@@ -123,6 +157,7 @@ export default function VisitForm({
         platform: platform as Platform,
         storeName,
         category: category as Category,
+        reviewTypes,
         sponsoredItems: trimToNull(sponsoredItems),
         reservationNote: trimToNull(reservationNote),
         campaignUrl: trimToNull(campaignUrl),
@@ -130,7 +165,7 @@ export default function VisitForm({
         retailValue: Number(retailValue),
         extraPayment: Number(extraPayment),
         status: status as VisitStatus,
-        postUrl: trimToNull(postUrl),
+        postUrls: postUrls.map((u) => u.trim()).filter((u) => u !== ''),
         reviewDeadline: toDateString(reviewDeadline as Date),
       })
     } catch {
@@ -213,6 +248,23 @@ export default function VisitForm({
               ))}
             </Select>
           </FormField>
+        </div>
+
+        <div className="flex flex-col gap-1 text-sm">
+          <span>리뷰 타입</span>
+          <div role="group" aria-label="리뷰 타입" className="flex flex-wrap gap-x-4 gap-y-2">
+            {reviewTypeOptions.map((rt) => (
+              <label key={rt} className="flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  checked={reviewTypes.includes(rt)}
+                  onChange={() => toggleReviewType(rt)}
+                  className="h-4 w-4 accent-blue"
+                />
+                {rt}
+              </label>
+            ))}
+          </div>
         </div>
 
         <FormField label="가게 정보 URL (선택)">
@@ -299,14 +351,34 @@ export default function VisitForm({
           />
         </FormField>
 
-        <FormField label="포스팅 링크 (선택)">
-          <input
-            type="url"
-            value={postUrl}
-            onChange={(e) => updateField('postUrl', e.target.value)}
-            className={compactInputClass}
-          />
-        </FormField>
+        <div className="flex flex-col gap-1 text-sm">
+          <span>포스팅 링크 (선택)</span>
+          <div className="flex flex-col gap-2">
+            {postUrls.map((url, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  type="url"
+                  aria-label={`포스팅 링크 ${i + 1}`}
+                  value={url}
+                  onChange={(e) => updatePostUrl(i, e.target.value)}
+                  className={`flex-1 ${compactInputClass}`}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => removePostUrl(i)}
+                  aria-label={`포스팅 링크 ${i + 1} 삭제`}
+                  className="shrink-0 px-3"
+                >
+                  ✕
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="secondary" onClick={addPostUrl} className="text-sm">
+              + 링크 추가
+            </Button>
+          </div>
+        </div>
       </div>
 
       {error && <p className="text-sm text-danger">{error}</p>}
