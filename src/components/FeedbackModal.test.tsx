@@ -1,12 +1,24 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import FeedbackModal from './FeedbackModal'
+import { useAuth } from '../context/AuthContext'
 import { addFeedback } from '../lib/feedback'
+
+vi.mock('../context/AuthContext', () => ({
+  useAuth: vi.fn(),
+}))
 
 vi.mock('../lib/feedback', () => ({
   addFeedback: vi.fn(),
 }))
+
+beforeEach(() => {
+  vi.mocked(useAuth).mockReturnValue({
+    session: { user: { id: '1', email: 'user@example.com' } },
+    loading: false,
+  } as never)
+})
 
 afterEach(() => {
   vi.clearAllMocks()
@@ -32,8 +44,28 @@ describe('FeedbackModal', () => {
     await userEvent.type(screen.getByLabelText('내용'), '버튼이 안 눌려요')
     await userEvent.click(screen.getByRole('button', { name: '제출' }))
 
-    expect(addFeedback).toHaveBeenCalledWith({ type: '건의', content: '버튼이 안 눌려요' })
+    expect(addFeedback).toHaveBeenCalledWith({
+      type: '건의',
+      content: '버튼이 안 눌려요',
+      userEmail: 'user@example.com',
+    })
     expect(await screen.findByText('제출되었습니다. 감사합니다!')).toBeInTheDocument()
+  })
+
+  it('disables the 취소 button while submitting', async () => {
+    let resolveSubmit: () => void = () => {}
+    vi.mocked(addFeedback).mockReturnValue(
+      new Promise((resolve) => {
+        resolveSubmit = resolve
+      }),
+    )
+    render(<FeedbackModal onClose={vi.fn()} />)
+
+    await userEvent.type(screen.getByLabelText('내용'), '테스트')
+    await userEvent.click(screen.getByRole('button', { name: '제출' }))
+
+    expect(screen.getByRole('button', { name: '취소' })).toBeDisabled()
+    resolveSubmit()
   })
 
   it('closes via the confirmation view\'s 닫기 button', async () => {
@@ -66,5 +98,29 @@ describe('FeedbackModal', () => {
     await userEvent.click(screen.getByRole('button', { name: '제출' }))
 
     expect(await screen.findByText('제출에 실패했습니다. 잠시 후 다시 시도해주세요.')).toBeInTheDocument()
+  })
+
+  it('calls onSubmitted once the feedback is successfully submitted', async () => {
+    vi.mocked(addFeedback).mockResolvedValue(undefined)
+    const onSubmitted = vi.fn()
+    render(<FeedbackModal onClose={vi.fn()} onSubmitted={onSubmitted} />)
+
+    await userEvent.type(screen.getByLabelText('내용'), '테스트')
+    await userEvent.click(screen.getByRole('button', { name: '제출' }))
+    await screen.findByText('제출되었습니다. 감사합니다!')
+
+    expect(onSubmitted).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call onSubmitted when submission fails', async () => {
+    vi.mocked(addFeedback).mockRejectedValue(new Error('network error'))
+    const onSubmitted = vi.fn()
+    render(<FeedbackModal onClose={vi.fn()} onSubmitted={onSubmitted} />)
+
+    await userEvent.type(screen.getByLabelText('내용'), '테스트')
+    await userEvent.click(screen.getByRole('button', { name: '제출' }))
+    await screen.findByText('제출에 실패했습니다. 잠시 후 다시 시도해주세요.')
+
+    expect(onSubmitted).not.toHaveBeenCalled()
   })
 })

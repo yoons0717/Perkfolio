@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Session } from '@supabase/supabase-js'
+import { FunctionsHttpError } from '@supabase/supabase-js'
 import {
+  deleteAccount,
   getSession,
   isRecoverySession,
   markOnboardingSeen,
@@ -29,6 +31,7 @@ vi.mock('./supabaseClient', () => ({
       resetPasswordForEmail: vi.fn(),
       updateUser: vi.fn(),
     },
+    functions: { invoke: vi.fn() },
   },
 }))
 
@@ -113,6 +116,20 @@ describe('signOut', () => {
 
     expect(supabase.auth.signOut).toHaveBeenCalled()
   })
+
+  it('resolves with the error supabase returns instead of throwing', async () => {
+    const error = new Error('network error')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(supabase.auth.signOut).mockResolvedValue({ error } as any)
+
+    await expect(signOut()).resolves.toEqual({ error })
+  })
+
+  it('wraps a rejection from the underlying call into an { error } result instead of throwing', async () => {
+    vi.mocked(supabase.auth.signOut).mockRejectedValue(new Error('network error'))
+
+    await expect(signOut()).resolves.toEqual({ error: new Error('network error') })
+  })
 })
 
 describe('signUpWithPassword', () => {
@@ -158,6 +175,37 @@ describe('markOnboardingSeen', () => {
     await markOnboardingSeen()
 
     expect(supabase.auth.updateUser).toHaveBeenCalledWith({ data: { has_seen_onboarding: true } })
+  })
+})
+
+describe('deleteAccount', () => {
+  it('invokes the delete-account function', async () => {
+    vi.mocked(supabase.functions.invoke).mockResolvedValue({ data: { success: true }, error: null } as never)
+
+    await deleteAccount()
+
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('delete-account')
+  })
+
+  it('surfaces the Edge Function response message on a FunctionsHttpError', async () => {
+    const context = {
+      json: () => Promise.resolve({ error: '인증에 실패했습니다.' }),
+    } as Response
+    vi.mocked(supabase.functions.invoke).mockResolvedValue({
+      data: null,
+      error: new FunctionsHttpError(context),
+    } as never)
+
+    await expect(deleteAccount()).rejects.toThrow('인증에 실패했습니다.')
+  })
+
+  it('throws when the function returns a non-HTTP error', async () => {
+    vi.mocked(supabase.functions.invoke).mockResolvedValue({
+      data: null,
+      error: new Error('network error'),
+    } as never)
+
+    await expect(deleteAccount()).rejects.toThrow('network error')
   })
 })
 

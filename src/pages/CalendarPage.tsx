@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import FloatingAddButton from '../components/FloatingAddButton'
 import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import { useVisits } from '../hooks/useVisits'
@@ -34,9 +35,10 @@ export default function CalendarPage() {
     const map = new Map<string, Visit[]>()
     for (const v of visits) {
       if (v.visitDate === null) continue
-      // once reviewed, a visit with a deadline is represented by its
-      // deadline-date card instead — showing it here too would duplicate it
-      if (v.status === '리뷰완료' && v.reviewDeadline) continue
+      // a visit with a deadline is represented by its deadline-date card
+      // instead — showing it here too would duplicate it, whether because
+      // it's already reviewed or because the deadline falls on the visit date
+      if (v.reviewDeadline && (v.status === '리뷰완료' || v.reviewDeadline === v.visitDate)) continue
       const list = map.get(v.visitDate) ?? []
       list.push(v)
       map.set(v.visitDate, list)
@@ -194,6 +196,7 @@ export default function CalendarPage() {
                       <p className="text-ink">{v.storeName}</p>
                       <p className="mt-0.5 text-xs text-muted">
                         {v.platform} · {v.category}
+                        {v.reviewTypes.length > 0 && ` · ${v.reviewTypes.join(', ')}`}
                       </p>
                     </div>
                   </div>
@@ -214,6 +217,9 @@ export default function CalendarPage() {
                       />
                       <div>
                         <p className="text-ink">{v.storeName}</p>
+                        {v.reviewTypes.length > 0 && (
+                          <p className="mt-0.5 text-xs text-muted">{v.reviewTypes.join(', ')}</p>
+                        )}
                         <p className={`mt-0.5 text-xs ${deadline.reviewed ? statusTextClass('리뷰완료') : deadlineUrgentTextClass}`}>
                           {deadline.reviewed ? '리뷰 완료' : '리뷰 마감'}
                         </p>
@@ -233,6 +239,7 @@ export default function CalendarPage() {
           )}
         </div>
       )}
+      <FloatingAddButton />
     </div>
   )
 }

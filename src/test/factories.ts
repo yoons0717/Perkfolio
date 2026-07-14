@@ -9,6 +9,7 @@ export function makeVisit(overrides: Partial<Visit> = {}): Visit {
     platform: '포포몬',
     storeName: '카페 온도',
     category: '카페',
+    reviewTypes: [],
     sponsoredItems: '음료 2',
     reservationNote: null,
     campaignUrl: 'https://campaign.example.com',
@@ -16,7 +17,7 @@ export function makeVisit(overrides: Partial<Visit> = {}): Visit {
     retailValue: 10000,
     extraPayment: 0,
     status: '예정',
-    postUrl: null,
+    postUrls: [],
     reviewDeadline: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
@@ -29,6 +30,9 @@ export function makeFeedback(overrides: Partial<Feedback> = {}): Feedback {
     type: '버그',
     content: '버튼이 안 눌려요',
     createdAt: '2026-01-01T00:00:00.000Z',
+    userEmail: 'user@example.com',
+    adminReply: null,
+    repliedAt: null,
     ...overrides,
   }
 }

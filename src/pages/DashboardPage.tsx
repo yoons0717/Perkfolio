@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import Button from '../components/Button'
-import FloatingAddButton from '../components/FloatingAddButton'
 import { focusRingClass, inputClass } from '../components/formStyles'
 import GraphBuilderForm from '../components/GraphBuilderForm'
 import GraphCard from '../components/GraphCard'
@@ -186,8 +185,6 @@ export default function DashboardPage() {
           )}
         </Section>
       </div>
-
-      <FloatingAddButton />
     </div>
   )
 }

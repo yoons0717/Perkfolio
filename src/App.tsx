@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
+import BottomTabBar from './components/BottomTabBar'
 import ErrorFallback from './components/ErrorFallback'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
@@ -16,6 +17,8 @@ import TablePage from './pages/TablePage'
 import CalendarPage from './pages/CalendarPage'
 import DashboardPage from './pages/DashboardPage'
 import AdminFeedbackPage from './pages/AdminFeedbackPage'
+import NaverCallbackPage from './pages/NaverCallbackPage'
+import MyPage from './pages/MyPage'
 
 function App() {
   return (
@@ -29,6 +32,7 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/auth/naver/callback" element={<NaverCallbackPage />} />
             <Route
               path="/add"
               element={
@@ -71,10 +75,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/mypage"
+              element={
+                <ProtectedRoute>
+                  <MyPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
       </ErrorBoundary>
       <Footer />
+      <BottomTabBar />
     </div>
   )
 }

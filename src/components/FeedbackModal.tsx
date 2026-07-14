@@ -1,25 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import Button from './Button'
 import Select from './Select'
 import { inputClass, selectClass } from './formStyles'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
+import { useAuth } from '../context/AuthContext'
 import { addFeedback } from '../lib/feedback'
 import type { FeedbackType } from '../types/feedback'
 
-export default function FeedbackModal({ onClose }: { onClose: () => void }) {
+export default function FeedbackModal({
+  onClose,
+  onSubmitted,
+}: {
+  onClose: () => void
+  onSubmitted?: () => void
+}) {
+  const { session } = useAuth()
   const [type, setType] = useState<FeedbackType>('버그')
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
-  useEffect(() => {
-    const original = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = original
-    }
-  }, [])
+  useBodyScrollLock()
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -27,8 +30,9 @@ export default function FeedbackModal({ onClose }: { onClose: () => void }) {
     setSubmitting(true)
 
     try {
-      await addFeedback({ type, content })
+      await addFeedback({ type, content, userEmail: session?.user.email ?? null })
       setSubmitted(true)
+      onSubmitted?.()
     } catch {
       setError('제출에 실패했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
@@ -78,7 +82,7 @@ export default function FeedbackModal({ onClose }: { onClose: () => void }) {
           </label>
           {error && <p className="text-sm text-danger">{error}</p>}
           <div className="flex gap-3">
-            <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+            <Button type="button" variant="secondary" disabled={submitting} onClick={onClose} className="flex-1">
               취소
             </Button>
             <Button type="submit" disabled={submitting} className="flex-1">

@@ -54,6 +54,14 @@ describe('TablePage loading states', () => {
     renderTablePage()
     expect(await screen.findByText('아직 등록된 체험단 기록이 없습니다.')).toBeInTheDocument()
   })
+
+  it('links the top 체험단 추가 button to /add', async () => {
+    vi.mocked(getVisits).mockResolvedValue([])
+    renderTablePage()
+    await screen.findByText('아직 등록된 체험단 기록이 없습니다.')
+
+    expect(screen.getByRole('link', { name: /체험단 추가/ })).toHaveAttribute('href', '/add')
+  })
 })
 
 describe('TablePage columns', () => {
@@ -67,6 +75,7 @@ describe('TablePage columns', () => {
         retailValue: 48000,
         extraPayment: 5000,
         status: '리뷰완료',
+        reviewTypes: ['블로그'],
       }),
     ])
     renderTablePage()
@@ -77,11 +86,30 @@ describe('TablePage columns', () => {
       '-',
       '2026-01-10',
       '카페 온도캐시노트 · 카페',
+      '블로그',
       '₩48,000',
       '₩5,000',
       '₩43,000',
       '리뷰완료',
     ])
+  })
+
+  it('shows review types as chips in the desktop table', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '파스타공방', reviewTypes: ['블로그', '릴스'] }),
+    ])
+    renderTablePage()
+
+    expect(await screen.findByText('블로그')).toBeInTheDocument()
+    expect(screen.getByText('릴스')).toBeInTheDocument()
+  })
+
+  it('shows "-" in the review type column for a visit with none set', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ storeName: '카페 온도', reviewTypes: [] })])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    expect(getRowCells('카페 온도')[3]).toHaveTextContent('-')
   })
 
   it('shows the net savings in red when extra payment exceeds retail value (a loss)', async () => {
@@ -104,7 +132,7 @@ describe('TablePage columns', () => {
 
     await screen.findByText('카페 온도')
     expect(screen.queryByText('₩43,000')).not.toBeInTheDocument()
-    const netSavedCell = getRowCells('카페 온도')[5]
+    const netSavedCell = getRowCells('카페 온도')[6]
     expect(netSavedCell).toHaveTextContent('-')
     expect(netSavedCell).toHaveClass('text-muted')
   })
@@ -292,6 +320,24 @@ describe('TablePage filters', () => {
 
     await userEvent.click(screen.getByRole('button', { name: '상태' }))
     await userEvent.click(screen.getByRole('button', { name: '전체' }))
+    expect(screen.getByText('가게A')).toBeInTheDocument()
+    expect(screen.getByText('가게B')).toBeInTheDocument()
+  })
+
+  it('filters by status when a mobile stat pill is tapped, and toggles off on a second tap', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true)
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', storeName: '가게A', status: '예정' }),
+      makeVisit({ id: '2', storeName: '가게B', status: '리뷰완료' }),
+    ])
+    renderTablePage()
+    await screen.findByText('가게A')
+
+    await userEvent.click(screen.getByRole('button', { name: /방문 예정/ }))
+    expect(screen.queryByText('가게B')).not.toBeInTheDocument()
+    expect(screen.getByText('가게A')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /방문 예정/ }))
     expect(screen.getByText('가게A')).toBeInTheDocument()
     expect(screen.getByText('가게B')).toBeInTheDocument()
   })

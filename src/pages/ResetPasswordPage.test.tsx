@@ -88,7 +88,7 @@ describe('ResetPasswordPage', () => {
 
   it('still navigates to /login even when signOut fails, since the password was already changed', async () => {
     vi.mocked(updatePassword).mockResolvedValue({ data: {}, error: null } as never)
-    vi.mocked(signOut).mockRejectedValue(new Error('network error'))
+    vi.mocked(signOut).mockResolvedValue({ error: new Error('network error') } as never)
     renderResetPasswordPage()
 
     await fillAndSubmit('NewPassword123!', 'NewPassword123!')

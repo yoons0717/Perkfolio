@@ -185,6 +185,11 @@ export default function EditPage() {
             <ViewField label="카테고리" value={visit.category} />
           </div>
 
+          <ViewField
+            label="리뷰 타입"
+            value={visit.reviewTypes.length > 0 ? visit.reviewTypes.join(', ') : '-'}
+          />
+
           <ViewLinkField label="가게 정보 URL" href={visit.storeInfoUrl} />
 
           <ViewField label="체험 내역" value={visit.sponsoredItems ?? '-'} />
@@ -205,7 +210,13 @@ export default function EditPage() {
         <div className="flex flex-col gap-3 border-t border-line pt-4">
           <p className={sectionLabelClass}>링크</p>
           <ViewLinkField label="체험단 URL" href={visit.campaignUrl} />
-          <ViewLinkField label="포스팅 링크" href={visit.postUrl} />
+          {visit.postUrls.map((url, i) => (
+            <ViewLinkField
+              key={i}
+              label={visit.postUrls.length > 1 ? `포스팅 링크 ${i + 1}` : '포스팅 링크'}
+              href={url}
+            />
+          ))}
         </div>
       </div>
 

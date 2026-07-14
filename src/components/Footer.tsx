@@ -6,7 +6,7 @@ export default function Footer() {
   if (!session || isPasswordRecovery) return null
 
   return (
-    <footer className="border-t border-line bg-surface px-6 py-4 text-center text-sm text-muted">
+    <footer className="hidden border-t border-line bg-surface px-6 py-4 text-center text-sm text-muted sm:block">
       © 2026 PerkTrack
     </footer>
   )

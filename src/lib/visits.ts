@@ -7,6 +7,7 @@ type VisitRow = {
   platform: Visit['platform']
   store_name: string
   category: Visit['category']
+  review_types: Visit['reviewTypes']
   sponsored_items: string | null
   reservation_note: string | null
   campaign_url: string | null
@@ -14,7 +15,7 @@ type VisitRow = {
   retail_value: number
   extra_payment: number
   status: Visit['status']
-  post_url: string | null
+  post_urls: string[]
   review_deadline: string | null
   created_at: string
 }
@@ -26,6 +27,7 @@ function toVisit(row: VisitRow): Visit {
     platform: row.platform,
     storeName: row.store_name,
     category: row.category,
+    reviewTypes: row.review_types,
     sponsoredItems: row.sponsored_items,
     reservationNote: row.reservation_note,
     campaignUrl: row.campaign_url,
@@ -33,7 +35,7 @@ function toVisit(row: VisitRow): Visit {
     retailValue: row.retail_value,
     extraPayment: row.extra_payment,
     status: row.status,
-    postUrl: row.post_url,
+    postUrls: row.post_urls,
     reviewDeadline: row.review_deadline,
     createdAt: row.created_at,
   }
@@ -63,6 +65,7 @@ export async function addVisit(visit: NewVisit): Promise<Visit> {
       platform: visit.platform,
       store_name: visit.storeName,
       category: visit.category,
+      review_types: visit.reviewTypes,
       sponsored_items: visit.sponsoredItems,
       reservation_note: visit.reservationNote,
       campaign_url: visit.campaignUrl,
@@ -70,7 +73,7 @@ export async function addVisit(visit: NewVisit): Promise<Visit> {
       retail_value: visit.retailValue,
       extra_payment: visit.extraPayment,
       status: visit.status,
-      post_url: visit.postUrl,
+      post_urls: visit.postUrls,
       review_deadline: visit.reviewDeadline,
     })
     .select()
@@ -88,6 +91,7 @@ export async function updateVisit(id: string, visit: NewVisit): Promise<Visit> {
       platform: visit.platform,
       store_name: visit.storeName,
       category: visit.category,
+      review_types: visit.reviewTypes,
       sponsored_items: visit.sponsoredItems,
       reservation_note: visit.reservationNote,
       campaign_url: visit.campaignUrl,
@@ -95,7 +99,7 @@ export async function updateVisit(id: string, visit: NewVisit): Promise<Visit> {
       retail_value: visit.retailValue,
       extra_payment: visit.extraPayment,
       status: visit.status,
-      post_url: visit.postUrl,
+      post_urls: visit.postUrls,
       review_deadline: visit.reviewDeadline,
     })
     .eq('id', id)

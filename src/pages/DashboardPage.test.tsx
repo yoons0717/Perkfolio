@@ -122,14 +122,6 @@ describe('DashboardPage', () => {
     expect(totalVisitCountText()).toBe('0건')
   })
 
-  it('shows a floating button linking to the add-visit page', async () => {
-    vi.mocked(getVisits).mockResolvedValue([makeVisit({})])
-    renderDashboard()
-
-    await screen.findByText('총 체험단')
-    expect(screen.getByRole('link', { name: '체험단 추가' })).toHaveAttribute('href', '/add')
-  })
-
   it('adds a graph via the builder form and renders a GraphCard computed with the selected scope', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', category: '카페', retailValue: 10000, extraPayment: 0 }),

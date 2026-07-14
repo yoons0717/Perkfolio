@@ -43,6 +43,13 @@ afterEach(() => {
 })
 
 describe('CalendarPage', () => {
+  it('renders the floating add button', async () => {
+    vi.mocked(getVisits).mockResolvedValue([])
+    renderCalendar()
+
+    expect(await screen.findByRole('link', { name: '체험단 추가' })).toHaveAttribute('href', '/add')
+  })
+
   it('shows an error message when loading visits fails', async () => {
     vi.mocked(getVisits).mockRejectedValue(new Error('network error'))
     renderCalendar()
@@ -112,6 +119,15 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('이 날짜에 등록된 체험단이 없습니다.')).toBeInTheDocument()
   })
 
+  it('shows a pending visit only once when its visit date and review deadline are the same day', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ visitDate: DAY_15, reviewDeadline: DAY_15, status: '예정' }),
+    ])
+    renderCalendar()
+
+    expect(await screen.findAllByText('카페 온도')).toHaveLength(1)
+  })
+
   it('excludes a visit with no visit date from the day grid, but still shows its deadline card', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeBaseVisit({ visitDate: null, reviewDeadline: DAY_16, storeName: '카페 온도', status: '예정' }),
@@ -156,6 +172,16 @@ describe('CalendarPage', () => {
 
     await userEvent.click(await screen.findByText('15'))
     expect(await screen.findByText('캐시노트 · 카페')).toBeInTheDocument()
+  })
+
+  it('appends review types to the platform/category line when set', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ visitDate: DAY_15, platform: '캐시노트', category: '카페', reviewTypes: ['블로그', '릴스'] }),
+    ])
+    renderCalendar()
+
+    await userEvent.click(await screen.findByText('15'))
+    expect(await screen.findByText('캐시노트 · 카페 · 블로그, 릴스')).toBeInTheDocument()
   })
 
   it('shows "+N개" when more than 2 visits fall on the same day', async () => {
