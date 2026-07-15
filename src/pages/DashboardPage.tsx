@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import type { ComponentProps } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -64,16 +63,26 @@ function ChartYAxis() {
   )
 }
 
-function ChartTooltip({ cursor }: { cursor: ComponentProps<typeof Tooltip>['cursor'] }) {
+type MonthlyTrendPoint = { month: string; net: number; count: number }
+
+function MonthlyTrendTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean
+  payload?: ReadonlyArray<{ payload?: MonthlyTrendPoint }>
+}) {
+  if (!active || !payload || payload.length === 0 || !payload[0].payload) return null
+  const { month, net, count } = payload[0].payload
   return (
-    <Tooltip
-      cursor={cursor}
-      wrapperStyle={{ zIndex: 10 }}
-      contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line)', borderRadius: 8 }}
-      labelStyle={{ color: 'var(--color-ink)' }}
-      itemStyle={{ color: 'var(--color-ink)' }}
-      formatter={(value) => formatWon(Number(value))}
-    />
+    <div
+      style={{ background: 'var(--color-surface)', border: '1px solid var(--color-line)', borderRadius: 8 }}
+      className="px-3 py-2"
+    >
+      <p className="text-xs font-semibold text-ink">{month}</p>
+      <p className="text-xs text-ink">순절감액 {formatWon(net)}</p>
+      <p className="text-xs text-muted">{count}건</p>
+    </div>
   )
 }
 
@@ -171,18 +180,22 @@ export default function DashboardPage() {
         </Section>
 
         <Section>
-          <p className="mb-4 font-display text-base font-extrabold text-ink">월별 평균 절감액</p>
+          <p className="mb-4 font-display text-base font-extrabold text-ink">월별 순절감액</p>
           <Panel>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={monthlyTrend}>
                 <ChartGrid />
                 <ChartXAxis dataKey="month" />
                 <ChartYAxis />
-                <ChartTooltip cursor={{ stroke: 'var(--color-line)' }} />
+                <Tooltip
+                  cursor={{ stroke: 'var(--color-line)' }}
+                  wrapperStyle={{ zIndex: 10 }}
+                  content={(props) => <MonthlyTrendTooltip {...props} />}
+                />
                 <Line
                   type="monotone"
-                  dataKey="avgNet"
-                  name="평균 절감액"
+                  dataKey="net"
+                  name="순절감액"
                   stroke="var(--color-blue)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
