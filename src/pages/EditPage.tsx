@@ -7,7 +7,7 @@ import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import VisitForm from '../components/VisitForm'
 import { sectionLabelClass } from '../components/formStyles'
-import { formatWon } from '../lib/format'
+import { formatWon, formatWonOrItem } from '../lib/format'
 import { deadlineDisplay } from '../lib/statusStyle'
 import { confirmAndDelete } from '../hooks/useVisitActions'
 import { getVisit, updateVisit } from '../lib/visits'
@@ -197,7 +197,7 @@ export default function EditPage() {
           <ViewField label="예약 정보" value={visit.reservationNote ?? '-'} />
 
           <div className="grid grid-cols-2 gap-3">
-            <ViewField label="체험가" value={formatWon(visit.retailValue)} />
+            <ViewField label="체험가" value={formatWonOrItem(visit.retailValue)} />
             <ViewField label="추가결제액" value={formatWon(visit.extraPayment)} />
           </div>
 

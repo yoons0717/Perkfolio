@@ -137,6 +137,19 @@ describe('TablePage columns', () => {
     expect(netSavedCell).toHaveClass('text-muted')
   })
 
+  it('shows 품목 제공 instead of a computed amount for 품목형(retailValue: null) visits', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ storeName: '카페 온도', retailValue: null, extraPayment: 0, status: '리뷰완료' }),
+    ])
+    renderTablePage()
+
+    await screen.findByText('카페 온도')
+    const cells = getRowCells('카페 온도')
+    expect(cells[4]).toHaveTextContent('품목 제공')
+    expect(cells[6]).toHaveTextContent('품목 제공')
+    expect(cells[6]).toHaveClass('text-muted')
+  })
+
   it('shows "-" for no deadline, and the original deadline date without a redundant 완료 tag once reviewed', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', storeName: '가게A', reviewDeadline: null }),
@@ -222,6 +235,22 @@ describe('TablePage sorting', () => {
     expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게B', '가게C', '가게A'])
 
     await userEvent.click(screen.getByText(/순절감액/)) // asc
+    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게B', '가게A'])
+  })
+
+  it('always sorts 품목형(retailValue: null) visits to the end when sorting by 체험가 or 순절감액', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', storeName: '가게A', retailValue: null, extraPayment: 0, status: '리뷰완료' }),
+      makeVisit({ id: '2', storeName: '가게B', retailValue: 10000, extraPayment: 0, status: '리뷰완료' }),
+      makeVisit({ id: '3', storeName: '가게C', retailValue: 20000, extraPayment: 0, status: '리뷰완료' }),
+    ])
+    renderTablePage()
+    await screen.findByText('가게A')
+
+    await userEvent.click(screen.getByText(/체험가/)) // desc
+    expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게B', '가게A'])
+
+    await userEvent.click(screen.getByText(/순절감액/)) // new column, desc
     expect(screen.getAllByText(/^가게/).map((el) => el.textContent)).toEqual(['가게C', '가게B', '가게A'])
   })
 

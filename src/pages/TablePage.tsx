@@ -9,7 +9,7 @@ import StatusBadge from '../components/StatusBadge'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useVisits } from '../hooks/useVisits'
-import { formatWon } from '../lib/format'
+import { formatWon, formatWonOrItem } from '../lib/format'
 import {
   deadlineDisplay,
   deadlineUrgentBadgeClass,
@@ -17,7 +17,8 @@ import {
   deadlineUrgentTextClass,
   statusOrder,
 } from '../lib/statusStyle'
-import { netColorClass, netSaved } from '../lib/visitStats'
+import { hasRetailValue, netColorClass, netSaved } from '../lib/visitStats'
+import type { MoneyVisit } from '../lib/visitStats'
 import { platforms } from '../types/visit'
 import type { Category, Platform, Visit, VisitStatus } from '../types/visit'
 
@@ -44,7 +45,10 @@ const columns: Column[] = [
 ]
 
 function sortValue(v: Visit, key: SortKey): string | number {
-  if (key === 'netSaved') return netSaved(v)
+  // netSaved/retailValue sort keys are only reached once the pinning logic
+  // below has ruled out a null retailValue for both rows being compared.
+  if (key === 'netSaved') return v.retailValue === null ? 0 : netSaved(v as MoneyVisit)
+  if (key === 'retailValue') return v.retailValue ?? 0
   if (key === 'reviewDeadline') return v.reviewDeadline ?? ''
   if (key === 'visitDate') return v.visitDate ?? ''
   return v[key]
@@ -178,8 +182,8 @@ const categoryIcon: Record<Category, string> = {
 }
 
 function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void }) {
-  const net = netSaved(visit)
-  const netColor = netColorClass(visit)
+  const net = hasRetailValue(visit) ? netSaved(visit) : null
+  const netColor = hasRetailValue(visit) ? netColorClass(visit) : 'text-muted'
   const deadline = deadlineDisplay(visit.status, visit.reviewDeadline)
 
   return (
@@ -214,7 +218,7 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
         <div className="flex flex-col gap-0.5 font-mono text-xs text-muted">
           <div className="flex justify-between gap-4">
             <span>체험가</span>
-            <span>{formatWon(visit.retailValue)}</span>
+            <span>{formatWonOrItem(visit.retailValue)}</span>
           </div>
           <div className="flex justify-between gap-4">
             <span>추가결제</span>
@@ -222,7 +226,7 @@ function VisitCard({ visit, onNavigate }: { visit: Visit; onNavigate: () => void
           </div>
         </div>
         <span className={`font-mono text-lg font-bold ${netColor}`}>
-          {visit.status === '예정' ? '-' : formatWon(net)}
+          {visit.status === '예정' ? '-' : net === null ? '품목 제공' : formatWon(net)}
         </span>
       </div>
     </div>
@@ -298,13 +302,21 @@ export default function TablePage() {
 
     result = [...result].sort((a, b) => {
       // 예정 visits don't show a real 순절감액 (displayed as "-", since the
-      // amount isn't confirmed yet), so sorting by that column pins them to
-      // the end regardless of asc/desc — otherwise the unconfirmed
-      // placeholder rows would interleave with the real sorted values.
+      // amount isn't confirmed yet), and 품목형(retailValue === null) visits
+      // never have one at all — both cases pin to the end regardless of
+      // asc/desc, otherwise these placeholder rows would interleave with
+      // the real sorted values.
       if (sortKey === 'netSaved') {
-        const aPending = a.status === '예정'
-        const bPending = b.status === '예정'
-        if (aPending || bPending) return aPending && bPending ? 0 : aPending ? 1 : -1
+        const aHidden = a.status === '예정' || a.retailValue === null
+        const bHidden = b.status === '예정' || b.retailValue === null
+        if (aHidden || bHidden) return aHidden && bHidden ? 0 : aHidden ? 1 : -1
+      }
+
+      // 품목형(retailValue === null) visits have no 체험가 value to sort by.
+      if (sortKey === 'retailValue') {
+        const aNull = a.retailValue === null
+        const bNull = b.retailValue === null
+        if (aNull || bNull) return aNull && bNull ? 0 : aNull ? 1 : -1
       }
 
       // same pinning idea for a visit with no confirmed date yet.
@@ -543,12 +555,12 @@ export default function TablePage() {
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-mono">{formatWon(v.retailValue)}</td>
+                      <td className="px-4 py-3 font-mono">{formatWonOrItem(v.retailValue)}</td>
                       <td className="px-4 py-3 font-mono">{formatWon(v.extraPayment)}</td>
                       <td
-                        className={`px-4 py-3 font-mono ${netColorClass(v)} ${v.status === '예정' ? '' : 'font-semibold'}`}
+                        className={`px-4 py-3 font-mono ${hasRetailValue(v) ? netColorClass(v) : 'text-muted'} ${v.status === '예정' ? '' : 'font-semibold'}`}
                       >
-                        {v.status === '예정' ? '-' : formatWon(netSaved(v))}
+                        {v.status === '예정' ? '-' : hasRetailValue(v) ? formatWon(netSaved(v)) : '품목 제공'}
                       </td>
                       <td className="py-3 pr-6 pl-4">
                         <StatusBadge status={v.status} />
