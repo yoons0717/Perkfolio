@@ -62,6 +62,22 @@ describe('VisitForm validation', () => {
     expect(submitted.visitDate).toBeNull()
   })
 
+  it('checking 금액 정보 없음 disables 체험가 and submits retailValue as null', async () => {
+    const { onSubmit } = renderForm()
+    await fillRequiredFields()
+    await userEvent.click(screen.getByRole('checkbox', { name: '금액 정보 없음' }))
+
+    const retailInput = screen.getByLabelText('체험가') as HTMLInputElement
+    expect(retailInput.disabled).toBe(true)
+    expect(retailInput.value).toBe('')
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }))
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+    const submitted = onSubmit.mock.calls[0][0] as NewVisit
+    expect(submitted.retailValue).toBeNull()
+  })
+
   it('blocks submission when review deadline is cleared (native required validation)', async () => {
     const { onSubmit } = renderForm()
     await fillRequiredFields()

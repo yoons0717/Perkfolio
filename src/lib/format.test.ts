@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatDateTime } from './format'
+import { formatDate, formatDateTime, formatWonOrItem } from './format'
+
+describe('formatWonOrItem', () => {
+  it('formats a number as won', () => {
+    expect(formatWonOrItem(48000)).toBe('₩48,000')
+  })
+
+  it('returns 품목 제공 for null (품목형 방문)', () => {
+    expect(formatWonOrItem(null)).toBe('품목 제공')
+  })
+})
 
 describe('formatDate', () => {
   it('formats an ISO date string as a Korean-locale date', () => {

@@ -153,6 +153,13 @@ describe('EditPage view mode', () => {
     expect(screen.getByText('체험(예정)일').nextElementSibling).toHaveTextContent('-')
   })
 
+  it('shows 품목 제공 for the 체험가 field when retailValue is null (품목형 방문)', async () => {
+    vi.mocked(getVisit).mockResolvedValue(makeVisit({ retailValue: null }))
+    renderEditPage()
+    await screen.findByRole('heading', { name: '카페 온도' })
+    expect(screen.getByText('체험가').nextElementSibling).toHaveTextContent('품목 제공')
+  })
+
   it('shows the reservation note when present', async () => {
     vi.mocked(getVisit).mockResolvedValue(makeVisit({ reservationNote: '예약 필수, 저녁 7시' }))
     renderEditPage()

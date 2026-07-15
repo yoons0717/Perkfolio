@@ -4,11 +4,12 @@ import {
   computeMonthlyTrend,
   computeTotals,
   confirmedVisits,
+  hasRetailValue,
   isInPeriod,
   netColorClass,
   netSaved,
 } from './visitStats'
-import { makeVisit } from '../test/factories'
+import { makeMoneyVisit, makeVisit } from '../test/factories'
 
 describe('confirmedVisits', () => {
   it('excludes 예정 visits, since they have not actually happened yet', () => {
@@ -22,29 +23,39 @@ describe('confirmedVisits', () => {
 
 describe('netSaved', () => {
   it('subtracts extraPayment from retailValue', () => {
-    expect(netSaved(makeVisit({ retailValue: 48000, extraPayment: 5000 }))).toBe(43000)
+    expect(netSaved(makeMoneyVisit({ retailValue: 48000, extraPayment: 5000 }))).toBe(43000)
   })
 
   it('can be negative when extraPayment exceeds retailValue', () => {
-    expect(netSaved(makeVisit({ retailValue: 10000, extraPayment: 15000 }))).toBe(-5000)
+    expect(netSaved(makeMoneyVisit({ retailValue: 10000, extraPayment: 15000 }))).toBe(-5000)
   })
 })
 
 describe('netColorClass', () => {
   it('returns text-muted for 예정 visits, regardless of net amount', () => {
-    expect(netColorClass(makeVisit({ status: '예정', retailValue: 50000, extraPayment: 0 }))).toBe('text-muted')
+    expect(netColorClass(makeMoneyVisit({ status: '예정', retailValue: 50000, extraPayment: 0 }))).toBe('text-muted')
   })
 
   it('returns text-danger when net savings is negative', () => {
-    expect(netColorClass(makeVisit({ status: '리뷰완료', retailValue: 10000, extraPayment: 20000 }))).toBe(
+    expect(netColorClass(makeMoneyVisit({ status: '리뷰완료', retailValue: 10000, extraPayment: 20000 }))).toBe(
       'text-danger',
     )
   })
 
   it('returns text-positive when net savings is zero or positive', () => {
-    expect(netColorClass(makeVisit({ status: '리뷰완료', retailValue: 20000, extraPayment: 10000 }))).toBe(
+    expect(netColorClass(makeMoneyVisit({ status: '리뷰완료', retailValue: 20000, extraPayment: 10000 }))).toBe(
       'text-positive',
     )
+  })
+})
+
+describe('hasRetailValue', () => {
+  it('returns false for a null retailValue (품목형 방문)', () => {
+    expect(hasRetailValue(makeVisit({ retailValue: null }))).toBe(false)
+  })
+
+  it('returns true for a numeric retailValue', () => {
+    expect(hasRetailValue(makeVisit({ retailValue: 10000 }))).toBe(true)
   })
 })
 
@@ -140,8 +151,8 @@ describe('isInPeriod ("custom" date range)', () => {
 describe('computeTotals', () => {
   it('sums retail/extra/net and computes the savings rate', () => {
     const visits = [
-      makeVisit({ retailValue: 10000, extraPayment: 0 }),
-      makeVisit({ retailValue: 30000, extraPayment: 10000 }),
+      makeMoneyVisit({ retailValue: 10000, extraPayment: 0 }),
+      makeMoneyVisit({ retailValue: 30000, extraPayment: 10000 }),
     ]
     expect(computeTotals(visits)).toEqual({ count: 2, retail: 40000, extra: 10000, net: 30000, rate: 75 })
   })
@@ -160,16 +171,27 @@ describe('computeCategoryBreakdown', () => {
     ]
     const result = computeCategoryBreakdown(visits)
     expect(result).toEqual([
-      { category: '카페', count: 2, pct: 100, avgNet: 12500 },
-      { category: '음식점', count: 0, pct: 0, avgNet: 0 },
-      { category: '술집', count: 1, pct: 50, avgNet: 30000 },
-      { category: '기타', count: 0, pct: 0, avgNet: 0 },
+      { category: '카페', count: 2, moneyCount: 2, pct: 100, avgNet: 12500 },
+      { category: '음식점', count: 0, moneyCount: 0, pct: 0, avgNet: 0 },
+      { category: '술집', count: 1, moneyCount: 1, pct: 50, avgNet: 30000 },
+      { category: '기타', count: 0, moneyCount: 0, pct: 0, avgNet: 0 },
     ])
   })
 
   it('does not divide by zero when there are no visits', () => {
     const result = computeCategoryBreakdown([])
     expect(result.every((r) => r.count === 0 && r.pct === 0 && r.avgNet === 0)).toBe(true)
+  })
+
+  it('counts 품목형(null retailValue) visits but excludes them from avgNet, exposing moneyCount separately', () => {
+    const visits = [
+      makeVisit({ category: '카페', retailValue: 10000, extraPayment: 0 }),
+      makeVisit({ category: '카페', retailValue: null, extraPayment: 0 }),
+    ]
+    const result = computeCategoryBreakdown(visits)
+    const cafe = result.find((r) => r.category === '카페')
+    // count includes both visits, but moneyCount/avgNet only reflect the money-type one
+    expect(cafe).toEqual({ category: '카페', count: 2, moneyCount: 1, pct: 100, avgNet: 10000 })
   })
 })
 
@@ -180,9 +202,9 @@ describe('computeMonthlyTrend', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 1, 15)) // 2026-02-15
     const visits = [
-      makeVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500
+      makeMoneyVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
+      makeMoneyVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
+      makeMoneyVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500
     ]
     expect(computeMonthlyTrend(visits)).toEqual([
       { month: '2026-01', avgNet: 12500 },
@@ -193,7 +215,7 @@ describe('computeMonthlyTrend', () => {
   it('fills months with no visits as 0 instead of omitting them', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 2, 10)) // 2026-03-10
-    const visits = [makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 })]
+    const visits = [makeMoneyVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 })]
     expect(computeMonthlyTrend(visits)).toEqual([
       { month: '2026-01', avgNet: 20000 },
       { month: '2026-02', avgNet: 0 },
@@ -205,8 +227,8 @@ describe('computeMonthlyTrend', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 0, 20)) // 2026-01-20
     const visits = [
-      makeVisit({ visitDate: null, retailValue: 10000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
+      makeMoneyVisit({ visitDate: null, retailValue: 10000, extraPayment: 0 }),
+      makeMoneyVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
     ]
     expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', avgNet: 20000 }])
   })
@@ -214,7 +236,7 @@ describe('computeMonthlyTrend', () => {
   it('ignores visits from a different year', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 0, 20)) // 2026-01-20
-    const visits = [makeVisit({ visitDate: '2025-12-15', retailValue: 20000, extraPayment: 0 })]
+    const visits = [makeMoneyVisit({ visitDate: '2025-12-15', retailValue: 20000, extraPayment: 0 })]
     expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', avgNet: 0 }])
   })
 })

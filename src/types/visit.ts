@@ -40,7 +40,7 @@ export type Visit = {
   reservationNote: string | null
   campaignUrl: string | null
   storeInfoUrl: string | null
-  retailValue: number
+  retailValue: number | null
   extraPayment: number
   status: VisitStatus
   postUrls: string[]
