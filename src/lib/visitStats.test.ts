@@ -1,20 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   computeCategoryBreakdown,
-  computeGraphData,
   computeMonthlyTrend,
-  computePlatformRanking,
   computeTotals,
-  computeUpcomingDeadlines,
   confirmedVisits,
   isInPeriod,
   netColorClass,
   netSaved,
-  visitsForGraphScope,
 } from './visitStats'
 import { makeVisit } from '../test/factories'
-import { categories } from '../types/visit'
-import type { Platform } from '../types/visit'
 
 describe('confirmedVisits', () => {
   it('excludes 예정 visits, since they have not actually happened yet', () => {
@@ -157,47 +151,6 @@ describe('computeTotals', () => {
   })
 })
 
-describe('computeUpcomingDeadlines', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date(2026, 0, 10)) // 2026-01-10
-  })
-  afterEach(() => vi.useRealTimers())
-
-  it('includes visits with a deadline within the next 3 days', () => {
-    const visits = [makeVisit({ id: '1', reviewDeadline: '2026-01-12', status: '예정' })]
-    expect(computeUpcomingDeadlines(visits).map((d) => d.visit.id)).toEqual(['1'])
-  })
-
-  it('includes overdue deadlines (negative days remaining)', () => {
-    const visits = [makeVisit({ id: '1', reviewDeadline: '2026-01-05', status: '예정' })]
-    expect(computeUpcomingDeadlines(visits).map((d) => d.visit.id)).toEqual(['1'])
-  })
-
-  it('excludes deadlines more than 3 days away', () => {
-    const visits = [makeVisit({ id: '1', reviewDeadline: '2026-01-20', status: '예정' })]
-    expect(computeUpcomingDeadlines(visits)).toEqual([])
-  })
-
-  it('excludes visits with no review deadline', () => {
-    const visits = [makeVisit({ id: '1', reviewDeadline: null })]
-    expect(computeUpcomingDeadlines(visits)).toEqual([])
-  })
-
-  it('excludes visits already marked 리뷰완료, even if the deadline is imminent', () => {
-    const visits = [makeVisit({ id: '1', reviewDeadline: '2026-01-11', status: '리뷰완료' })]
-    expect(computeUpcomingDeadlines(visits)).toEqual([])
-  })
-
-  it('sorts by deadline date ascending (soonest first)', () => {
-    const visits = [
-      makeVisit({ id: 'later', reviewDeadline: '2026-01-13', status: '예정' }),
-      makeVisit({ id: 'sooner', reviewDeadline: '2026-01-11', status: '예정' }),
-    ]
-    expect(computeUpcomingDeadlines(visits).map((d) => d.visit.id)).toEqual(['sooner', 'later'])
-  })
-})
-
 describe('computeCategoryBreakdown', () => {
   it('counts visits per category and averages net savings, including zero-count categories', () => {
     const visits = [
@@ -220,44 +173,20 @@ describe('computeCategoryBreakdown', () => {
   })
 })
 
-describe('computePlatformRanking', () => {
-  it('averages net savings per visit for each platform and sorts descending', () => {
-    const visits = [
-      makeVisit({ platform: '포포몬', retailValue: 10000, extraPayment: 0 }), // 10000
-      makeVisit({ platform: '캐시노트', retailValue: 30000, extraPayment: 5000 }), // 25000
-      makeVisit({ platform: '포포몬', retailValue: 5000, extraPayment: 0 }), // avg(10000, 5000) = 7500
-    ]
-    expect(computePlatformRanking(visits)).toEqual([
-      { platform: '캐시노트', avgNet: 25000, count: 1, pct: 100 },
-      { platform: '포포몬', avgNet: 7500, count: 2, pct: 30 },
-    ])
-  })
-
-  it('is not skewed by visit count (many small visits do not outrank one big one)', () => {
-    const visits = [
-      makeVisit({ platform: '많이쓴곳' as Platform, retailValue: 1000, extraPayment: 0 }),
-      makeVisit({ platform: '많이쓴곳' as Platform, retailValue: 1000, extraPayment: 0 }),
-      makeVisit({ platform: '많이쓴곳' as Platform, retailValue: 1000, extraPayment: 0 }),
-      makeVisit({ platform: '한번쓴곳' as Platform, retailValue: 10000, extraPayment: 0 }),
-    ]
-    expect(computePlatformRanking(visits)[0].platform).toBe('한번쓴곳')
-  })
-})
-
 describe('computeMonthlyTrend', () => {
   afterEach(() => vi.useRealTimers())
 
-  it('sums net savings per YYYY-MM, fixed to January through the current month', () => {
+  it('averages net savings per YYYY-MM, fixed to January through the current month', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 1, 15)) // 2026-02-15
     const visits = [
       makeVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
       makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }),
+      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500
     ]
     expect(computeMonthlyTrend(visits)).toEqual([
-      { month: '2026-01', net: 25000 },
-      { month: '2026-02', net: 10000 },
+      { month: '2026-01', avgNet: 12500 },
+      { month: '2026-02', avgNet: 10000 },
     ])
   })
 
@@ -266,9 +195,9 @@ describe('computeMonthlyTrend', () => {
     vi.setSystemTime(new Date(2026, 2, 10)) // 2026-03-10
     const visits = [makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 })]
     expect(computeMonthlyTrend(visits)).toEqual([
-      { month: '2026-01', net: 20000 },
-      { month: '2026-02', net: 0 },
-      { month: '2026-03', net: 0 },
+      { month: '2026-01', avgNet: 20000 },
+      { month: '2026-02', avgNet: 0 },
+      { month: '2026-03', avgNet: 0 },
     ])
   })
 
@@ -279,80 +208,13 @@ describe('computeMonthlyTrend', () => {
       makeVisit({ visitDate: null, retailValue: 10000, extraPayment: 0 }),
       makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
     ]
-    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 20000 }])
+    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', avgNet: 20000 }])
   })
 
   it('ignores visits from a different year', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 0, 20)) // 2026-01-20
     const visits = [makeVisit({ visitDate: '2025-12-15', retailValue: 20000, extraPayment: 0 })]
-    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 0 }])
-  })
-})
-
-describe('computeGraphData', () => {
-  it('groups by category (fixed category order, including zero-count categories) and returns avg/total net savings', () => {
-    const visits = [
-      makeVisit({ category: '카페', retailValue: 10000, extraPayment: 0 }),
-      makeVisit({ category: '카페', retailValue: 20000, extraPayment: 5000 }), // avg(10000, 15000) = 12500, total 25000
-      makeVisit({ category: '술집', retailValue: 30000, extraPayment: 0 }),
-    ]
-    expect(computeGraphData(visits, 'category')).toEqual([
-      { label: '카페', avgNet: 12500, totalNet: 25000, count: 2 },
-      { label: '음식점', avgNet: 0, totalNet: 0, count: 0 },
-      { label: '술집', avgNet: 30000, totalNet: 30000, count: 1 },
-      { label: '기타', avgNet: 0, totalNet: 0, count: 0 },
-    ])
-  })
-
-  it('groups by platform (only platforms present in the data, sorted alphabetically) and returns avg/total net savings', () => {
-    const visits = [
-      makeVisit({ platform: '포포몬', retailValue: 10000, extraPayment: 0 }), // 10000
-      makeVisit({ platform: '캐시노트', retailValue: 30000, extraPayment: 5000 }), // 25000
-      makeVisit({ platform: '포포몬', retailValue: 5000, extraPayment: 0 }), // avg(10000, 5000) = 7500, total 15000
-    ]
-    expect(computeGraphData(visits, 'platform')).toEqual([
-      { label: '캐시노트', avgNet: 25000, totalNet: 25000, count: 1 },
-      { label: '포포몬', avgNet: 7500, totalNet: 15000, count: 2 },
-    ])
-  })
-
-  it('groups by visitDate YYYY-MM, sorted chronologically, and skips visits with no visit date', () => {
-    const visits = [
-      makeVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500, total 25000
-      makeVisit({ visitDate: null, retailValue: 99999, extraPayment: 0 }),
-    ]
-    expect(computeGraphData(visits, 'month')).toEqual([
-      { label: '2026-01', avgNet: 12500, totalNet: 25000, count: 2 },
-      { label: '2026-02', avgNet: 10000, totalNet: 10000, count: 1 },
-    ])
-  })
-
-  it('does not divide by zero when there are no visits, for any axis', () => {
-    // category always returns all fixed categories (including zero-count ones), while platform/month return only present labels
-    expect(computeGraphData([], 'category')).toEqual(
-      categories.map((label) => ({ label, avgNet: 0, totalNet: 0, count: 0 }))
-    )
-    expect(computeGraphData([], 'platform')).toEqual([])
-    expect(computeGraphData([], 'month')).toEqual([])
-  })
-})
-
-describe('visitsForGraphScope', () => {
-  it("returns all visits unfiltered when scope is 'all'", () => {
-    const visits = [makeVisit({ visitDate: '2020-01-01' }), makeVisit({ visitDate: '2026-01-01' })]
-    expect(visitsForGraphScope('all', visits)).toEqual(visits)
-  })
-
-  it('filters to visits within the given fixed period', () => {
-    const now = new Date()
-    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
-    const visits = [
-      makeVisit({ id: 'a', visitDate: thisMonth }),
-      makeVisit({ id: 'b', visitDate: '2020-01-01' }),
-    ]
-    expect(visitsForGraphScope('thisMonth', visits).map((v) => v.id)).toEqual(['a'])
+    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', avgNet: 0 }])
   })
 })

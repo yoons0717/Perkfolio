@@ -1,25 +1,22 @@
 import { useMemo, useState } from 'react'
+import type { ComponentProps } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import Button from '../components/Button'
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { focusRingClass, inputClass } from '../components/formStyles'
-import GraphBuilderForm from '../components/GraphBuilderForm'
-import GraphCard from '../components/GraphCard'
 import InfoTooltip from '../components/InfoTooltip'
 import Panel from '../components/Panel'
 import Section from '../components/Section'
 import Select from '../components/Select'
 import Spinner from '../components/Spinner'
-import { useDashboardGraphs } from '../hooks/useDashboardGraphs'
 import { useVisits } from '../hooks/useVisits'
 import { formatWon } from '../lib/format'
 import {
   computeCategoryBreakdown,
-  computeGraphData,
+  computeMonthlyTrend,
   computeTotals,
   confirmedVisits,
   isInPeriod,
-  visitsForGraphScope,
 } from '../lib/visitStats'
 import type { CustomRange, Period } from '../lib/visitStats'
 
@@ -41,13 +38,49 @@ function StatCard({ label, value, valueClassName = 'text-ink' }: { label: string
   )
 }
 
+function ChartGrid() {
+  return <CartesianGrid stroke="var(--color-line)" vertical={false} />
+}
+
+function ChartXAxis({ dataKey }: { dataKey: string }) {
+  return (
+    <XAxis
+      dataKey={dataKey}
+      tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
+      axisLine={{ stroke: 'var(--color-line)' }}
+      tickLine={false}
+    />
+  )
+}
+
+function ChartYAxis() {
+  return (
+    <YAxis
+      tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
+      axisLine={false}
+      tickLine={false}
+      tickFormatter={(value: number) => value.toLocaleString('ko-KR')}
+    />
+  )
+}
+
+function ChartTooltip({ cursor }: { cursor: ComponentProps<typeof Tooltip>['cursor'] }) {
+  return (
+    <Tooltip
+      cursor={cursor}
+      wrapperStyle={{ zIndex: 10 }}
+      contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-line)', borderRadius: 8 }}
+      labelStyle={{ color: 'var(--color-ink)' }}
+      itemStyle={{ color: 'var(--color-ink)' }}
+      formatter={(value) => formatWon(Number(value))}
+    />
+  )
+}
+
 export default function DashboardPage() {
   const { visits, loading, error } = useVisits()
-  const { graphs, loading: graphsLoading, error: graphsError, addGraph, removeGraph } = useDashboardGraphs()
   const [period, setPeriod] = useState<Period>('thisMonth')
   const [customRange, setCustomRange] = useState<CustomRange>([null, null])
-  const [showGraphBuilder, setShowGraphBuilder] = useState(false)
-  const [graphActionError, setGraphActionError] = useState<string | null>(null)
 
   // "N월 요약" 섹션: 선택한 기간에 종속된 스냅샷 통계.
   const filtered = useMemo(
@@ -60,8 +93,9 @@ export default function DashboardPage() {
   const totals = useMemo(() => computeTotals(confirmed), [confirmed])
   const categoryBreakdown = useMemo(() => computeCategoryBreakdown(confirmed), [confirmed])
 
-  // 커스텀 그래프의 scope==='all'은 기간 필터와 무관하게 항상 전체 데이터를 봐야 한다.
+  // 월별 트렌드는 기간 필터와 무관하게 항상 연초~이번 달 전체를 봐야 의미가 있다.
   const allTimeConfirmed = useMemo(() => confirmedVisits(visits), [visits])
+  const monthlyTrend = useMemo(() => computeMonthlyTrend(allTimeConfirmed), [allTimeConfirmed])
 
   if (loading) return <Spinner />
   if (error) return <p className="text-sm text-danger">{error}</p>
@@ -137,52 +171,26 @@ export default function DashboardPage() {
         </Section>
 
         <Section>
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <p className="font-display text-base font-extrabold text-ink">커스텀 그래프</p>
-            <Button variant="secondary" size="sm" onClick={() => setShowGraphBuilder((prev) => !prev)}>
-              {showGraphBuilder ? '닫기' : '+ 그래프 추가'}
-            </Button>
-          </div>
-
-          {showGraphBuilder && (
-            <Panel className="mb-3">
-              <GraphBuilderForm
-                previewVisits={allTimeConfirmed}
-                onSave={async (g) => {
-                  try {
-                    await addGraph(g)
-                    setGraphActionError(null)
-                    setShowGraphBuilder(false)
-                  } catch {
-                    setGraphActionError('그래프를 추가하지 못했습니다.')
-                  }
-                }}
-              />
-            </Panel>
-          )}
-
-          {graphsError && <p className="text-sm text-danger">{graphsError}</p>}
-          {graphActionError && <p className="text-sm text-danger">{graphActionError}</p>}
-
-          {!graphsLoading && !graphsError && graphs.length > 0 && (
-            <div className="flex flex-col gap-3">
-              {graphs.map((graph) => (
-                <GraphCard
-                  key={graph.id}
-                  graph={graph}
-                  data={computeGraphData(visitsForGraphScope(graph.scope, allTimeConfirmed), graph.axis)}
-                  onDelete={async () => {
-                    try {
-                      await removeGraph(graph.id)
-                      setGraphActionError(null)
-                    } catch {
-                      setGraphActionError('그래프를 삭제하지 못했습니다.')
-                    }
-                  }}
+          <p className="mb-4 font-display text-base font-extrabold text-ink">월별 평균 절감액</p>
+          <Panel>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={monthlyTrend}>
+                <ChartGrid />
+                <ChartXAxis dataKey="month" />
+                <ChartYAxis />
+                <ChartTooltip cursor={{ stroke: 'var(--color-line)' }} />
+                <Line
+                  type="monotone"
+                  dataKey="avgNet"
+                  name="평균 절감액"
+                  stroke="var(--color-blue)"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  isAnimationActive={false}
                 />
-              ))}
-            </div>
-          )}
+              </LineChart>
+            </ResponsiveContainer>
+          </Panel>
         </Section>
       </div>
     </div>
