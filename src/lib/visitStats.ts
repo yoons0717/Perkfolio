@@ -78,7 +78,7 @@ export function computeCategoryBreakdown(visits: Visit[]) {
     const moneyCount = moneyCounts.get(category) ?? 0
     const total = totals.get(category) ?? 0
     const avgNet = moneyCount === 0 ? 0 : Math.round(total / moneyCount)
-    return { category, count, pct: (count / max) * 100, avgNet }
+    return { category, count, moneyCount, pct: (count / max) * 100, avgNet }
   })
 }
 

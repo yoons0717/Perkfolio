@@ -171,10 +171,10 @@ describe('computeCategoryBreakdown', () => {
     ]
     const result = computeCategoryBreakdown(visits)
     expect(result).toEqual([
-      { category: '카페', count: 2, pct: 100, avgNet: 12500 },
-      { category: '음식점', count: 0, pct: 0, avgNet: 0 },
-      { category: '술집', count: 1, pct: 50, avgNet: 30000 },
-      { category: '기타', count: 0, pct: 0, avgNet: 0 },
+      { category: '카페', count: 2, moneyCount: 2, pct: 100, avgNet: 12500 },
+      { category: '음식점', count: 0, moneyCount: 0, pct: 0, avgNet: 0 },
+      { category: '술집', count: 1, moneyCount: 1, pct: 50, avgNet: 30000 },
+      { category: '기타', count: 0, moneyCount: 0, pct: 0, avgNet: 0 },
     ])
   })
 
@@ -183,15 +183,15 @@ describe('computeCategoryBreakdown', () => {
     expect(result.every((r) => r.count === 0 && r.pct === 0 && r.avgNet === 0)).toBe(true)
   })
 
-  it('counts 품목형(null retailValue) visits but excludes them from avgNet', () => {
+  it('counts 품목형(null retailValue) visits but excludes them from avgNet, exposing moneyCount separately', () => {
     const visits = [
       makeVisit({ category: '카페', retailValue: 10000, extraPayment: 0 }),
       makeVisit({ category: '카페', retailValue: null, extraPayment: 0 }),
     ]
     const result = computeCategoryBreakdown(visits)
     const cafe = result.find((r) => r.category === '카페')
-    // count includes both visits, but avgNet only averages the money-type one
-    expect(cafe).toEqual({ category: '카페', count: 2, pct: 100, avgNet: 10000 })
+    // count includes both visits, but moneyCount/avgNet only reflect the money-type one
+    expect(cafe).toEqual({ category: '카페', count: 2, moneyCount: 1, pct: 100, avgNet: 10000 })
   })
 })
 

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -109,6 +109,28 @@ describe('DashboardPage', () => {
 
     expect(screen.getByLabelText('기간 범위 선택')).toHaveValue('')
     expect(totalVisitCountText()).toBe('0건')
+  })
+
+  it('excludes 품목형(retailValue: null) visits from money totals, showing them in a separate section', async () => {
+    vi.mocked(getVisits).mockResolvedValue([
+      makeVisit({ id: '1', status: '리뷰완료', retailValue: 10000, extraPayment: 0, category: '술집' }),
+      makeVisit({ id: '2', status: '리뷰완료', retailValue: null, extraPayment: 0, category: '카페' }),
+    ])
+    renderDashboard()
+
+    await screen.findByText('총 체험단')
+    expect(totalVisitCountText()).toBe('1건') // 품목형 excluded from the money summary
+
+    const itemSection = screen.getByText('품목형 체험').closest('section')!
+    expect(screen.getByText('품목형 체험').nextElementSibling).toHaveTextContent('1건') // 품목형 badge count
+    expect(within(itemSection).getByText('카페').closest('div')).toHaveTextContent('카페1건')
+  })
+
+  it('hides the 품목형 체험 section when there are no 품목형 visits', async () => {
+    vi.mocked(getVisits).mockResolvedValue([makeVisit({ status: '리뷰완료', retailValue: 10000 })])
+    renderDashboard()
+    await screen.findByText('총 체험단')
+    expect(screen.queryByText('품목형 체험')).not.toBeInTheDocument()
   })
 
   it('shows the 월별 평균 절감액 section regardless of the selected stats period', async () => {
