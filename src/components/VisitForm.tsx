@@ -46,6 +46,7 @@ type FormFields = {
   campaignUrl: string
   storeInfoUrl: string
   retailValue: string
+  noRetailValue: boolean
   extraPayment: string
   postUrls: string[]
   reviewDeadline: Date | null
@@ -64,6 +65,7 @@ function initialFormFields(initialValues: NewVisit | undefined): FormFields {
     campaignUrl: initialValues?.campaignUrl ?? '',
     storeInfoUrl: initialValues?.storeInfoUrl ?? '',
     retailValue: String(initialValues?.retailValue ?? ''),
+    noRetailValue: initialValues ? initialValues.retailValue === null : false,
     extraPayment: String(initialValues?.extraPayment ?? 0),
     postUrls: initialValues?.postUrls ?? [],
     reviewDeadline: initialValues?.reviewDeadline ? parseDateString(initialValues.reviewDeadline) : null,
@@ -130,6 +132,7 @@ export default function VisitForm({
     campaignUrl,
     storeInfoUrl,
     retailValue,
+    noRetailValue,
     extraPayment,
     postUrls,
     reviewDeadline,
@@ -162,7 +165,7 @@ export default function VisitForm({
         reservationNote: trimToNull(reservationNote),
         campaignUrl: trimToNull(campaignUrl),
         storeInfoUrl: trimToNull(storeInfoUrl),
-        retailValue: Number(retailValue),
+        retailValue: noRetailValue ? null : Number(retailValue),
         extraPayment: Number(extraPayment),
         status: status as VisitStatus,
         postUrls: postUrls.map((u) => u.trim()).filter((u) => u !== ''),
@@ -297,16 +300,32 @@ export default function VisitForm({
         </FormField>
 
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="체험가">
+          <div className="flex flex-col gap-1 text-sm">
+            <span>체험가</span>
             <input
               type="number"
               min="0"
               value={retailValue}
               onChange={(e) => updateField('retailValue', e.target.value)}
-              required
+              required={!noRetailValue}
+              disabled={noRetailValue}
+              aria-label="체험가"
               className={compactInputClass}
             />
-          </FormField>
+            <label className="flex items-center gap-1.5 text-xs text-muted">
+              <input
+                type="checkbox"
+                checked={noRetailValue}
+                onChange={(e) => {
+                  const checked = e.target.checked
+                  updateField('noRetailValue', checked)
+                  if (checked) updateField('retailValue', '')
+                }}
+                className="h-3.5 w-3.5 accent-blue"
+              />
+              금액 정보 없음
+            </label>
+          </div>
 
           <FormField label="추가결제액">
             <input
