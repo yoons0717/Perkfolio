@@ -111,12 +111,12 @@ describe('DashboardPage', () => {
     expect(totalVisitCountText()).toBe('0건')
   })
 
-  it('shows the 월별 평균 절감액 section regardless of the selected stats period', async () => {
+  it('shows the 월별 순절감액 section regardless of the selected stats period', async () => {
     vi.mocked(getVisits).mockResolvedValue([
       makeVisit({ id: '1', visitDate: '2020-01-01', status: '리뷰완료' }),
     ])
     renderDashboard()
 
-    expect(await screen.findByText('월별 평균 절감액')).toBeInTheDocument()
+    expect(await screen.findByText('월별 순절감액')).toBeInTheDocument()
   })
 })

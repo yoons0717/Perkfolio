@@ -83,8 +83,6 @@ export function computeMonthlyTrend(visits: Visit[]) {
   }
   return Array.from({ length: now.getMonth() + 1 }, (_, i) => {
     const month = `${year}-${String(i + 1).padStart(2, '0')}`
-    const count = counts.get(month) ?? 0
-    const total = totals.get(month) ?? 0
-    return { month, avgNet: count === 0 ? 0 : Math.round(total / count) }
+    return { month, net: totals.get(month) ?? 0, count: counts.get(month) ?? 0 }
   })
 }

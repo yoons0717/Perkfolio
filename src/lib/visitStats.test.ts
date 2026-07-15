@@ -176,17 +176,17 @@ describe('computeCategoryBreakdown', () => {
 describe('computeMonthlyTrend', () => {
   afterEach(() => vi.useRealTimers())
 
-  it('averages net savings per YYYY-MM, fixed to January through the current month', () => {
+  it('sums net savings and counts visits per YYYY-MM, fixed to January through the current month', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 1, 15)) // 2026-02-15
     const visits = [
       makeVisit({ visitDate: '2026-02-01', retailValue: 10000, extraPayment: 0 }),
       makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
-      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // avg(20000, 5000) = 12500
+      makeVisit({ visitDate: '2026-01-20', retailValue: 5000, extraPayment: 0 }), // sum(20000, 5000) = 25000
     ]
     expect(computeMonthlyTrend(visits)).toEqual([
-      { month: '2026-01', avgNet: 12500 },
-      { month: '2026-02', avgNet: 10000 },
+      { month: '2026-01', net: 25000, count: 2 },
+      { month: '2026-02', net: 10000, count: 1 },
     ])
   })
 
@@ -195,9 +195,9 @@ describe('computeMonthlyTrend', () => {
     vi.setSystemTime(new Date(2026, 2, 10)) // 2026-03-10
     const visits = [makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 })]
     expect(computeMonthlyTrend(visits)).toEqual([
-      { month: '2026-01', avgNet: 20000 },
-      { month: '2026-02', avgNet: 0 },
-      { month: '2026-03', avgNet: 0 },
+      { month: '2026-01', net: 20000, count: 1 },
+      { month: '2026-02', net: 0, count: 0 },
+      { month: '2026-03', net: 0, count: 0 },
     ])
   })
 
@@ -208,13 +208,13 @@ describe('computeMonthlyTrend', () => {
       makeVisit({ visitDate: null, retailValue: 10000, extraPayment: 0 }),
       makeVisit({ visitDate: '2026-01-15', retailValue: 20000, extraPayment: 0 }),
     ]
-    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', avgNet: 20000 }])
+    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 20000, count: 1 }])
   })
 
   it('ignores visits from a different year', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 0, 20)) // 2026-01-20
     const visits = [makeVisit({ visitDate: '2025-12-15', retailValue: 20000, extraPayment: 0 })]
-    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', avgNet: 0 }])
+    expect(computeMonthlyTrend(visits)).toEqual([{ month: '2026-01', net: 0, count: 0 }])
   })
 })
