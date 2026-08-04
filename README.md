@@ -16,7 +16,7 @@
 
 ## 주요 기능
 
-- **방문 기록 관리** — 방문일, 마감일, 플랫폼, 업체명, 카테고리, 리뷰 유형(블로그/클립/유튜브/인스타 게시물/릴스 중복 선택), 체험가/추가결제액, 예약 메모, 포스팅 링크(복수) 등을 기록 (`/add`, `/edit/:id`)
+- **방문 기록 관리** — 방문일, 마감일, 플랫폼, 업체명, 카테고리, 리뷰 유형(블로그/클립/유튜브/인스타 게시물/릴스 중복 선택), 체험가/추가결제액, 예약 메모, 포스팅 링크(복수) 등을 기록 (`/add`, `/edit/:id`). 디너의여왕·강남맛집 체험단 URL을 붙여넣으면 업체명·체험내역·마감일·예약정보를 자동으로 채워주는 기능 포함
 - **표 · 캘린더 뷰** — 방문 내역을 정렬/필터 가능한 표 또는 월간 캘린더로 확인 (`/table`, `/calendar`), 무한 스크롤로 목록을 나눠 불러오고 모바일에서는 카드 목록으로 자동 전환
 - **대시보드** — 기간별 요약(총 방문/체험가/순절감액/평균 절감율), 카테고리 분포, 플랫폼별 평균 절감액, 월별 트렌드, 마감 임박 알림 (`/dashboard`)
 - **인증** — 이메일/비밀번호 회원가입·로그인, 네이버 소셜 로그인, 비밀번호 찾기/재설정. 방문 기록은 계정별로 분리되어 보임 (Supabase RLS)
@@ -64,10 +64,11 @@ supabase link --project-ref your-project-ref
 supabase db push
 ```
 
-`supabase/functions/`에는 두 개의 Edge Function이 있습니다. `delete-account`는 계정 삭제 기능에 필요하므로 배포해주세요. `naver-auth`는 네이버 소셜 로그인 사용 시에만 필요하며, 배포 시 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET`을 Supabase 프로젝트 시크릿으로 등록해야 합니다.
+`supabase/functions/`에는 세 개의 Edge Function이 있습니다. `delete-account`는 계정 삭제 기능에, `fetch-campaign-info`는 체험단 URL 자동 채우기 기능에 필요하므로 배포해주세요(둘 다 별도 시크릿 불필요). `naver-auth`는 네이버 소셜 로그인 사용 시에만 필요하며, 배포 시 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET`을 Supabase 프로젝트 시크릿으로 등록해야 합니다.
 
 ```bash
 supabase functions deploy delete-account
+supabase functions deploy fetch-campaign-info
 supabase functions deploy naver-auth
 supabase secrets set NAVER_CLIENT_ID=... NAVER_CLIENT_SECRET=...
 ```
@@ -106,7 +107,7 @@ src/
 
 supabase/
 ├── migrations/  # DB 스키마 변경 이력
-└── functions/   # Edge Functions (naver-auth, delete-account)
+└── functions/   # Edge Functions (naver-auth, delete-account, fetch-campaign-info)
 ```
 
 ## 데이터 모델

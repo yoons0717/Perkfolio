@@ -14,6 +14,7 @@ paths:
 
 ## 스타일링
 - 공유 컴포넌트 템플릿에 이미 박혀있는 padding/margin 유틸리티(예: `Card.tsx`의 `p-4`)를 `className="p-0"`처럼 상충되는 클래스로 덮어쓰지 말 것. Tailwind는 같은 속성의 두 클래스 중 어느 게 이길지 소스 순서로 보장하지 않는다. padding만 다르게 하고 싶으면 필요한 스타일만 복사한 별도 `div`를 만들거나, 컴포넌트에 padding variant/prop을 추가한다.
+- `VisitForm.tsx`의 `FormField`처럼 children을 `<label>`로 감싸는 컴포넌트 안에는 실제 입력 요소(input/select/textarea/button 등)와 그 라벨 텍스트만 두고, 에러 메시지나 안내문 같은 보조 텍스트는 절대 넣지 말 것. `<label>` 안의 텍스트는 (폼 컨트롤 자체의 텍스트는 제외하고) 전부 그 컨트롤의 접근성 이름 계산에 합쳐지기 때문에, 조건부로 나타나는 텍스트를 넣으면 "평소엔 안 보이다가 어느 순간부터 항상 뭔가 렌더링되는" 사소한 변경만으로 `getByLabelText` 계열 테스트가 갑자기 깨질 수 있다(실제로 겪음). 보조 텍스트는 `</FormField>` 밖, 형제 요소로 뺄 것.
 
 ## 에러 표시
 - `catch`에서 `console.error(err)`로 로깅하고, 사용자에게는 한국어 안내 메시지를 state로 세팅해 보여준다(`setError`, `onError` 등). `alert()`는 쓰지 않는다.

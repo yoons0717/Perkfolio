@@ -1,6 +1,8 @@
 import { decodeHtmlText, truncate } from './common.ts'
 import type { CampaignInfo } from './common.ts'
 
+// 홑따옴표(') 매칭이 중요함: 페이지 <head>엔 실제 정보가 없는 정적 og:title(큰따옴표)이
+// 따로 있고, 캠페인 정보가 담긴 진짜 og:title은 본문 중간에 홑따옴표로 렌더링됨.
 function extractStoreName(html: string): string | null {
   const match = html.match(/<meta property='og:title' content='([^']*)'/)
   if (!match) return null
@@ -19,6 +21,8 @@ function extractSponsoredItems(html: string): string | null {
   return truncate(decodeHtmlText(raw))
 }
 
+// 사이트가 연도를 아예 안 보여준다("MM.DD"만) — 올해로 가정하고, 그 날짜가 이미
+// 지났으면 내년으로 보정한다.
 function extractReviewDeadline(html: string): string | null {
   const match = html.match(/<dt>리뷰 등록기간<\/dt>\s*<dd>\s*[\d.]+\s*~\s*(\d{2})\.(\d{2})\s*<\/dd>/)
   if (!match) return null
