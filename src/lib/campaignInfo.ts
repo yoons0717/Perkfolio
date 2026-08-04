@@ -26,9 +26,10 @@ export function detectSupportedPlatform(url: string): Platform | null {
   return SUPPORTED_HOSTNAMES[hostname] ?? null
 }
 
-export async function fetchCampaignInfo(url: string): Promise<CampaignInfo> {
+export async function fetchCampaignInfo(url: string, signal?: AbortSignal): Promise<CampaignInfo> {
   const { data, error } = await supabase.functions.invoke('fetch-campaign-info', {
     body: { url },
+    signal,
   })
   if (error) {
     if (error instanceof FunctionsHttpError) {

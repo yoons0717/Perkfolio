@@ -512,4 +512,52 @@ describe('VisitForm 체험단 URL 가져오기', () => {
     await screen.findByRole('button', { name: '가져오기' })
     expect(screen.getByLabelText('업체명').closest('[inert]')).toBeNull()
   })
+
+  it('cancels the in-flight fetch and returns to the guide message when 취소 is clicked', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue('디너의여왕')
+    vi.mocked(fetchCampaignInfo).mockImplementation(
+      (_url, signal) =>
+        new Promise((_resolve, reject) => {
+          signal?.addEventListener('abort', () => reject(new Error('aborted')))
+        }),
+    )
+    renderForm()
+    await userEvent.type(
+      screen.getByLabelText('체험단 URL (선택)'),
+      'https://dinnerqueen.net/taste/1477357',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+
+    const cancelButton = await screen.findByRole('button', { name: '취소' })
+    await userEvent.click(cancelButton)
+
+    await screen.findByRole('button', { name: '가져오기' })
+    expect(
+      screen.getByText(
+        '디너의여왕·강남맛집 URL을 붙여넣으면 업체명·체험내역·마감일·예약정보를 자동으로 채워드려요.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('aborts the in-flight fetch when the component unmounts', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue('디너의여왕')
+    let receivedSignal: AbortSignal | undefined
+    vi.mocked(fetchCampaignInfo).mockImplementation((_url, signal) => {
+      receivedSignal = signal
+      return new Promise(() => {}) // never settles on its own
+    })
+    const { unmount } = render(
+      <VisitForm onSubmit={vi.fn().mockResolvedValue(undefined)} submitLabel="저장" pendingLabel="저장 중..." />,
+    )
+    await userEvent.type(
+      screen.getByLabelText('체험단 URL (선택)'),
+      'https://dinnerqueen.net/taste/1477357',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+    await screen.findByRole('button', { name: '취소' })
+
+    expect(receivedSignal?.aborted).toBe(false)
+    unmount()
+    expect(receivedSignal?.aborted).toBe(true)
+  })
 })

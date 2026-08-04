@@ -62,6 +62,21 @@ describe('fetchCampaignInfo', () => {
     expect(result).toEqual(info)
   })
 
+  it('passes an AbortSignal through to functions.invoke when given one', async () => {
+    vi.mocked(supabase.functions.invoke).mockResolvedValue({
+      data: { platform: '디너의여왕', storeName: null, sponsoredItems: null, reviewDeadline: null, reservationNote: null },
+      error: null,
+    } as never)
+    const controller = new AbortController()
+
+    await fetchCampaignInfo('https://dinnerqueen.net/taste/1', controller.signal)
+
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('fetch-campaign-info', {
+      body: { url: 'https://dinnerqueen.net/taste/1' },
+      signal: controller.signal,
+    })
+  })
+
   it('throws when the function returns a generic error', async () => {
     vi.mocked(supabase.functions.invoke).mockResolvedValue({
       data: null,

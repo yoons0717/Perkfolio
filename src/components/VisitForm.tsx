@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -92,6 +92,11 @@ export default function VisitForm({
   const [submitting, setSubmitting] = useState(false)
   const [fetchingCampaignInfo, setFetchingCampaignInfo] = useState(false)
   const [campaignFetchError, setCampaignFetchError] = useState<string | null>(null)
+  const fetchControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => fetchControllerRef.current?.abort()
+  }, [])
 
   function updateField<K extends keyof FormFields>(key: K, value: FormFields[K]) {
     setFields((f) => ({ ...f, [key]: value }))
@@ -145,10 +150,13 @@ export default function VisitForm({
       return
     }
 
+    const controller = new AbortController()
+    fetchControllerRef.current = controller
+
     setCampaignFetchError(null)
     setFetchingCampaignInfo(true)
     try {
-      const info = await fetchCampaignInfo(campaignUrl)
+      const info = await fetchCampaignInfo(campaignUrl, controller.signal)
       const allNull =
         info.storeName === null &&
         info.sponsoredItems === null &&
@@ -166,13 +174,19 @@ export default function VisitForm({
         updateField('reviewDeadline', parseDateString(info.reviewDeadline))
       }
     } catch (err) {
+      if (controller.signal.aborted) return
       console.error(err)
       setCampaignFetchError(
         err instanceof Error ? err.message : '정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.',
       )
     } finally {
+      fetchControllerRef.current = null
       setFetchingCampaignInfo(false)
     }
+  }
+
+  function handleCancelFetch() {
+    fetchControllerRef.current?.abort()
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -460,9 +474,14 @@ export default function VisitForm({
 
       {fetchingCampaignInfo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="flex items-center gap-2 rounded-lg bg-surface px-4 py-3 text-sm text-ink">
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-blue" />
-            가져오는 중...
+          <div className="flex w-64 flex-col items-center gap-3.5 rounded-lg bg-surface px-7 py-6">
+            <div className="flex items-center gap-2.5 text-sm text-ink">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-blue" />
+              가져오는 중...
+            </div>
+            <Button type="button" variant="secondary" onClick={handleCancelFetch} className="w-full">
+              취소
+            </Button>
           </div>
         </div>
       )}
