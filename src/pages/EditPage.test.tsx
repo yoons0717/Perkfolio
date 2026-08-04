@@ -122,18 +122,21 @@ describe('EditPage view mode', () => {
     )
   })
 
-  it('shows review types joined by comma', async () => {
+  it('shows review types as checked, disabled checkboxes', async () => {
     vi.mocked(getVisit).mockResolvedValue(makeVisit({ reviewTypes: ['블로그', '릴스'] }))
     renderEditPage()
     await screen.findByRole('heading', { name: '카페 온도' })
-    expect(screen.getByText('블로그, 릴스')).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: '블로그' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: '릴스' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: '클립' })).not.toBeChecked()
   })
 
-  it('shows "-" for review types when none are set', async () => {
+  it('shows every review type checkbox unchecked when none are set', async () => {
     vi.mocked(getVisit).mockResolvedValue(makeVisit({ reviewTypes: [] }))
     renderEditPage()
     await screen.findByRole('heading', { name: '카페 온도' })
-    expect(screen.getByText('리뷰 타입').nextElementSibling).toHaveTextContent('-')
+    expect(screen.getByRole('checkbox', { name: '블로그' })).not.toBeChecked()
+    expect(screen.getByRole('checkbox', { name: '릴스' })).not.toBeChecked()
   })
 
   it('numbers post URL rows when there is more than one', async () => {

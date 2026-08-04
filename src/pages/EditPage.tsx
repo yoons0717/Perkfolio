@@ -11,6 +11,7 @@ import { formatWon } from '../lib/format'
 import { deadlineDisplay } from '../lib/statusStyle'
 import { confirmAndDelete } from '../hooks/useVisitActions'
 import { getVisit, updateVisit } from '../lib/visits'
+import { reviewTypes as reviewTypeOptions } from '../types/visit'
 import type { NewVisit, Visit } from '../types/visit'
 
 const viewBoxClass = 'rounded-lg border border-line px-3 py-2'
@@ -164,6 +165,8 @@ export default function EditPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3">
+          <ViewLinkField label="체험단 URL" href={visit.campaignUrl} />
+
           <div className="grid grid-cols-2 gap-3">
             <ViewField label="체험(예정)일" value={visit.visitDate ?? '-'} />
             <ViewField label="플랫폼" value={visit.platform} />
@@ -185,10 +188,43 @@ export default function EditPage() {
             <ViewField label="카테고리" value={visit.category} />
           </div>
 
-          <ViewField
-            label="리뷰 타입"
-            value={visit.reviewTypes.length > 0 ? visit.reviewTypes.join(', ') : '-'}
-          />
+          <div className="flex flex-col gap-1 text-sm">
+            <span className="text-muted">리뷰 타입</span>
+            <div role="group" aria-label="리뷰 타입" className="flex flex-wrap gap-x-4 gap-y-2">
+              {reviewTypeOptions.map((rt) => {
+                const checked = visit.reviewTypes.includes(rt)
+                return (
+                  <div key={rt} className="flex items-center gap-1.5">
+                    <span
+                      role="checkbox"
+                      aria-checked={checked}
+                      aria-label={rt}
+                      className={`flex h-4 w-4 items-center justify-center rounded border ${
+                        checked ? 'border-blue bg-blue' : 'border-line'
+                      }`}
+                    >
+                      {checked && (
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </span>
+                    <span aria-hidden="true">{rt}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
 
           <ViewLinkField label="가게 정보 URL" href={visit.storeInfoUrl} />
 
@@ -209,7 +245,6 @@ export default function EditPage() {
 
         <div className="flex flex-col gap-3 border-t border-line pt-4">
           <p className={sectionLabelClass}>링크</p>
-          <ViewLinkField label="체험단 URL" href={visit.campaignUrl} />
           {visit.postUrls.map((url, i) => (
             <ViewLinkField
               key={i}
