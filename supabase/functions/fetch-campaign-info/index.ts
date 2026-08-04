@@ -72,11 +72,13 @@ export async function handleRequest(req: Request, deps: Deps): Promise<Response>
       } finally {
         clearTimeout(timeout)
       }
-    } catch {
+    } catch (fetchErr) {
+      console.error(`target fetch threw for ${parsedUrl.hostname}:`, fetchErr)
       return jsonResponse({ error: GENERIC_FETCH_ERROR }, 502)
     }
 
     if (!res.ok) {
+      console.error(`target fetch returned non-ok for ${parsedUrl.hostname}: ${res.status} ${res.statusText}`)
       return jsonResponse({ error: GENERIC_FETCH_ERROR }, 502)
     }
 
