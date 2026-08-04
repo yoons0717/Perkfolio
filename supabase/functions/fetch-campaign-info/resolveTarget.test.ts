@@ -1,22 +1,22 @@
 import { assertEquals, assertExists } from 'jsr:@std/assert'
 import { resolveTarget } from './resolveTarget.ts'
 
-Deno.test('resolves dinnerqueen.net to 디너의여왕', () => {
+Deno.test('resolves dinnerqueen.net to the dinnerqueen parser', () => {
   const target = resolveTarget('dinnerqueen.net')
   assertExists(target)
-  assertEquals(target.platform, '디너의여왕')
+  assertEquals(target.parse('').platform, '디너의여왕')
 })
 
-Deno.test('resolves www.dinnerqueen.net to 디너의여왕', () => {
+Deno.test('resolves www.dinnerqueen.net to the dinnerqueen parser', () => {
   const target = resolveTarget('www.dinnerqueen.net')
   assertExists(target)
-  assertEquals(target.platform, '디너의여왕')
+  assertEquals(target.parse('').platform, '디너의여왕')
 })
 
-Deno.test('resolves the punycode hostname to 강남맛집', () => {
+Deno.test('resolves the punycode hostname to the gangnammatzip parser', () => {
   const target = resolveTarget('xn--939au0g4vj8sq.net')
   assertExists(target)
-  assertEquals(target.platform, '강남맛집')
+  assertEquals(target.parse('').platform, '강남맛집')
 })
 
 Deno.test('returns null for an unsupported hostname', () => {

@@ -93,4 +93,11 @@ describe('fetchCampaignInfo', () => {
       '정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.',
     )
   })
+
+  it('throws a generic message when the response data is missing or malformed', async () => {
+    vi.mocked(supabase.functions.invoke).mockResolvedValue({ data: undefined, error: null } as never)
+    await expect(fetchCampaignInfo('https://dinnerqueen.net/taste/1')).rejects.toThrow(
+      '정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.',
+    )
+  })
 })

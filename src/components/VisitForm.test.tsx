@@ -378,6 +378,15 @@ describe('VisitForm 체험단 URL 가져오기', () => {
     expect(screen.getByRole('button', { name: '가져오기' })).toBeDisabled()
   })
 
+  it('shows a guide message about the supported sites by default', () => {
+    renderForm()
+    expect(
+      screen.getByText(
+        '디너의여왕·강남맛집 URL을 붙여넣으면 업체명·체험내역·마감일·예약정보를 자동으로 채워드려요.',
+      ),
+    ).toBeInTheDocument()
+  })
+
   it('shows an error and does not call fetchCampaignInfo for an unsupported URL', async () => {
     vi.mocked(detectSupportedPlatform).mockReturnValue(null)
     renderForm()

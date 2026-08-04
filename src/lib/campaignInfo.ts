@@ -37,5 +37,8 @@ export async function fetchCampaignInfo(url: string): Promise<CampaignInfo> {
     }
     throw error
   }
+  if (!data || typeof data.platform !== 'string') {
+    throw new Error('정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.')
+  }
   return data
 }

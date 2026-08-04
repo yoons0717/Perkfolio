@@ -381,26 +381,34 @@ export default function VisitForm({
       <div className="flex flex-col gap-3 border-t border-line pt-4">
         <p className={sectionLabelClass}>링크</p>
 
-        <FormField label="체험단 URL (선택)">
-          <div className="flex gap-2">
-            <input
-              type="url"
-              value={campaignUrl}
-              onChange={(e) => updateField('campaignUrl', e.target.value)}
-              className={`flex-1 ${compactInputClass}`}
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleFetchCampaignInfo}
-              disabled={campaignUrl.trim() === '' || fetchingCampaignInfo}
-              className="shrink-0 px-3 text-sm"
-            >
-              {fetchingCampaignInfo ? '가져오는 중...' : '가져오기'}
-            </Button>
-          </div>
-          {campaignFetchError && <p className="mt-1 text-xs text-danger">{campaignFetchError}</p>}
-        </FormField>
+        <div className="flex flex-col gap-1">
+          <FormField label="체험단 URL (선택)">
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={campaignUrl}
+                onChange={(e) => updateField('campaignUrl', e.target.value)}
+                className={`flex-1 ${compactInputClass}`}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleFetchCampaignInfo}
+                disabled={campaignUrl.trim() === '' || fetchingCampaignInfo}
+                className="shrink-0 px-3 text-sm"
+              >
+                {fetchingCampaignInfo ? '가져오는 중...' : '가져오기'}
+              </Button>
+            </div>
+          </FormField>
+          {campaignFetchError ? (
+            <p className="text-xs text-danger">{campaignFetchError}</p>
+          ) : (
+            <p className="text-xs text-muted">
+              디너의여왕·강남맛집 URL을 붙여넣으면 업체명·체험내역·마감일·예약정보를 자동으로 채워드려요.
+            </p>
+          )}
+        </div>
 
         <div className="flex flex-col gap-1 text-sm">
           <span>포스팅 링크 (선택)</span>
