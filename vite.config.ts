@@ -10,6 +10,8 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
     // .claude/worktrees holds sibling git worktrees for other in-progress
     // branches — without this, their test files get picked up too.
-    exclude: [...configDefaults.exclude, '.claude/**'],
+    // supabase/functions holds Deno Edge Function tests (Deno.test, jsr: imports) —
+    // run with `deno test`, not Vitest.
+    exclude: [...configDefaults.exclude, '.claude/**', 'supabase/functions/**'],
   },
 })

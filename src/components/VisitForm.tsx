@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -7,6 +7,7 @@ import Select from './Select'
 import { inputClass, selectClass, sectionLabelClass } from './formStyles'
 import { toDateString } from '../lib/format'
 import { statusOrder } from '../lib/statusStyle'
+import { detectSupportedPlatform, fetchCampaignInfo } from '../lib/campaignInfo'
 import { categories, platforms, reviewTypes as reviewTypeOptions } from '../types/visit'
 import type { Category, NewVisit, Platform, ReviewType, VisitStatus } from '../types/visit'
 
@@ -89,6 +90,13 @@ export default function VisitForm({
   const [fields, setFields] = useState<FormFields>(() => initialFormFields(initialValues))
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [fetchingCampaignInfo, setFetchingCampaignInfo] = useState(false)
+  const [campaignFetchError, setCampaignFetchError] = useState<string | null>(null)
+  const fetchControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => fetchControllerRef.current?.abort()
+  }, [])
 
   function updateField<K extends keyof FormFields>(key: K, value: FormFields[K]) {
     setFields((f) => ({ ...f, [key]: value }))
@@ -136,6 +144,51 @@ export default function VisitForm({
     status,
   } = fields
 
+  async function handleFetchCampaignInfo() {
+    if (!detectSupportedPlatform(campaignUrl)) {
+      setCampaignFetchError('지원하지 않는 사이트예요. 직접 입력해주세요.')
+      return
+    }
+
+    const controller = new AbortController()
+    fetchControllerRef.current = controller
+
+    setCampaignFetchError(null)
+    setFetchingCampaignInfo(true)
+    try {
+      const info = await fetchCampaignInfo(campaignUrl, controller.signal)
+      const allNull =
+        info.storeName === null &&
+        info.sponsoredItems === null &&
+        info.reviewDeadline === null &&
+        info.reservationNote === null
+      if (allNull) {
+        setCampaignFetchError('정보를 가져오지 못했어요. 직접 입력해주세요.')
+        return
+      }
+      updateField('platform', info.platform)
+      if (info.storeName !== null) updateField('storeName', info.storeName)
+      if (info.sponsoredItems !== null) updateField('sponsoredItems', info.sponsoredItems)
+      if (info.reservationNote !== null) updateField('reservationNote', info.reservationNote)
+      if (info.reviewDeadline !== null) {
+        updateField('reviewDeadline', parseDateString(info.reviewDeadline))
+      }
+    } catch (err) {
+      if (controller.signal.aborted) return
+      console.error(err)
+      setCampaignFetchError(
+        err instanceof Error ? err.message : '정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.',
+      )
+    } finally {
+      fetchControllerRef.current = null
+      setFetchingCampaignInfo(false)
+    }
+  }
+
+  function handleCancelFetch() {
+    fetchControllerRef.current?.abort()
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     // platform/category/status/reviewDeadline are guaranteed non-empty here
@@ -176,224 +229,262 @@ export default function VisitForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label="체험(예정)일">
-            <DatePicker
-              selected={visitDate}
-              onChange={(date: Date | null) => updateField('visitDate', date)}
-              dateFormat="yyyy-MM-dd"
-              className={`w-full ${compactInputClass}`}
-              isClearable
-            />
-          </FormField>
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4" inert={fetchingCampaignInfo || undefined}>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <FormField label="체험단 URL (선택)">
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={campaignUrl}
+                    onChange={(e) => updateField('campaignUrl', e.target.value)}
+                    className={`flex-1 ${compactInputClass}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleFetchCampaignInfo}
+                    disabled={campaignUrl.trim() === '' || fetchingCampaignInfo}
+                    className="shrink-0 px-3 text-sm"
+                  >
+                    {fetchingCampaignInfo ? '가져오는 중...' : '가져오기'}
+                  </Button>
+                </div>
+              </FormField>
+              {campaignFetchError ? (
+                <p className="text-xs text-danger">{campaignFetchError}</p>
+              ) : (
+                <p className="text-xs text-muted">
+                  디너의여왕·강남맛집 URL을 붙여넣으면 업체명·체험내역·마감일·예약정보를 자동으로 채워드려요.
+                </p>
+              )}
+            </div>
 
-          <FormField label="플랫폼">
-            <Select
-              aria-label="플랫폼"
-              required
-              value={platform}
-              onChange={(e) => updateField('platform', e.target.value as Platform)}
-              className={compactSelectClass}
-            >
-              <option value="" disabled hidden>
-                선택하세요
-              </option>
-              {platforms.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-        </div>
-
-        <FormField label="마감일">
-          <DatePicker
-            selected={reviewDeadline}
-            onChange={(date: Date | null) => updateField('reviewDeadline', date)}
-            dateFormat="yyyy-MM-dd"
-            className={`w-full ${compactInputClass}`}
-            required
-          />
-        </FormField>
-
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label="업체명">
-            <input
-              type="text"
-              value={storeName}
-              onChange={(e) => updateField('storeName', e.target.value)}
-              required
-              className={compactInputClass}
-            />
-          </FormField>
-
-          <FormField label="카테고리">
-            <Select
-              aria-label="카테고리"
-              required
-              value={category}
-              onChange={(e) => updateField('category', e.target.value as Category)}
-              className={compactSelectClass}
-            >
-              <option value="" disabled hidden>
-                선택하세요
-              </option>
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-        </div>
-
-        <div className="flex flex-col gap-1 text-sm">
-          <span>리뷰 타입</span>
-          <div role="group" aria-label="리뷰 타입" className="flex flex-wrap gap-x-4 gap-y-2">
-            {reviewTypeOptions.map((rt) => (
-              <label key={rt} className="flex items-center gap-1.5">
-                <input
-                  type="checkbox"
-                  checked={reviewTypes.includes(rt)}
-                  onChange={() => toggleReviewType(rt)}
-                  className="h-4 w-4 accent-blue"
+            <div className="grid grid-cols-2 gap-3">
+              <FormField label="체험(예정)일">
+                <DatePicker
+                  selected={visitDate}
+                  onChange={(date: Date | null) => updateField('visitDate', date)}
+                  dateFormat="yyyy-MM-dd"
+                  className={`w-full ${compactInputClass}`}
+                  isClearable
                 />
-                {rt}
-              </label>
-            ))}
+              </FormField>
+
+              <FormField label="플랫폼">
+                <Select
+                  aria-label="플랫폼"
+                  required
+                  value={platform}
+                  onChange={(e) => updateField('platform', e.target.value as Platform)}
+                  className={compactSelectClass}
+                >
+                  <option value="" disabled hidden>
+                    선택하세요
+                  </option>
+                  {platforms.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+            </div>
+
+            <FormField label="마감일">
+              <DatePicker
+                selected={reviewDeadline}
+                onChange={(date: Date | null) => updateField('reviewDeadline', date)}
+                dateFormat="yyyy-MM-dd"
+                className={`w-full ${compactInputClass}`}
+                required
+              />
+            </FormField>
+
+            <div className="grid grid-cols-2 gap-3">
+              <FormField label="업체명">
+                <input
+                  type="text"
+                  value={storeName}
+                  onChange={(e) => updateField('storeName', e.target.value)}
+                  required
+                  className={compactInputClass}
+                />
+              </FormField>
+
+              <FormField label="카테고리">
+                <Select
+                  aria-label="카테고리"
+                  required
+                  value={category}
+                  onChange={(e) => updateField('category', e.target.value as Category)}
+                  className={compactSelectClass}
+                >
+                  <option value="" disabled hidden>
+                    선택하세요
+                  </option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+            </div>
+
+            <div className="flex flex-col gap-1 text-sm">
+              <span>리뷰 타입</span>
+              <div role="group" aria-label="리뷰 타입" className="flex flex-wrap gap-x-4 gap-y-2">
+                {reviewTypeOptions.map((rt) => (
+                  <label key={rt} className="flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      checked={reviewTypes.includes(rt)}
+                      onChange={() => toggleReviewType(rt)}
+                      className="h-4 w-4 accent-blue"
+                    />
+                    {rt}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <FormField label="가게 정보 URL (선택)">
+              <input
+                type="url"
+                value={storeInfoUrl}
+                onChange={(e) => updateField('storeInfoUrl', e.target.value)}
+                className={compactInputClass}
+              />
+            </FormField>
+
+            <FormField label="체험 내역 (선택)">
+              <textarea
+                placeholder="예: 파스타 2, 음료 2"
+                value={sponsoredItems}
+                onChange={(e) => updateField('sponsoredItems', e.target.value)}
+                rows={2}
+                className={compactInputClass}
+              />
+            </FormField>
+
+            <FormField label="예약 정보 (선택)">
+              <textarea
+                placeholder="예: 예약 필수, 저녁 7시"
+                value={reservationNote}
+                onChange={(e) => updateField('reservationNote', e.target.value)}
+                rows={2}
+                className={compactInputClass}
+              />
+            </FormField>
+
+            <div className="grid grid-cols-2 gap-3">
+              <FormField label="체험가">
+                <input
+                  type="number"
+                  min="0"
+                  value={retailValue}
+                  onChange={(e) => updateField('retailValue', e.target.value)}
+                  required
+                  className={compactInputClass}
+                />
+              </FormField>
+
+              <FormField label="추가결제액">
+                <input
+                  type="number"
+                  min="0"
+                  value={extraPayment}
+                  onChange={(e) => updateField('extraPayment', e.target.value)}
+                  className={compactInputClass}
+                />
+              </FormField>
+            </div>
+
+            <FormField label="상태">
+              <Select
+                aria-label="상태"
+                required
+                value={status}
+                onChange={(e) => updateField('status', e.target.value as VisitStatus)}
+                className={compactSelectClass}
+              >
+                <option value="" disabled hidden>
+                  선택하세요
+                </option>
+                {statusOrder.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
           </div>
-        </div>
 
-        <FormField label="가게 정보 URL (선택)">
-          <input
-            type="url"
-            value={storeInfoUrl}
-            onChange={(e) => updateField('storeInfoUrl', e.target.value)}
-            className={compactInputClass}
-          />
-        </FormField>
+          <div className="flex flex-col gap-3 border-t border-line pt-4">
+            <p className={sectionLabelClass}>링크</p>
 
-        <FormField label="체험 내역 (선택)">
-          <input
-            type="text"
-            placeholder="예: 파스타 2, 음료 2"
-            value={sponsoredItems}
-            onChange={(e) => updateField('sponsoredItems', e.target.value)}
-            className={compactInputClass}
-          />
-        </FormField>
-
-        <FormField label="예약 정보 (선택)">
-          <input
-            type="text"
-            placeholder="예: 예약 필수, 저녁 7시"
-            value={reservationNote}
-            onChange={(e) => updateField('reservationNote', e.target.value)}
-            className={compactInputClass}
-          />
-        </FormField>
-
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label="체험가">
-            <input
-              type="number"
-              min="0"
-              value={retailValue}
-              onChange={(e) => updateField('retailValue', e.target.value)}
-              required
-              className={compactInputClass}
-            />
-          </FormField>
-
-          <FormField label="추가결제액">
-            <input
-              type="number"
-              min="0"
-              value={extraPayment}
-              onChange={(e) => updateField('extraPayment', e.target.value)}
-              className={compactInputClass}
-            />
-          </FormField>
-        </div>
-
-        <FormField label="상태">
-          <Select
-            aria-label="상태"
-            required
-            value={status}
-            onChange={(e) => updateField('status', e.target.value as VisitStatus)}
-            className={compactSelectClass}
-          >
-            <option value="" disabled hidden>
-              선택하세요
-            </option>
-            {statusOrder.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </Select>
-        </FormField>
-      </div>
-
-      <div className="flex flex-col gap-3 border-t border-line pt-4">
-        <p className={sectionLabelClass}>링크</p>
-
-        <FormField label="체험단 URL (선택)">
-          <input
-            type="url"
-            value={campaignUrl}
-            onChange={(e) => updateField('campaignUrl', e.target.value)}
-            className={compactInputClass}
-          />
-        </FormField>
-
-        <div className="flex flex-col gap-1 text-sm">
-          <span>포스팅 링크 (선택)</span>
-          <div className="flex flex-col gap-2">
-            {postUrls.map((url, i) => (
-              <div key={i} className="flex gap-2">
-                <input
-                  type="url"
-                  aria-label={`포스팅 링크 ${i + 1}`}
-                  value={url}
-                  onChange={(e) => updatePostUrl(i, e.target.value)}
-                  className={`flex-1 ${compactInputClass}`}
-                />
+            <div className="flex flex-col gap-1 text-sm">
+              <span>포스팅 링크 (선택)</span>
+              <div className="flex flex-col gap-2">
+                {postUrls.map((url, i) => (
+                  <div key={i} className="flex gap-2">
+                    <input
+                      type="url"
+                      aria-label={`포스팅 링크 ${i + 1}`}
+                      value={url}
+                      onChange={(e) => updatePostUrl(i, e.target.value)}
+                      className={`flex-1 ${compactInputClass}`}
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => removePostUrl(i)}
+                      aria-label={`포스팅 링크 ${i + 1} 삭제`}
+                      className="shrink-0 px-3"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                ))}
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => removePostUrl(i)}
-                  aria-label={`포스팅 링크 ${i + 1} 삭제`}
-                  className="shrink-0 px-3"
+                  onClick={addPostUrl}
+                  className="self-start border-dashed text-sm text-blue hover:bg-blue-bg"
                 >
-                  ✕
+                  + 링크 추가
                 </Button>
               </div>
-            ))}
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={addPostUrl}
-              className="self-start border-dashed text-sm text-blue hover:bg-blue-bg"
-            >
-              + 링크 추가
+            </div>
+          </div>
+
+          {error && <p className="text-sm text-danger">{error}</p>}
+
+          <div className="flex items-center gap-3">
+            <Button type="submit" disabled={submitting} className="flex-1">
+              {submitting ? pendingLabel : submitLabel}
+            </Button>
+            {footerExtra?.(submitting)}
+          </div>
+        </div>
+      </form>
+
+      {fetchingCampaignInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="flex w-64 flex-col items-center gap-3.5 rounded-lg bg-surface px-7 py-6">
+            <div className="flex items-center gap-2.5 text-sm text-ink">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-blue" />
+              가져오는 중...
+            </div>
+            <Button type="button" variant="secondary" onClick={handleCancelFetch} className="w-full">
+              취소
             </Button>
           </div>
         </div>
-      </div>
-
-      {error && <p className="text-sm text-danger">{error}</p>}
-
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={submitting} className="flex-1">
-          {submitting ? pendingLabel : submitLabel}
-        </Button>
-        {footerExtra?.(submitting)}
-      </div>
-    </form>
+      )}
+    </>
   )
 }
