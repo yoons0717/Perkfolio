@@ -7,6 +7,7 @@ import Select from './Select'
 import { inputClass, selectClass, sectionLabelClass } from './formStyles'
 import { toDateString } from '../lib/format'
 import { statusOrder } from '../lib/statusStyle'
+import { detectSupportedPlatform, fetchCampaignInfo } from '../lib/campaignInfo'
 import { categories, platforms, reviewTypes as reviewTypeOptions } from '../types/visit'
 import type { Category, NewVisit, Platform, ReviewType, VisitStatus } from '../types/visit'
 
@@ -89,6 +90,8 @@ export default function VisitForm({
   const [fields, setFields] = useState<FormFields>(() => initialFormFields(initialValues))
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [fetchingCampaignInfo, setFetchingCampaignInfo] = useState(false)
+  const [campaignFetchError, setCampaignFetchError] = useState<string | null>(null)
 
   function updateField<K extends keyof FormFields>(key: K, value: FormFields[K]) {
     setFields((f) => ({ ...f, [key]: value }))
@@ -135,6 +138,42 @@ export default function VisitForm({
     reviewDeadline,
     status,
   } = fields
+
+  async function handleFetchCampaignInfo() {
+    if (!detectSupportedPlatform(campaignUrl)) {
+      setCampaignFetchError('지원하지 않는 사이트예요. 직접 입력해주세요.')
+      return
+    }
+
+    setCampaignFetchError(null)
+    setFetchingCampaignInfo(true)
+    try {
+      const info = await fetchCampaignInfo(campaignUrl)
+      const allNull =
+        info.storeName === null &&
+        info.sponsoredItems === null &&
+        info.reviewDeadline === null &&
+        info.reservationNote === null
+      if (allNull) {
+        setCampaignFetchError('정보를 가져오지 못했어요. 직접 입력해주세요.')
+        return
+      }
+      updateField('platform', info.platform)
+      if (info.storeName !== null) updateField('storeName', info.storeName)
+      if (info.sponsoredItems !== null) updateField('sponsoredItems', info.sponsoredItems)
+      if (info.reservationNote !== null) updateField('reservationNote', info.reservationNote)
+      if (info.reviewDeadline !== null) {
+        updateField('reviewDeadline', parseDateString(info.reviewDeadline))
+      }
+    } catch (err) {
+      console.error(err)
+      setCampaignFetchError(
+        err instanceof Error ? err.message : '정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.',
+      )
+    } finally {
+      setFetchingCampaignInfo(false)
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -343,12 +382,24 @@ export default function VisitForm({
         <p className={sectionLabelClass}>링크</p>
 
         <FormField label="체험단 URL (선택)">
-          <input
-            type="url"
-            value={campaignUrl}
-            onChange={(e) => updateField('campaignUrl', e.target.value)}
-            className={compactInputClass}
-          />
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={campaignUrl}
+              onChange={(e) => updateField('campaignUrl', e.target.value)}
+              className={`flex-1 ${compactInputClass}`}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleFetchCampaignInfo}
+              disabled={campaignUrl.trim() === '' || fetchingCampaignInfo}
+              className="shrink-0 px-3 text-sm"
+            >
+              {fetchingCampaignInfo ? '가져오는 중...' : '가져오기'}
+            </Button>
+          </div>
+          {campaignFetchError && <p className="mt-1 text-xs text-danger">{campaignFetchError}</p>}
         </FormField>
 
         <div className="flex flex-col gap-1 text-sm">

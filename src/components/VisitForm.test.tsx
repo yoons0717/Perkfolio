@@ -1,8 +1,16 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import VisitForm from './VisitForm'
 import type { NewVisit } from '../types/visit'
+import { detectSupportedPlatform, fetchCampaignInfo } from '../lib/campaignInfo'
+
+vi.mock('../lib/campaignInfo', () => ({
+  detectSupportedPlatform: vi.fn(),
+  fetchCampaignInfo: vi.fn(),
+}))
+
+afterEach(() => vi.clearAllMocks())
 
 function renderForm(onSubmit = vi.fn().mockResolvedValue(undefined)) {
   render(<VisitForm onSubmit={onSubmit} submitLabel="저장" pendingLabel="저장 중..." />)
@@ -361,5 +369,104 @@ describe('VisitForm with initialValues', () => {
     expect(screen.getByLabelText('상태')).toHaveValue('리뷰완료')
     expect(screen.getByLabelText('체험(예정)일')).toHaveValue('2026-08-15')
     expect(screen.getByLabelText('마감일')).toHaveValue('2026-08-20')
+  })
+})
+
+describe('VisitForm 체험단 URL 가져오기', () => {
+  it('disables the 가져오기 button when the campaign URL is empty', () => {
+    renderForm()
+    expect(screen.getByRole('button', { name: '가져오기' })).toBeDisabled()
+  })
+
+  it('shows an error and does not call fetchCampaignInfo for an unsupported URL', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue(null)
+    renderForm()
+    await userEvent.type(screen.getByLabelText('체험단 URL (선택)'), 'https://revu.net/campaigns/1')
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+
+    expect(await screen.findByText('지원하지 않는 사이트예요. 직접 입력해주세요.')).toBeInTheDocument()
+    expect(fetchCampaignInfo).not.toHaveBeenCalled()
+  })
+
+  it('fills matching fields when fetchCampaignInfo succeeds', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue('디너의여왕')
+    vi.mocked(fetchCampaignInfo).mockResolvedValue({
+      platform: '디너의여왕',
+      storeName: '최가네샤브버섯칼국수',
+      sponsoredItems: '스페셜샤브샤브 2인',
+      reviewDeadline: '2026-08-19',
+      reservationNote: '예약 필수',
+    })
+    renderForm()
+    await userEvent.type(
+      screen.getByLabelText('체험단 URL (선택)'),
+      'https://dinnerqueen.net/taste/1477357',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+
+    expect(await screen.findByLabelText('업체명')).toHaveValue('최가네샤브버섯칼국수')
+    expect(screen.getByLabelText('플랫폼')).toHaveValue('디너의여왕')
+    expect(screen.getByLabelText('체험 내역 (선택)')).toHaveValue('스페셜샤브샤브 2인')
+    expect(screen.getByLabelText('예약 정보 (선택)')).toHaveValue('예약 필수')
+    expect(screen.getByLabelText('마감일')).toHaveValue('2026-08-19')
+  })
+
+  it('keeps existing field values when the response has null for that field', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue('디너의여왕')
+    vi.mocked(fetchCampaignInfo).mockResolvedValue({
+      platform: '디너의여왕',
+      storeName: null,
+      sponsoredItems: '스페셜샤브샤브 2인',
+      reviewDeadline: null,
+      reservationNote: null,
+    })
+    renderForm()
+    await userEvent.type(screen.getByLabelText('업체명'), '기존 업체명')
+    await userEvent.type(
+      screen.getByLabelText('체험단 URL (선택)'),
+      'https://dinnerqueen.net/taste/1477357',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+
+    expect(await screen.findByLabelText('체험 내역 (선택)')).toHaveValue('스페셜샤브샤브 2인')
+    expect(screen.getByLabelText('업체명')).toHaveValue('기존 업체명')
+  })
+
+  it('shows an error and changes no field when every response field is null', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue('디너의여왕')
+    vi.mocked(fetchCampaignInfo).mockResolvedValue({
+      platform: '디너의여왕',
+      storeName: null,
+      sponsoredItems: null,
+      reviewDeadline: null,
+      reservationNote: null,
+    })
+    renderForm()
+    await userEvent.type(screen.getByLabelText('업체명'), '기존 업체명')
+    await userEvent.type(
+      screen.getByLabelText('체험단 URL (선택)'),
+      'https://dinnerqueen.net/taste/1477357',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+
+    expect(await screen.findByText('정보를 가져오지 못했어요. 직접 입력해주세요.')).toBeInTheDocument()
+    expect(screen.getByLabelText('업체명')).toHaveValue('기존 업체명')
+  })
+
+  it('shows the thrown error message when fetchCampaignInfo rejects', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue('디너의여왕')
+    vi.mocked(fetchCampaignInfo).mockRejectedValue(
+      new Error('정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.'),
+    )
+    renderForm()
+    await userEvent.type(
+      screen.getByLabelText('체험단 URL (선택)'),
+      'https://dinnerqueen.net/taste/1477357',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+
+    expect(
+      await screen.findByText('정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.'),
+    ).toBeInTheDocument()
   })
 })
