@@ -478,4 +478,38 @@ describe('VisitForm 체험단 URL 가져오기', () => {
       await screen.findByText('정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.'),
     ).toBeInTheDocument()
   })
+
+  it('shows a full-form overlay and marks the form inert while fetching', async () => {
+    vi.mocked(detectSupportedPlatform).mockReturnValue('디너의여왕')
+    let resolveFetch!: (info: Awaited<ReturnType<typeof fetchCampaignInfo>>) => void
+    vi.mocked(fetchCampaignInfo).mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve
+      }),
+    )
+    renderForm()
+    await userEvent.type(
+      screen.getByLabelText('체험단 URL (선택)'),
+      'https://dinnerqueen.net/taste/1477357',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '가져오기' }))
+
+    const pendingButton = await screen.findByRole('button', { name: /가져오는 중/ })
+    expect(pendingButton).toBeDisabled()
+    // The overlay renders its own "가져오는 중..." text alongside the button's,
+    // so more than one match is expected here.
+    expect(screen.getAllByText('가져오는 중...').length).toBeGreaterThan(0)
+    expect(screen.getByLabelText('업체명').closest('[inert]')).not.toBeNull()
+
+    resolveFetch({
+      platform: '디너의여왕',
+      storeName: '최가네샤브버섯칼국수',
+      sponsoredItems: null,
+      reviewDeadline: null,
+      reservationNote: null,
+    })
+
+    await screen.findByRole('button', { name: '가져오기' })
+    expect(screen.getByLabelText('업체명').closest('[inert]')).toBeNull()
+  })
 })
