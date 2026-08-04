@@ -11,6 +11,8 @@ const corsHeaders = {
 }
 
 const FETCH_TIMEOUT_MS = 10000
+const MAX_FETCH_ATTEMPTS = 2
+const RETRY_DELAY_MS = 1000
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
 
@@ -19,6 +21,7 @@ const GENERIC_FETCH_ERROR = '정보를 가져오지 못했어요. 잠시 후 다
 type Deps = {
   verifyUser: (authHeader: string | null) => Promise<boolean>
   fetchImpl: typeof fetch
+  retryDelayMs?: number
 }
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -26,6 +29,23 @@ function jsonResponse(body: unknown, status = 200): Response {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function fetchWithTimeout(fetchImpl: typeof fetch, url: string): Promise<Response> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+  try {
+    return await fetchImpl(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      signal: controller.signal,
+    })
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 export async function handleRequest(req: Request, deps: Deps): Promise<Response> {
@@ -60,25 +80,30 @@ export async function handleRequest(req: Request, deps: Deps): Promise<Response>
       return jsonResponse({ error: '지원하지 않는 사이트예요. 직접 입력해주세요.' }, 400)
     }
 
-    let res: Response
-    try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+    const retryDelayMs = deps.retryDelayMs ?? RETRY_DELAY_MS
+    let res: Response | null = null
+    for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
       try {
-        res = await deps.fetchImpl(parsedUrl.toString(), {
-          headers: { 'User-Agent': USER_AGENT },
-          signal: controller.signal,
-        })
-      } finally {
-        clearTimeout(timeout)
+        const candidate = await fetchWithTimeout(deps.fetchImpl, parsedUrl.toString())
+        if (candidate.ok) {
+          res = candidate
+          break
+        }
+        console.error(
+          `target fetch returned non-ok for ${parsedUrl.hostname} (attempt ${attempt}/${MAX_FETCH_ATTEMPTS}): ${candidate.status} ${candidate.statusText}`,
+        )
+      } catch (fetchErr) {
+        console.error(
+          `target fetch threw for ${parsedUrl.hostname} (attempt ${attempt}/${MAX_FETCH_ATTEMPTS}):`,
+          fetchErr,
+        )
       }
-    } catch (fetchErr) {
-      console.error(`target fetch threw for ${parsedUrl.hostname}:`, fetchErr)
-      return jsonResponse({ error: GENERIC_FETCH_ERROR }, 502)
+      if (attempt < MAX_FETCH_ATTEMPTS) {
+        await sleep(retryDelayMs)
+      }
     }
 
-    if (!res.ok) {
-      console.error(`target fetch returned non-ok for ${parsedUrl.hostname}: ${res.status} ${res.statusText}`)
+    if (!res) {
       return jsonResponse({ error: GENERIC_FETCH_ERROR }, 502)
     }
 

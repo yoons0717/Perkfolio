@@ -80,6 +80,7 @@ Deno.test('returns 502 without parsing when the target site responds non-2xx', a
   const res = await handleRequest(makeReq({ url: 'https://dinnerqueen.net/taste/1' }), {
     verifyUser: () => Promise.resolve(true),
     fetchImpl: () => Promise.resolve(new Response(html, { status: 404 })),
+    retryDelayMs: 0,
   })
   assertEquals(res.status, 502)
   const body = await res.json()
@@ -87,12 +88,33 @@ Deno.test('returns 502 without parsing when the target site responds non-2xx', a
   assertEquals(body.storeName, undefined)
 })
 
-Deno.test('returns 502 when the target fetch throws', async () => {
+Deno.test('returns 502 when every attempt throws', async () => {
   const res = await handleRequest(makeReq({ url: 'https://dinnerqueen.net/taste/1' }), {
     verifyUser: () => Promise.resolve(true),
     fetchImpl: () => Promise.reject(new Error('network down')),
+    retryDelayMs: 0,
   })
   assertEquals(res.status, 502)
+})
+
+Deno.test('retries once and succeeds when the first attempt fails but the second works', async () => {
+  const html = await Deno.readTextFile(
+    new URL('./parsers/fixtures/dinnerqueen-sample.html', import.meta.url),
+  )
+  let callCount = 0
+  const res = await handleRequest(makeReq({ url: 'https://dinnerqueen.net/taste/1477357' }), {
+    verifyUser: () => Promise.resolve(true),
+    fetchImpl: () => {
+      callCount += 1
+      if (callCount === 1) return Promise.reject(new Error('transient network blip'))
+      return Promise.resolve(new Response(html, { status: 200 }))
+    },
+    retryDelayMs: 0,
+  })
+  assertEquals(callCount, 2)
+  assertEquals(res.status, 200)
+  const body = await res.json()
+  assertEquals(body.storeName, '최가네샤브버섯칼국수')
 })
 
 Deno.test('returns parsed campaign info on success', async () => {
