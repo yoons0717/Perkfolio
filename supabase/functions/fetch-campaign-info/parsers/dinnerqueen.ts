@@ -1,0 +1,47 @@
+import { decodeHtmlText, truncate } from './common.ts'
+import type { CampaignInfo } from './common.ts'
+
+function extractStoreName(html: string): string | null {
+  const match = html.match(/<meta property="og:title" content="([^"]*)"/)
+  if (!match) return null
+  let name = decodeHtmlText(match[1])
+  const dashIdx = name.indexOf(' - ')
+  if (dashIdx !== -1) name = name.slice(dashIdx + 3)
+  name = name.replace(/\[[^\]]*\]/g, '').trim()
+  name = name.replace(/\s*\d+차\s*$/, '').trim()
+  return name || null
+}
+
+function extractSponsoredItems(html: string): string | null {
+  const match = html.match(/<strong class="w-600">([^<]*)<\/strong>/)
+  if (!match) return null
+  return truncate(decodeHtmlText(match[1]))
+}
+
+function extractReviewDeadline(html: string): string | null {
+  const labelIdx = html.indexOf('리뷰 기간')
+  if (labelIdx === -1) return null
+  const windowText = html.slice(labelIdx, labelIdx + 700)
+  const matches = [...windowText.matchAll(/(\d{2})\.(\d{2})\.(\d{2})\s*[–-]\s*(\d{2})\.(\d{2})\.(\d{2})/g)]
+  if (matches.length === 0) return null
+  const last = matches[matches.length - 1]
+  const [, , , , endYY, endMM, endDD] = last
+  return `20${endYY}-${endMM}-${endDD}`
+}
+
+function extractReservationNote(html: string): string | null {
+  const spans = [...html.matchAll(/<span class="white-pre-l">([\s\S]*?)<\/span>/g)]
+  const target = spans.find((m) => m[1].includes('예약'))
+  if (!target) return null
+  return truncate(decodeHtmlText(target[1]))
+}
+
+export function parse(html: string): CampaignInfo {
+  return {
+    platform: '디너의여왕',
+    storeName: extractStoreName(html),
+    sponsoredItems: extractSponsoredItems(html),
+    reviewDeadline: extractReviewDeadline(html),
+    reservationNote: extractReservationNote(html),
+  }
+}
