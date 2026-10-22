@@ -24,7 +24,7 @@ export default function WelcomeModal({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="w-full max-w-sm rounded-xl border border-line bg-surface p-6">
-        <h2 className="mb-2 font-display text-xl font-extrabold text-ink">PerkTrack에 오신 걸 환영해요</h2>
+        <h2 className="mb-2 font-display text-xl font-extrabold text-ink">Perkfolio에 오신 걸 환영해요</h2>
         <p className="mb-5 text-sm text-muted">이렇게 시작해보세요.</p>
         <ul className="mb-6 flex flex-col gap-2 text-sm text-ink">
           {steps.map((step) => (

@@ -16,7 +16,7 @@ describe('WelcomeModal', () => {
   it('renders the welcome copy and usage steps', () => {
     render(<WelcomeModal onDismiss={vi.fn()} />)
 
-    expect(screen.getByText('PerkTrack에 오신 걸 환영해요')).toBeInTheDocument()
+    expect(screen.getByText('Perkfolio에 오신 걸 환영해요')).toBeInTheDocument()
     expect(screen.getByText('+ 버튼으로 체험단을 추가해보세요')).toBeInTheDocument()
   })
 

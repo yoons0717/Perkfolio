@@ -29,7 +29,7 @@ export default function NavBar() {
     <nav className="relative border-b border-line bg-surface px-4 py-3 sm:px-6">
       <div className="flex items-center justify-between">
         <Link to="/table" className="font-display text-lg font-extrabold text-ink">
-          Perk<span className="text-blue">Track</span>
+          Perk<span className="text-blue">folio</span>
         </Link>
         <div className="hidden items-center gap-5 font-display text-sm font-semibold sm:flex">
           <Link

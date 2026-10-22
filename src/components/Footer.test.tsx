@@ -38,7 +38,7 @@ describe('Footer', () => {
     } as never)
     render(<Footer />)
 
-    expect(screen.getByText('© 2026 PerkTrack')).toBeInTheDocument()
+    expect(screen.getByText('© 2026 Perkfolio')).toBeInTheDocument()
   })
 
   it('is hidden on mobile so it does not overlap the fixed BottomTabBar, and only shown from sm: up', () => {
@@ -49,6 +49,6 @@ describe('Footer', () => {
     } as never)
     render(<Footer />)
 
-    expect(screen.getByText('© 2026 PerkTrack').closest('footer')).toHaveClass('hidden', 'sm:block')
+    expect(screen.getByText('© 2026 Perkfolio').closest('footer')).toHaveClass('hidden', 'sm:block')
   })
 })

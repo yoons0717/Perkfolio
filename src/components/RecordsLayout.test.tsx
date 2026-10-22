@@ -38,7 +38,7 @@ describe('RecordsLayout', () => {
 
     renderRecordsLayout()
 
-    expect(screen.getByText('PerkTrack에 오신 걸 환영해요')).toBeInTheDocument()
+    expect(screen.getByText('Perkfolio에 오신 걸 환영해요')).toBeInTheDocument()
   })
 
   it('does not show the welcome modal when has_seen_onboarding is already true', () => {
@@ -48,7 +48,7 @@ describe('RecordsLayout', () => {
 
     renderRecordsLayout()
 
-    expect(screen.queryByText('PerkTrack에 오신 걸 환영해요')).not.toBeInTheDocument()
+    expect(screen.queryByText('Perkfolio에 오신 걸 환영해요')).not.toBeInTheDocument()
   })
 
   it('dismisses the modal after clicking 시작하기', async () => {
@@ -60,6 +60,6 @@ describe('RecordsLayout', () => {
     await userEvent.click(screen.getByRole('button', { name: '시작하기' }))
 
     expect(markOnboardingSeen).toHaveBeenCalled()
-    expect(screen.queryByText('PerkTrack에 오신 걸 환영해요')).not.toBeInTheDocument()
+    expect(screen.queryByText('Perkfolio에 오신 걸 환영해요')).not.toBeInTheDocument()
   })
 })
